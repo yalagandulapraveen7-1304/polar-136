@@ -40,65 +40,77 @@ last_explanation_time = 0.0
 # Current global system state snapshot
 current_system_snapshot: Dict[str, Any] = {}
 
+def compute_system_snapshot() -> Dict[str, Any]:
+    global last_explanation, last_explanation_time, current_system_snapshot
+    # 1. Ingest unified telemetry
+    telemetry = ingestion_driver.ingest()
+    guardrail.update_clock(1.0)
+    
+    # 2. Renewable physics potential
+    station = STATIONS.get(telemetry["station_id"], STATIONS["MAITRI"])
+    wind_avail = forecaster.calculate_wind_power(telemetry["wind_speed_ms"], station["wind_capacity_kw"])
+    solar_avail = forecaster.calculate_solar_power(telemetry["solar_irradiance_wm2"], station["solar_capacity_kw"])
+    
+    # 3. Model Predictive Control (SciPy Linear Programming)
+    optimizer_dispatch = optimizer.optimize_dispatch(telemetry, wind_avail, solar_avail)
+    
+    # 4. Deterministic Safety Guardrails
+    guardrail_result = guardrail.enforce_safety(telemetry, optimizer_dispatch)
+    safe_dispatch = guardrail_result["safe_dispatch"]
+    
+    # 5. Groq LLM Decision Explanation (every 30s or immediately upon guardrail trigger)
+    now_ts = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    if guardrail_result["is_overridden"] or (now_ts - last_explanation_time > 30.0):
+        try:
+            last_explanation = ai_service.explain_dispatch(telemetry, safe_dispatch, guardrail_result)
+            last_explanation_time = now_ts
+        except Exception:
+            pass
+
+    # 6. Demand & renewable forecast
+    try:
+        forecast_24h = forecaster.predict_24h(telemetry)
+    except Exception:
+        forecast_24h = []
+
+    # 7. Offline SQLite Logging
+    try:
+        logger.log_telemetry_and_dispatch(telemetry, safe_dispatch, guardrail_result, last_explanation)
+    except Exception:
+        pass
+
+    # 8. Assemble Payload
+    payload = {
+        "telemetry": telemetry,
+        "dispatch": safe_dispatch,
+        "guardrail": {
+            "is_overridden": guardrail_result["is_overridden"],
+            "interventions": guardrail_result["interventions"],
+            "gen1_runtime_minutes": guardrail_result["gen1_runtime_minutes"],
+            "gen2_runtime_minutes": guardrail_result["gen2_runtime_minutes"]
+        },
+        "explanation": last_explanation,
+        "forecast_24h": forecast_24h,
+        "hardware_health": {
+            "genset_1_health_pct": 0 if telemetry["genset_1_fault"] else 88,
+            "genset_1_status": "FAULT_TRIPPED" if telemetry["genset_1_fault"] else ("RUNNING" if safe_dispatch.get("p_diesel_1_kw", 0) > 0 else "WARM_STANDBY"),
+            "genset_2_health_pct": 96,
+            "genset_2_status": "RUNNING" if safe_dispatch.get("p_diesel_2_kw", 0) > 0 else "STANDBY",
+            "wind_turbine_health_pct": 92 if telemetry["wind_speed_ms"] <= 25.0 else 78,
+            "wind_turbine_status": "FEATHERED_BRAKED" if telemetry["wind_speed_ms"] > 25.0 else "GENERATING",
+            "bess_thermal_health_pct": 42 if telemetry["battery_heater_fault"] else 97,
+            "bess_status": "HEATER_FAULT" if telemetry["battery_heater_fault"] else ("SUBZERO_DERATED" if safe_dispatch.get("battery_derating_factor", 1.0) < 1.0 else "NOMINAL")
+        },
+        "cloud_ai_active": ai_service.is_cloud_enabled()
+    }
+    current_system_snapshot = payload
+    return payload
+
 async def telemetry_broadcast_loop():
     """1-second high-resolution telemetry, MPC optimization, guardrail, and logging loop"""
-    global last_explanation, last_explanation_time, current_system_snapshot
     while True:
         try:
-            # 1. Ingest unified telemetry
-            telemetry = ingestion_driver.ingest()
-            guardrail.update_clock(1.0)
-            
-            # 2. Renewable physics potential
-            station = STATIONS.get(telemetry["station_id"], STATIONS["MAITRI"])
-            wind_avail = forecaster.calculate_wind_power(telemetry["wind_speed_ms"], station["wind_capacity_kw"])
-            solar_avail = forecaster.calculate_solar_power(telemetry["solar_irradiance_wm2"], station["solar_capacity_kw"])
-            
-            # 3. Model Predictive Control (SciPy Linear Programming)
-            optimizer_dispatch = optimizer.optimize_dispatch(telemetry, wind_avail, solar_avail)
-            
-            # 4. Deterministic Safety Guardrails
-            guardrail_result = guardrail.enforce_safety(telemetry, optimizer_dispatch)
-            safe_dispatch = guardrail_result["safe_dispatch"]
-            
-            # 5. Groq LLM Decision Explanation (every 30s or immediately upon guardrail trigger)
-            now_ts = asyncio.get_event_loop().time()
-            if guardrail_result["is_overridden"] or (now_ts - last_explanation_time > 30.0):
-                last_explanation = ai_service.explain_dispatch(telemetry, safe_dispatch, guardrail_result)
-                last_explanation_time = now_ts
-
-            # 6. LightGBM 24-hour demand & renewable forecast
-            forecast_24h = forecaster.predict_24h(telemetry)
-
-            # 7. Offline SQLite Logging
-            logger.log_telemetry_and_dispatch(telemetry, safe_dispatch, guardrail_result, last_explanation)
-
-            # 8. Assemble WebSocket Payload
-            payload = {
-                "telemetry": telemetry,
-                "dispatch": safe_dispatch,
-                "guardrail": {
-                    "is_overridden": guardrail_result["is_overridden"],
-                    "interventions": guardrail_result["interventions"],
-                    "gen1_runtime_minutes": guardrail_result["gen1_runtime_minutes"],
-                    "gen2_runtime_minutes": guardrail_result["gen2_runtime_minutes"]
-                },
-                "explanation": last_explanation,
-                "forecast_24h": forecast_24h,
-                "hardware_health": {
-                    "genset_1_health_pct": 0 if telemetry["genset_1_fault"] else 88,
-                    "genset_1_status": "FAULT_TRIPPED" if telemetry["genset_1_fault"] else ("RUNNING" if safe_dispatch["p_diesel_1_kw"] > 0 else "WARM_STANDBY"),
-                    "genset_2_health_pct": 96,
-                    "genset_2_status": "RUNNING" if safe_dispatch["p_diesel_2_kw"] > 0 else "STANDBY",
-                    "wind_turbine_health_pct": 92 if telemetry["wind_speed_ms"] <= 25.0 else 78,
-                    "wind_turbine_status": "FEATHERED_BRAKED" if telemetry["wind_speed_ms"] > 25.0 else "GENERATING",
-                    "bess_thermal_health_pct": 42 if telemetry["battery_heater_fault"] else 97,
-                    "bess_status": "HEATER_FAULT" if telemetry["battery_heater_fault"] else ("SUBZERO_DERATED" if safe_dispatch["battery_derating_factor"] < 1.0 else "NOMINAL")
-                },
-                "cloud_ai_active": ai_service.is_cloud_enabled()
-            }
-            
-            current_system_snapshot = payload
+            payload = compute_system_snapshot()
 
             # Broadcast to active WebSockets
             if active_websockets:
@@ -120,10 +132,20 @@ async def telemetry_broadcast_loop():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Start background 1-second telemetry loop
-    task = asyncio.create_task(telemetry_broadcast_loop())
+    try:
+        compute_system_snapshot()
+    except Exception as e:
+        print(f"[Startup Snapshot Warning]: {e}")
+
+    task = None
+    try:
+        task = asyncio.create_task(telemetry_broadcast_loop())
+    except Exception as e:
+        print(f"[Broadcast Task Warning]: {e}")
+
     yield
-    task.cancel()
+    if task:
+        task.cancel()
 
 app = FastAPI(title="PolarOPS SEMS", version="1.0.0", lifespan=lifespan)
 
@@ -161,7 +183,9 @@ class ChatRequest(BaseModel):
 # ----------------- REST Endpoints -----------------
 @app.get("/api/status")
 async def get_status():
+    snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
     return {
+        **snapshot,
         "status": "ONLINE",
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "station": ingestion_driver.station_id,
@@ -196,14 +220,13 @@ async def commander_reset():
 
 @app.post("/api/chat")
 async def ai_chat(req: ChatRequest):
-    if not current_system_snapshot:
-        return {"answer": "System telemetry initializing. Please try again in 2 seconds."}
+    snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
     
     answer = ai_service.answer_commander(
         req.query,
-        current_system_snapshot.get("telemetry", {}),
-        current_system_snapshot.get("dispatch", {}),
-        current_system_snapshot.get("guardrail", {})
+        snapshot.get("telemetry", {}),
+        snapshot.get("dispatch", {}),
+        snapshot.get("guardrail", {})
     )
     logger.log_chat_interaction(req.query, answer)
     return {"answer": answer}

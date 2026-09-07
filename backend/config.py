@@ -74,4 +74,8 @@ WIND_CUT_OUT_MS = 25.0               # High wind mechanical feathering shutoff
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "YOUR_GROQ_API_KEY")
 SEMS_MODE = os.getenv("SEMS_MODE", "DEMO_MODE") # DEMO_MODE or SCADA_MODE
 DEFAULT_STATION = os.getenv("DEFAULT_STATION", "MAITRI")
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sems_logs.db")
+if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+    DB_PATH = "/tmp/sems_logs.db"
+else:
+    DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sems_logs.db")
+

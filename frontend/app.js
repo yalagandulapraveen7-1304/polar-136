@@ -766,7 +766,7 @@ function initHttpFallback() {
   // Sync audit log periodically every 4s
   setInterval(loadAndRenderAuditTable, 4000);
 
-  setInterval(async () => {
+  const pollStatus = async () => {
     if (!state.wsConnected) {
       try {
         const res = await fetch('/api/status');
@@ -778,7 +778,11 @@ function initHttpFallback() {
         // quiet retry
       }
     }
-  }, 3000);
+  };
+
+  // Immediate poll for serverless environments
+  pollStatus();
+  setInterval(pollStatus, 2000);
 }
 
 // -------------------------------------------------------------

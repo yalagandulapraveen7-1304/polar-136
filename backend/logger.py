@@ -16,15 +16,21 @@ class SystemEventLogger:
         self._init_db()
 
     def _get_connection(self):
-        conn = sqlite3.connect(self.db_path, check_same_thread=False)
-        conn.row_factory = sqlite3.Row
-        return conn
+        try:
+            conn = sqlite3.connect(self.db_path, check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            return conn
+        except Exception:
+            conn = sqlite3.connect(":memory:", check_same_thread=False)
+            conn.row_factory = sqlite3.Row
+            return conn
 
     def _init_db(self):
-        with self._lock:
-            with self._get_connection() as conn:
-                cursor = conn.cursor()
-                # 1. Telemetry table
+        try:
+            with self._lock:
+                with self._get_connection() as conn:
+                    cursor = conn.cursor()
+                    # 1. Telemetry table
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS telemetry_logs (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,6 +91,8 @@ class SystemEventLogger:
                     )
                 """)
                 conn.commit()
+        except Exception as e:
+            print(f"[Logger Init Warning]: {e}")
 
     def log_telemetry_and_dispatch(
         self,
