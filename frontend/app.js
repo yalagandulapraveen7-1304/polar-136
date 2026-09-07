@@ -1112,28 +1112,21 @@ function setupBurgerMenu() {
   const btnBurger = document.getElementById('btnBurgerMenu');
   const drawer = document.getElementById('mobileNavDrawer');
   const icon = document.getElementById('burgerIcon');
-  const navHeader = document.getElementById('mainNavHeader');
   if (!btnBurger || !drawer) return;
 
   function toggleMenu(forceClose = false) {
-    const isOpening = forceClose ? false : drawer.classList.contains('hidden');
-    if (isOpening) {
-      drawer.classList.remove('hidden');
-      drawer.classList.add('flex');
-      if (navHeader) navHeader.classList.add('menu-open');
+    const shouldOpen = forceClose ? false : !drawer.classList.contains('is-open');
+    if (shouldOpen) {
+      drawer.classList.add('is-open');
       btnBurger.setAttribute('aria-expanded', 'true');
       if (icon) {
-        icon.classList.remove('fa-bars');
-        icon.classList.add('fa-xmark');
+        icon.className = 'fa-solid fa-xmark text-sm transition-transform duration-150 rotate-90';
       }
     } else {
-      drawer.classList.add('hidden');
-      drawer.classList.remove('flex');
-      if (navHeader) navHeader.classList.remove('menu-open');
+      drawer.classList.remove('is-open');
       btnBurger.setAttribute('aria-expanded', 'false');
       if (icon) {
-        icon.classList.remove('fa-xmark');
-        icon.classList.add('fa-bars');
+        icon.className = 'fa-solid fa-bars text-sm transition-transform duration-150';
       }
     }
   }
@@ -1143,12 +1136,10 @@ function setupBurgerMenu() {
     toggleMenu();
   });
 
-  // Close when clicking outside header
+  // Close when clicking outside
   document.addEventListener('click', (e) => {
-    if (!drawer.classList.contains('hidden')) {
-      if (navHeader && !navHeader.contains(e.target)) {
-        toggleMenu(true);
-      }
+    if (drawer.classList.contains('is-open') && !drawer.contains(e.target) && !btnBurger.contains(e.target)) {
+      toggleMenu(true);
     }
   });
 
@@ -1162,7 +1153,7 @@ function setupBurgerMenu() {
 
   // Close on Escape key
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !drawer.classList.contains('hidden')) {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
       toggleMenu(true);
     }
   });

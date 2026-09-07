@@ -27,3 +27,5 @@ scratch/
 .idea/
 .DS_Store
 Thumbs.db
+.vercel
+.env*
