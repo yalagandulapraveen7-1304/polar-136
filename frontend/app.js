@@ -715,10 +715,12 @@ function renderTelemetry(data) {
 // -------------------------------------------------------------
 function startClock() {
   const clockEl = document.getElementById('stationClock');
+  const clockElMobile = document.getElementById('stationClockMobile');
   setInterval(() => {
     const now = new Date();
     const utcStr = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
     if (clockEl) clockEl.textContent = utcStr;
+    if (clockElMobile) clockElMobile.textContent = utcStr;
   }, 1000);
 }
 
@@ -876,22 +878,26 @@ async function loadAndRenderAuditTable() {
 function setupStationSwitchers() {
   const btnBharati = document.getElementById('btn-bharati');
   const btnMaitri = document.getElementById('btn-maitri');
+  const btnBharatiMob = document.getElementById('btn-bharati-mobile');
+  const btnMaitriMob = document.getElementById('btn-maitri-mobile');
+  const btnBharatiPill = document.getElementById('btn-bharati-mobile-pill');
+  const btnMaitriPill = document.getElementById('btn-maitri-mobile-pill');
   const locationBadge = document.getElementById('stationLocationBadge');
   const capLabel = document.getElementById('batteryCapacityKwh');
 
   async function switchStation(id) {
     state.stationId = id;
-    if (id === 'BHARATI') {
-      btnBharati.classList.add('active');
-      btnMaitri.classList.remove('active');
-      if (locationBadge) locationBadge.textContent = STATIONS.BHARATI.locationText;
-      if (capLabel) capLabel.textContent = `${STATIONS.BHARATI.batteryCapacity} kWh`;
-    } else {
-      btnMaitri.classList.add('active');
-      btnBharati.classList.remove('active');
-      if (locationBadge) locationBadge.textContent = STATIONS.MAITRI.locationText;
-      if (capLabel) capLabel.textContent = `${STATIONS.MAITRI.batteryCapacity} kWh`;
-    }
+    const isBharati = (id === 'BHARATI');
+    
+    [btnBharati, btnBharatiMob, btnBharatiPill].forEach(b => {
+      if (b) b.classList.toggle('active', isBharati);
+    });
+    [btnMaitri, btnMaitriMob, btnMaitriPill].forEach(b => {
+      if (b) b.classList.toggle('active', !isBharati);
+    });
+
+    if (locationBadge) locationBadge.textContent = STATIONS[id].locationText;
+    if (capLabel) capLabel.textContent = `${STATIONS[id].batteryCapacity} kWh`;
 
     try {
       await fetch('/api/station/switch', {
@@ -905,23 +911,30 @@ function setupStationSwitchers() {
     loadAndRenderAuditTable();
   }
 
-  if (btnBharati) btnBharati.addEventListener('click', () => switchStation('BHARATI'));
-  if (btnMaitri) btnMaitri.addEventListener('click', () => switchStation('MAITRI'));
+  [btnBharati, btnBharatiMob, btnBharatiPill].forEach(b => {
+    if (b) b.addEventListener('click', () => switchStation('BHARATI'));
+  });
+  [btnMaitri, btnMaitriMob, btnMaitriPill].forEach(b => {
+    if (b) b.addEventListener('click', () => switchStation('MAITRI'));
+  });
 }
 
 function setupModeSwitchers() {
   const btnDemo = document.getElementById('btn-mode-demo');
   const btnScada = document.getElementById('btn-mode-scada');
+  const btnDemoMob = document.getElementById('btn-mode-demo-mobile');
+  const btnScadaMob = document.getElementById('btn-mode-scada-mobile');
 
   async function switchMode(mode) {
     state.mode = mode;
-    if (mode === 'DEMO_MODE') {
-      btnDemo.classList.add('active');
-      btnScada.classList.remove('active');
-    } else {
-      btnScada.classList.add('active');
-      btnDemo.classList.remove('active');
-    }
+    const isDemo = (mode === 'DEMO_MODE');
+    
+    [btnDemo, btnDemoMob].forEach(b => {
+      if (b) b.classList.toggle('active', isDemo);
+    });
+    [btnScada, btnScadaMob].forEach(b => {
+      if (b) b.classList.toggle('active', !isDemo);
+    });
 
     try {
       await fetch('/api/mode/switch', {
@@ -934,8 +947,12 @@ function setupModeSwitchers() {
     }
   }
 
-  if (btnDemo) btnDemo.addEventListener('click', () => switchMode('DEMO_MODE'));
-  if (btnScada) btnScada.addEventListener('click', () => switchMode('SCADA_MODE'));
+  [btnDemo, btnDemoMob].forEach(b => {
+    if (b) b.addEventListener('click', () => switchMode('DEMO_MODE'));
+  });
+  [btnScada, btnScadaMob].forEach(b => {
+    if (b) b.addEventListener('click', () => switchMode('SCADA_MODE'));
+  });
 }
 
 function setupModals() {
@@ -1043,6 +1060,111 @@ function setupModals() {
       const h = pill.getAttribute('data-horizon');
       if (h) updateForecastHorizon(h);
     });
+  });
+
+  // Mobile Drawer Navigation Triggers
+  const mobileNavOverview = document.getElementById('mobileNavOverview');
+  const mobileNavForecast = document.getElementById('mobileNavForecast');
+  const mobileNavDispatch = document.getElementById('mobileNavDispatch');
+  const mobileNavAssistant = document.getElementById('mobileNavAssistant');
+  const mobileNavMaintenance = document.getElementById('mobileNavMaintenance');
+  const mobileNavManual = document.getElementById('mobileNavManual');
+
+  if (mobileNavOverview) {
+    mobileNavOverview.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+  if (mobileNavForecast) {
+    mobileNavForecast.addEventListener('click', () => {
+      openModal(modals.forecast);
+      initForecastChart();
+    });
+  }
+  if (mobileNavDispatch) {
+    mobileNavDispatch.addEventListener('click', () => {
+      openModal(modals.dispatch);
+      loadAndRenderAuditTable();
+      setTimeout(initEnergyFlowCanvas, 50);
+    });
+  }
+  if (mobileNavAssistant) {
+    mobileNavAssistant.addEventListener('click', () => {
+      openModal(modals.copilot);
+    });
+  }
+  if (mobileNavMaintenance) {
+    mobileNavMaintenance.addEventListener('click', () => {
+      openModal(modals.maintenance);
+    });
+  }
+  if (mobileNavManual) {
+    mobileNavManual.addEventListener('click', () => {
+      openModal(modals.manual);
+    });
+  }
+}
+
+// -------------------------------------------------------------
+// Burger Menu & Mobile Navigation Drawer
+// -------------------------------------------------------------
+function setupBurgerMenu() {
+  const btnBurger = document.getElementById('btnBurgerMenu');
+  const drawer = document.getElementById('mobileNavDrawer');
+  const icon = document.getElementById('burgerIcon');
+  const navHeader = document.getElementById('mainNavHeader');
+  if (!btnBurger || !drawer) return;
+
+  function toggleMenu(forceClose = false) {
+    const isOpening = forceClose ? false : drawer.classList.contains('hidden');
+    if (isOpening) {
+      drawer.classList.remove('hidden');
+      drawer.classList.add('flex');
+      if (navHeader) navHeader.classList.add('menu-open');
+      btnBurger.setAttribute('aria-expanded', 'true');
+      if (icon) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-xmark');
+      }
+    } else {
+      drawer.classList.add('hidden');
+      drawer.classList.remove('flex');
+      if (navHeader) navHeader.classList.remove('menu-open');
+      btnBurger.setAttribute('aria-expanded', 'false');
+      if (icon) {
+        icon.classList.remove('fa-xmark');
+        icon.classList.add('fa-bars');
+      }
+    }
+  }
+
+  btnBurger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMenu();
+  });
+
+  // Close when clicking outside header
+  document.addEventListener('click', (e) => {
+    if (!drawer.classList.contains('hidden')) {
+      if (navHeader && !navHeader.contains(e.target)) {
+        toggleMenu(true);
+      }
+    }
+  });
+
+  // Close when any mobile action button is clicked
+  const mobileButtons = drawer.querySelectorAll('.mobile-nav-btn, .station-pill, .mode-pill');
+  mobileButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleMenu(true);
+    });
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !drawer.classList.contains('hidden')) {
+      toggleMenu(true);
+    }
   });
 }
 
@@ -1402,6 +1524,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupStationSwitchers();
   setupModeSwitchers();
   setupModals();
+  setupBurgerMenu();
   setupCommanderOverrides();
   setupDemoScenarios();
   setupCopilot();

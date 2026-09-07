@@ -22,7 +22,7 @@
   <!-- Custom Stylesheet -->
   <link rel="stylesheet" href="/static/styles.css">
 </head>
-<body class="bg-[#f4fafc] text-slate-800 antialiased selection:bg-[#05c5ff] selection:text-white min-h-screen">
+<body class="bg-[#f4fafc] text-slate-800 antialiased selection:bg-[#05c5ff] selection:text-white min-h-screen overflow-x-hidden w-full">
 
   <!-- =========================================================================
        MAIN DASHBOARD CONTAINER (Max width 1600px, Clean Arctic Ice Layout)
@@ -30,78 +30,142 @@
   <div class="w-full max-w-[1600px] mx-auto p-3 sm:p-4 lg:p-5 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
 
     <!-- FLOATING TOP NAVIGATION PILL -->
-    <header class="w-full flex flex-col md:flex-row items-center justify-between floating-nav px-4 sm:px-5 py-2 z-20 gap-2 md:gap-0">
-      
-      <!-- Brand Identity -->
-      <div class="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-start">
-        <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center shadow-sm">
-            <i class="fa-solid fa-snowflake text-xs text-white"></i>
+    <header id="mainNavHeader" class="w-full floating-nav px-3.5 sm:px-5 py-2.5 z-30 relative transition-all duration-300">
+      <div class="flex items-center justify-between w-full">
+        
+        <!-- Brand Identity -->
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center shadow-sm shrink-0">
+            <i class="fa-solid fa-snowflake text-xs sm:text-sm text-white"></i>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="font-extrabold tracking-tight text-base text-[#127694] leading-none">NOVARA</span>
-            <span class="text-[9px] tracking-wider uppercase font-bold px-1.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4]">POLAR EMS</span>
+            <span class="font-extrabold tracking-tight text-base sm:text-lg text-[#127694] leading-none">NOVARA</span>
+            <span class="text-[9px] sm:text-[10px] tracking-wider uppercase font-bold px-1.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4]">POLAR EMS</span>
           </div>
         </div>
 
-        <!-- Mobile-only live status indicator -->
-        <div class="md:hidden flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-200">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Live</span>
-        </div>
-      </div>
-
-      <!-- Station Selector Pills (Bharati & Maitri) -->
-      <div class="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
-        <button id="btn-bharati" class="station-pill active" data-station="BHARATI">
-          Bharati
-        </button>
-        <button id="btn-maitri" class="station-pill" data-station="MAITRI">
-          Maitri
-        </button>
-      </div>
-
-      <!-- Center Navigation Links -->
-      <nav class="hidden lg:flex items-center gap-1 bg-white/80 p-1 rounded-full border border-[#9ae5fe]/60 shadow-inner">
-        <button class="nav-pill active" data-nav="overview">
-          <i class="fa-solid fa-table-cells-large text-xs"></i> Overview
-        </button>
-        <button class="nav-pill" id="navBtnForecast" data-nav="forecast">
-          <i class="fa-solid fa-chart-line text-xs"></i> Forecast (Full)
-        </button>
-        <button class="nav-pill" id="navBtnDispatch" data-nav="dispatch">
-          <i class="fa-solid fa-code-fork text-xs"></i> Dispatch
-        </button>
-        <button class="nav-pill" id="navBtnAssistant" data-nav="assistant">
-          <i class="fa-solid fa-robot text-xs"></i> Assistant
-        </button>
-        <button class="nav-pill" id="navBtnMaintenance" data-nav="maintenance">
-          <i class="fa-solid fa-shield-halved text-xs"></i> Maintenance
-        </button>
-      </nav>
-
-      <!-- Right Header Actions (Mode, Manual Entry & Clock) -->
-      <div class="flex items-center gap-2">
-        <!-- Dual Mode Pill Toggle (Demo API vs SCADA Bus) -->
-        <div class="hidden sm:flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
-          <button id="btn-mode-demo" class="mode-pill active" title="Live NASA/Open-Meteo Antarctic Weather API">
-            API
+        <!-- Station Selector Pills (Visible on md+ tablets and desktop) -->
+        <div class="hidden md:flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+          <button id="btn-bharati" class="station-pill active" data-station="BHARATI">
+            Bharati
           </button>
-          <button id="btn-mode-scada" class="mode-pill" title="Modbus TCP / MQTT Registers">
-            SCADA
+          <button id="btn-maitri" class="station-pill" data-station="MAITRI">
+            Maitri
           </button>
         </div>
 
-        <!-- Manual Override Entry Button -->
-        <button id="btnOpenManualModal" class="text-[11px] font-bold text-[#127694] hover:text-[#0698c4] transition flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-[#9ae5fe] shadow-sm">
-          <i class="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
-          <span>Manual Entry</span>
-        </button>
+        <!-- Center Navigation Links (Visible on lg+) -->
+        <nav class="hidden lg:flex items-center gap-1 bg-white/80 p-1 rounded-full border border-[#9ae5fe]/60 shadow-inner">
+          <button class="nav-pill active" data-nav="overview">
+            <i class="fa-solid fa-table-cells-large text-xs"></i> Overview
+          </button>
+          <button class="nav-pill" id="navBtnForecast" data-nav="forecast">
+            <i class="fa-solid fa-chart-line text-xs"></i> Forecast (Full)
+          </button>
+          <button class="nav-pill" id="navBtnDispatch" data-nav="dispatch">
+            <i class="fa-solid fa-code-fork text-xs"></i> Dispatch
+          </button>
+          <button class="nav-pill" id="navBtnAssistant" data-nav="assistant">
+            <i class="fa-solid fa-robot text-xs"></i> Assistant
+          </button>
+          <button class="nav-pill" id="navBtnMaintenance" data-nav="maintenance">
+            <i class="fa-solid fa-shield-halved text-xs"></i> Maintenance
+          </button>
+        </nav>
 
-        <!-- Live UTC Station Clock -->
-        <div class="hidden xl:flex items-center gap-1.5 text-slate-500 font-mono text-[10px] bg-white/90 px-3 py-1.5 rounded-full border border-[#9ae5fe]">
-          <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
-          <span id="stationClock">2026-09-07 16:11:29 UTC</span>
+        <!-- Right Header Actions -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <!-- Dual Mode Pill Toggle (Desktop & Tablet) -->
+          <div class="hidden sm:flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
+            <button id="btn-mode-demo" class="mode-pill active" title="Live NASA/Open-Meteo Antarctic Weather API">
+              API
+            </button>
+            <button id="btn-mode-scada" class="mode-pill" title="Modbus TCP / MQTT Registers">
+              SCADA
+            </button>
+          </div>
+
+          <!-- Manual Override Entry Button (Desktop & Tablet) -->
+          <button id="btnOpenManualModal" class="hidden sm:flex text-[11px] font-bold text-[#127694] hover:text-[#0698c4] transition items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-[#9ae5fe] shadow-sm">
+            <i class="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
+            <span>Manual Entry</span>
+          </button>
+
+          <!-- Live UTC Station Clock (Desktop only) -->
+          <div class="hidden xl:flex items-center gap-1.5 text-slate-500 font-mono text-[10px] bg-white/90 px-3 py-1.5 rounded-full border border-[#9ae5fe]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+            <span id="stationClock">2026-09-07 16:11:29 UTC</span>
+          </div>
+
+          <!-- Mobile Station Badge Pill (< md) -->
+          <div class="flex md:hidden items-center gap-0.5 bg-[#e5f6fd] p-0.5 rounded-full border border-[#9ae5fe] text-[10px]">
+            <button id="btn-bharati-mobile-pill" class="station-pill-mini active" data-station="BHARATI">Bharati</button>
+            <button id="btn-maitri-mobile-pill" class="station-pill-mini" data-station="MAITRI">Maitri</button>
+          </div>
+
+          <!-- BURGER BUTTON (Visible on mobile & tablet: < lg) -->
+          <button id="btnBurgerMenu" class="lg:hidden p-2 rounded-xl bg-white/95 hover:bg-[#e5f6fd] active:scale-95 border border-[#9ae5fe] text-[#127694] transition-all flex items-center justify-center shadow-sm" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i id="burgerIcon" class="fa-solid fa-bars text-sm transition-transform duration-200"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- COLLAPSIBLE MOBILE & TABLET DRAWER -->
+      <div id="mobileNavDrawer" class="hidden lg:hidden flex flex-col gap-3 pt-3 mt-2 border-t border-[#9ae5fe]/60">
+        <!-- Navigation Grid: 2 columns on mobile, 3 columns on tablet -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <button type="button" class="mobile-nav-btn active" id="mobileNavOverview">
+            <i class="fa-solid fa-table-cells-large text-base text-[#0698c4]"></i>
+            <span>Overview</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavForecast">
+            <i class="fa-solid fa-chart-line text-base text-[#0698c4]"></i>
+            <span>Full Forecast</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavDispatch">
+            <i class="fa-solid fa-code-fork text-base text-[#0698c4]"></i>
+            <span>Dispatch Matrix</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavAssistant">
+            <i class="fa-solid fa-robot text-base text-[#0698c4]"></i>
+            <span>AI Assistant</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavMaintenance">
+            <i class="fa-solid fa-shield-halved text-base text-[#0698c4]"></i>
+            <span>Maintenance</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavManual">
+            <i class="fa-solid fa-sliders text-base text-[#05c5ff]"></i>
+            <span>Manual Entry</span>
+          </button>
+        </div>
+
+        <!-- Quick Switch Bar for Station & Mode (Mobile & Tablet) -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-[#9ae5fe]/40">
+          <div class="flex items-center justify-between sm:justify-start gap-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Station:</span>
+            <div class="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+              <button id="btn-bharati-mobile" class="station-pill active" data-station="BHARATI">Bharati</button>
+              <button id="btn-maitri-mobile" class="station-pill" data-station="MAITRI">Maitri</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-start gap-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Stream:</span>
+            <div class="flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
+              <button id="btn-mode-demo-mobile" class="mode-pill active">API Weather</button>
+              <button id="btn-mode-scada-mobile" class="mode-pill">SCADA PLC</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Clock & Live Status -->
+        <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono bg-white/80 px-3 py-1.5 rounded-xl border border-[#9ae5fe]/60">
+          <span class="flex items-center gap-1.5 font-sans font-semibold text-emerald-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+            Microgrid Online
+          </span>
+          <span id="stationClockMobile">--:--:-- UTC</span>
         </div>
       </div>
     </header>
@@ -153,21 +217,21 @@
               </div>
 
               <!-- 3 Key Live Glance Stats -->
-              <div class="grid grid-cols-3 gap-2 sm:gap-3 mt-1">
-                <div class="bg-white/95 rounded-2xl p-2.5 sm:p-3 border border-[#9ae5fe] shadow-sm">
-                  <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Station Load</div>
-                  <div id="valTotalDemandKw" class="text-base sm:text-lg font-extrabold text-[#127694]">40.4 kW</div>
-                  <div class="text-[9px] text-slate-500 truncate">Demand: <span id="valRequiredKw" class="font-semibold text-slate-700">40.4 kW</span></div>
+              <div class="grid grid-cols-3 gap-1.5 sm:gap-3 mt-1">
+                <div class="bg-white/95 rounded-2xl p-2 sm:p-3 border border-[#9ae5fe] shadow-sm">
+                  <div class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Station Load</div>
+                  <div id="valTotalDemandKw" class="text-sm sm:text-lg font-extrabold text-[#127694] truncate">40.4 kW</div>
+                  <div class="text-[8px] sm:text-[9px] text-slate-500 truncate">Demand: <span id="valRequiredKw" class="font-semibold text-slate-700">40.4 kW</span></div>
                 </div>
-                <div class="bg-white/95 rounded-2xl p-2.5 sm:p-3 border border-[#9ae5fe] shadow-sm">
-                  <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outside Temp</div>
-                  <div id="valOutsideTemp" class="text-base sm:text-lg font-extrabold text-slate-800">-26.3°C</div>
-                  <div class="text-[9px] text-slate-500 truncate">Chill: <span id="valWindChill" class="font-semibold text-slate-700">-48.0°C</span></div>
+                <div class="bg-white/95 rounded-2xl p-2 sm:p-3 border border-[#9ae5fe] shadow-sm">
+                  <div class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Outside Temp</div>
+                  <div id="valOutsideTemp" class="text-sm sm:text-lg font-extrabold text-slate-800 truncate">-26.3°C</div>
+                  <div class="text-[8px] sm:text-[9px] text-slate-500 truncate">Chill: <span id="valWindChill" class="font-semibold text-slate-700">-48.0°C</span></div>
                 </div>
-                <div class="bg-white/95 rounded-2xl p-2.5 sm:p-3 border border-[#9ae5fe] shadow-sm">
-                  <div class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fuel Autonomy</div>
-                  <div id="valFuelDaysHero" class="text-base sm:text-lg font-extrabold text-[#0698c4]">26.6 Days</div>
-                  <div class="text-[9px] text-slate-500 truncate"><span id="valFuelPctHero">75%</span> Tank Reserve</div>
+                <div class="bg-white/95 rounded-2xl p-2 sm:p-3 border border-[#9ae5fe] shadow-sm">
+                  <div class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Fuel Autonomy</div>
+                  <div id="valFuelDaysHero" class="text-sm sm:text-lg font-extrabold text-[#0698c4] truncate">26.6 Days</div>
+                  <div class="text-[8px] sm:text-[9px] text-slate-500 truncate"><span id="valFuelPctHero">75%</span> Tank Reserve</div>
                 </div>
               </div>
             </div>
@@ -469,7 +533,7 @@
       <!-- =====================================================================
            RIGHT COLUMN: 3 STACKED STATUS CARDS
            ===================================================================== -->
-      <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
+      <div class="lg:col-span-4 xl:col-span-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-3.5 sm:gap-4 lg:gap-5">
 
         <!-- CARD R1: Station Battery Reserve -->
         <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
@@ -846,7 +910,7 @@
           <span class="text-[9px] font-mono text-slate-400">Timestamped SQLite Ledger (sems_logs.db)</span>
         </div>
         <div class="overflow-x-auto rounded-2xl border border-slate-200 max-h-56 overflow-y-auto shadow-sm">
-          <table class="w-full text-left text-xs">
+          <table class="w-full min-w-[540px] text-left text-xs">
             <thead class="bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase sticky top-0 z-10">
               <tr>
                 <th class="py-2.5 px-3">Time (UTC)</th>
