@@ -1,0 +1,393 @@
+/* =========================================================================
+   NOVARA POLAR EMS // Clean Arctic Design System
+   Matches SIH Polar Smart Energy Management System Specification
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  --polar-bg: #f4fafc;
+  --polar-card: #ffffff;
+  --polar-ice-light: #e5f6fd;
+  --polar-ice-badge: #c2f0fe;
+  --polar-ice-border: #9ae5fe;
+  --polar-teal-dark: #127694;
+  --polar-cyan-primary: #0698c4;
+  --polar-cyan-bright: #05c5ff;
+  --polar-emerald: #10b981;
+  --polar-amber: #f59e0b;
+  --polar-rose: #f43f5e;
+  --turbine-speed: 3s;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--polar-bg);
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1e293b;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* -------------------------------------------------------------
+   Glassmorphism & Cards
+   ------------------------------------------------------------- */
+.novara-card {
+  background: var(--polar-card);
+  border: 1px solid var(--polar-ice-border);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 16px -2px rgba(18, 118, 148, 0.07), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.novara-card:hover {
+  border-color: #62d2fc;
+  box-shadow: 0 8px 24px -4px rgba(6, 152, 196, 0.12);
+}
+
+.floating-nav {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--polar-ice-border);
+  border-radius: 9999px;
+  box-shadow: 0 4px 20px -2px rgba(6, 152, 196, 0.10);
+}
+
+/* -------------------------------------------------------------
+   Station & Mode Selector Pills
+   ------------------------------------------------------------- */
+.station-pill {
+  padding: 0.25rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--polar-teal-dark);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.station-pill:hover:not(.active) {
+  background: var(--polar-ice-badge);
+  color: var(--polar-cyan-primary);
+}
+
+.station-pill.active {
+  background: var(--polar-teal-dark);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(18, 118, 148, 0.35);
+}
+
+.mode-pill {
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.03em;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-pill:hover:not(.active) {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.mode-pill.active {
+  background: #0284c7;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(2, 132, 199, 0.3);
+}
+
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-pill:hover:not(.active) {
+  color: var(--polar-cyan-primary);
+  background: rgba(194, 240, 254, 0.4);
+}
+
+.nav-pill.active {
+  background: var(--polar-teal-dark);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(18, 118, 148, 0.25);
+}
+
+/* -------------------------------------------------------------
+   Copilot Command Bar
+   ------------------------------------------------------------- */
+.copilot-command-pill {
+  background: #ffffff;
+  border: 1px solid var(--polar-ice-border);
+  border-radius: 9999px;
+  box-shadow: 0 2px 10px rgba(6, 152, 196, 0.08);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.copilot-command-pill:focus-within {
+  border-color: var(--polar-cyan-bright);
+  box-shadow: 0 0 0 3px rgba(5, 197, 255, 0.15);
+}
+
+.ai-chip {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ai-chip:hover {
+  transform: translateY(-1px);
+  background-color: var(--polar-ice-badge);
+}
+
+/* -------------------------------------------------------------
+   Battery Cylinder Gauge
+   ------------------------------------------------------------- */
+.cylinder-battery-container {
+  width: 100%;
+  height: 22px;
+  background: #e2f4fb;
+  border: 1.5px solid var(--polar-ice-border);
+  border-radius: 9999px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(18, 118, 148, 0.1);
+}
+
+.cylinder-battery-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0698c4 0%, #05c5ff 100%);
+  border-radius: 9999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  box-shadow: 0 0 10px rgba(5, 197, 255, 0.4);
+}
+
+.battery-pct-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* -------------------------------------------------------------
+   Scenario 2x2 Buttons
+   ------------------------------------------------------------- */
+.scenario-btn {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scenario-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(6, 152, 196, 0.12);
+  border-color: var(--polar-cyan-bright);
+}
+
+.scenario-btn.active {
+  border-color: var(--polar-cyan-bright);
+  background-color: #f0faff;
+  box-shadow: 0 0 0 2px rgba(5, 197, 255, 0.25);
+}
+
+/* -------------------------------------------------------------
+   Risk Mode Badges
+   ------------------------------------------------------------- */
+.badge-risk-normal {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-risk-conservative {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-risk-emergency {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* -------------------------------------------------------------
+   Rotating Wind Turbine Animation
+   ------------------------------------------------------------- */
+@keyframes rotateTurbine {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-turbine {
+  animation: rotateTurbine var(--turbine-speed) linear infinite;
+  transform-origin: 50px 50px;
+}
+
+/* -------------------------------------------------------------
+   Modals
+   ------------------------------------------------------------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: modalFadeIn 0.2s ease;
+}
+
+.modal-backdrop.hidden {
+  display: none !important;
+}
+
+.modal-content {
+  background: #ffffff;
+  border: 1px solid var(--polar-ice-border);
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 50px -10px rgba(18, 118, 148, 0.25), 0 0 0 1px rgba(154, 229, 254, 0.4);
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-content::-webkit-scrollbar-track {
+  background: #f0faff;
+  border-radius: 9999px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+  background: #9ae5fe;
+  border-radius: 9999px;
+}
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: #0698c4;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(16px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.horizon-pill {
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.horizon-pill:hover:not(.active) {
+  color: var(--polar-cyan-primary);
+  background: var(--polar-ice-badge);
+}
+
+.horizon-pill.active {
+  background: var(--polar-teal-dark);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(18, 118, 148, 0.2);
+}
+
+/* -------------------------------------------------------------
+   Custom Scrollbar
+   ------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9ae5fe;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0698c4;
+}
+
+/* Sliders */
+input[type=range] {
+  -webkit-appearance: none;
+  background: #e2e8f0;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0698c4;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(6, 152, 196, 0.4);
+  transition: transform 0.15s, background-color 0.15s;
+}
+
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #05c5ff;
+}
+
+/* Status Pulse */
+@keyframes pulseDot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.pulse-dot {
+  animation: pulseDot 2s infinite ease-in-out;
+}

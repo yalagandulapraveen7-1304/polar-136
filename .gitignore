@@ -1,0 +1,29 @@
+﻿# Environments and Secrets
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# SQLite Database Logs
+*.db
+*.sqlite
+*.sqlite3
+
+# Scratch & Logs
+scratch/
+*.log
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
