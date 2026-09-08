@@ -114,6 +114,7 @@ class DataIngestionDriver:
         self.fault_genset_1 = False
         self.fault_battery_heater = False
         self.override_battery_soc = None
+        self.current_battery_soc = 76.5
         self.battery_reserve_pct = 20.0
         try:
             if OVERRIDE_STORE_PATH.exists():
