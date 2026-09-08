@@ -515,7 +515,14 @@ function renderTelemetry(data) {
   document.documentElement.style.setProperty('--turbine-speed', `${rotorSpeed}s`);
 
   // 4. Battery Reserve & Derating
-  const soc = t.battery_soc_pct !== undefined ? t.battery_soc_pct : 24.0;
+  if (t.battery_soc_pct !== undefined && t.battery_soc_pct !== null) {
+    state.lastValidSoc = t.battery_soc_pct;
+  }
+  if (t.battery_reserve_pct !== undefined && t.battery_reserve_pct !== null) {
+    state.lastValidReserve = t.battery_reserve_pct;
+  }
+  const soc = state.lastValidSoc !== undefined ? state.lastValidSoc : 76.5;
+  const battReserve = state.lastValidReserve !== undefined ? state.lastValidReserve : 20.0;
   const battTemp = t.battery_temp_c !== undefined ? t.battery_temp_c : -6.1;
   const battDischargeKw = d.p_battery_discharge_kw || 0.0;
   const battChargeKw = d.p_battery_charge_kw || 0.0;
@@ -537,24 +544,23 @@ function renderTelemetry(data) {
   if (batteryPctText) batteryPctText.textContent = `${Math.round(soc)}%`;
   if (batteryFillBar) batteryFillBar.style.width = `${Math.min(100, Math.max(5, soc))}%`;
   if (batteryCellTemp) batteryCellTemp.textContent = `${battTemp.toFixed(1)}°C`;
-  const battReserve = t.battery_reserve_pct !== undefined ? t.battery_reserve_pct : 20.0;
   const batteryReservePctText = document.getElementById('batteryReservePctText');
   if (batteryReservePctText) batteryReservePctText.textContent = `${Math.round(battReserve)}% Reserve`;
   if (batteryRateEl) {
-    if (battChargeKw > 0.05) {
+    if (battChargeKw > 0.1) {
       batteryRateEl.textContent = `+${battChargeKw.toFixed(2)} kW`;
-    } else if (battDischargeKw > 0.05) {
+    } else if (battDischargeKw > 0.1) {
       batteryRateEl.textContent = `-${battDischargeKw.toFixed(2)} kW`;
     } else {
       batteryRateEl.textContent = `0.00 kW`;
     }
   }
-  if (flowBatteryKw) flowBatteryKw.textContent = `${(battChargeKw > 0.05 ? battChargeKw : battDischargeKw).toFixed(1)} kW`;
+  if (flowBatteryKw) flowBatteryKw.textContent = `${(battChargeKw > 0.1 ? battChargeKw : battDischargeKw).toFixed(1)} kW`;
   if (dispBatteryKw) {
-    if (battChargeKw > 0.05) {
+    if (battChargeKw > 0.1) {
       dispBatteryKw.textContent = `+${battChargeKw.toFixed(2)} kW`;
       dispBatteryKw.className = 'text-sm font-black text-emerald-600';
-    } else if (battDischargeKw > 0.05) {
+    } else if (battDischargeKw > 0.1) {
       dispBatteryKw.textContent = `-${battDischargeKw.toFixed(2)} kW`;
       dispBatteryKw.className = 'text-sm font-black text-[#0698c4]';
     } else {
@@ -562,13 +568,13 @@ function renderTelemetry(data) {
       dispBatteryKw.className = 'text-sm font-black text-[#127694]';
     }
   }
-  if (flowBatteryVal) flowBatteryVal.textContent = `${(battChargeKw > 0.05 ? ('+' + battChargeKw.toFixed(2)) : (battDischargeKw > 0.05 ? ('-' + battDischargeKw.toFixed(2)) : '0.00'))} kW`;
+  if (flowBatteryVal) flowBatteryVal.textContent = `${(battChargeKw > 0.1 ? ('+' + battChargeKw.toFixed(2)) : (battDischargeKw > 0.1 ? ('-' + battDischargeKw.toFixed(2)) : '0.00'))} kW`;
 
   if (batteryStatusSub) {
-    if (battRateKw < -0.1) {
+    if (battChargeKw > 0.5 || battRateKw < -0.5) {
       batteryStatusSub.textContent = 'Charging';
       batteryStatusSub.className = 'text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200';
-    } else if (battRateKw > 0.1) {
+    } else if (battDischargeKw > 0.5 || battRateKw > 0.5) {
       batteryStatusSub.textContent = 'Discharging';
       batteryStatusSub.className = 'text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full';
     } else {
@@ -1028,7 +1034,18 @@ function setupModals() {
   if (btnOpenManual) btnOpenManual.addEventListener('click', () => openModal(modals.manual));
   if (btnTriggerSecondary) btnTriggerSecondary.addEventListener('click', () => openModal(modals.manual));
   const btnQuickAdjustReserve = document.getElementById('btnQuickAdjustReserve');
-  if (btnQuickAdjustReserve) btnQuickAdjustReserve.addEventListener('click', () => openModal(modals.manual));
+  if (btnQuickAdjustReserve) {
+    btnQuickAdjustReserve.addEventListener('click', () => {
+      openModal(modals.manual);
+      setTimeout(() => {
+        const slider = document.getElementById('slider-batt-reserve');
+        if (slider) {
+          slider.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          slider.focus();
+        }
+      }, 100);
+    });
+  }
   if (btnCloseManual) btnCloseManual.addEventListener('click', () => closeModal(modals.manual));
 
   // Backdrop close
@@ -1227,10 +1244,57 @@ function setupCommanderOverrides() {
     });
   }
 
+  // Restore persisted overrides from localStorage if available
+  try {
+    const saved = localStorage.getItem('polarops_overrides');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.battery_reserve_pct !== undefined) {
+        state.lastValidReserve = parsed.battery_reserve_pct;
+        if (sliderBattReserve) {
+          sliderBattReserve.value = parsed.battery_reserve_pct;
+          if (sliderBattReserveVal) sliderBattReserveVal.textContent = `${parsed.battery_reserve_pct}%`;
+        }
+      }
+      if (parsed.battery_soc_pct !== undefined) {
+        state.lastValidSoc = parsed.battery_soc_pct;
+        if (sliderBattSoc) {
+          sliderBattSoc.value = parsed.battery_soc_pct;
+          if (sliderBattSocVal) sliderBattSocVal.textContent = `${parsed.battery_soc_pct}%`;
+        }
+      }
+      if (parsed.ambient_temp_c !== undefined && sliderTemp) {
+        sliderTemp.value = parsed.ambient_temp_c;
+        if (sliderTempVal) sliderTempVal.textContent = `${parseFloat(parsed.ambient_temp_c).toFixed(1)}°C`;
+      }
+      if (parsed.wind_speed_ms !== undefined && sliderWind) {
+        sliderWind.value = parsed.wind_speed_ms;
+        if (sliderWindVal) sliderWindVal.textContent = `${parseFloat(parsed.wind_speed_ms).toFixed(1)} m/s`;
+      }
+      if (parsed.load_multiplier !== undefined && sliderLoadMult) {
+        sliderLoadMult.value = parsed.load_multiplier;
+        if (sliderLoadMultVal) sliderLoadMultVal.textContent = `${parseFloat(parsed.load_multiplier).toFixed(1)}x`;
+      }
+      // Re-sync with backend in case of serverless cold restart
+      fetch('/api/commander/override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(parsed)
+      }).catch(() => {});
+    }
+  } catch (e) {
+    console.warn('Could not restore overrides from localStorage:', e);
+  }
+
   if (btnResetOverrides) {
     btnResetOverrides.addEventListener('click', async () => {
       state.tripGen1 = false;
       state.faultBess = false;
+      state.lastValidReserve = 20.0;
+      try {
+        localStorage.removeItem('polarops_overrides');
+      } catch (e) {}
+
       if (btnTripGen1) btnTripGen1.className = 'p-2 rounded-2xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm';
       if (btnFaultBess) btnFaultBess.className = 'p-2 rounded-2xl bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm';
       if (sliderTemp) { sliderTemp.value = -26.3; sliderTempVal.textContent = '-26.3°C'; }
@@ -1238,6 +1302,9 @@ function setupCommanderOverrides() {
       if (sliderLoadMult) { sliderLoadMult.value = 1.0; sliderLoadMultVal.textContent = '1.0x'; }
       if (sliderBattReserve) { sliderBattReserve.value = 20; sliderBattReserveVal.textContent = '20%'; }
       if (sliderBattSoc) { sliderBattSoc.value = 74; sliderBattSocVal.textContent = '74%'; }
+
+      const batteryReservePctText = document.getElementById('batteryReservePctText');
+      if (batteryReservePctText) batteryReservePctText.textContent = '20% Reserve';
 
       try {
         await fetch('/api/commander/reset', { method: 'POST' });
@@ -1259,15 +1326,33 @@ function setupCommanderOverrides() {
         btnApply.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> <span>Applying...</span>';
       }
 
+      const reserveVal = sliderBattReserve ? parseFloat(sliderBattReserve.value) : undefined;
+      const socVal = sliderBattSoc ? parseFloat(sliderBattSoc.value) : undefined;
+
       const payload = {
         ambient_temp_c: sliderTemp ? parseFloat(sliderTemp.value) : undefined,
         wind_speed_ms: sliderWind ? parseFloat(sliderWind.value) : undefined,
         load_multiplier: sliderLoadMult ? parseFloat(sliderLoadMult.value) : 1.0,
         fault_genset_1: state.tripGen1,
         fault_battery_heater: state.faultBess,
-        battery_reserve_pct: sliderBattReserve ? parseFloat(sliderBattReserve.value) : undefined,
-        battery_soc_pct: sliderBattSoc ? parseFloat(sliderBattSoc.value) : undefined
+        battery_reserve_pct: reserveVal,
+        battery_soc_pct: socVal
       };
+
+      // Immediately pin state so the UI stays stable without waiting for next poll
+      if (reserveVal !== undefined) {
+        state.lastValidReserve = reserveVal;
+        const batteryReservePctText = document.getElementById('batteryReservePctText');
+        if (batteryReservePctText) batteryReservePctText.textContent = `${Math.round(reserveVal)}% Reserve`;
+      }
+      if (socVal !== undefined) {
+        state.lastValidSoc = socVal;
+      }
+
+      // Persist to localStorage for client durability
+      try {
+        localStorage.setItem('polarops_overrides', JSON.stringify(payload));
+      } catch (err) {}
 
       try {
         const res = await fetch('/api/commander/override', {

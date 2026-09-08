@@ -535,7 +535,7 @@
            ===================================================================== -->
       <div class="lg:col-span-4 xl:col-span-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-3.5 sm:gap-4 lg:gap-5">
 
-        <!-- CARD R1: Station Battery Reserve -->
+        <!-- CARD R1: Station Battery & Reserve -->
         <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between mb-2">
@@ -543,15 +543,18 @@
                 <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
                   <i class="fa-solid fa-car-battery text-xs"></i>
                 </div>
-                <span class="font-bold text-xs text-[#127694]">Station Battery Reserve</span>
+                <span class="font-bold text-xs text-[#127694]">Station Battery & Reserve</span>
               </div>
-              <span id="batteryStatusSub" class="text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full">
-                Charging
+              <span id="batteryStatusSub" class="text-[9px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                Buffer Standby
               </span>
             </div>
             
             <div class="flex items-baseline justify-between my-2">
-              <span id="batterySocBig" class="text-2xl font-black text-slate-800">24%</span>
+              <div class="flex items-baseline gap-2">
+                <span id="batterySocBig" class="text-2xl font-black text-slate-800">77%</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Current SoC</span>
+              </div>
               <span class="text-xs font-semibold text-slate-400">Capacity: <strong id="batteryCapacityKwh" class="text-slate-700">94.6 kWh</strong></span>
             </div>
           </div>
@@ -559,20 +562,20 @@
           <!-- Cylinder Battery Bar -->
           <div class="space-y-1.5 my-2">
             <div class="cylinder-battery-container">
-              <div id="batteryFillBar" class="cylinder-battery-fill" style="width: 24%;">
-                <span id="batteryPctText" class="battery-pct-label">24%</span>
+              <div id="batteryFillBar" class="cylinder-battery-fill" style="width: 77%;">
+                <span id="batteryPctText" class="battery-pct-label">77%</span>
               </div>
             </div>
             <div class="flex items-center justify-between text-[10px] text-slate-500">
               <span>Cell Temp: <strong id="batteryCellTemp">-6.1°C</strong></span>
-              <span class="flex items-center gap-1">Protected: <strong id="batteryReservePctText">20% Reserve</strong>
+              <span class="flex items-center gap-1">Protected Floor: <strong id="batteryReservePctText" class="text-[#127694] font-black">20% Reserve</strong>
                 <button type="button" id="btnQuickAdjustReserve" title="Adjust protected battery reserve floor" class="text-[9px] font-bold text-[#0698c4] hover:text-[#05c5ff] bg-[#e0f7fe] hover:bg-[#c2f0fe] px-1.5 py-0.5 rounded transition">Manual</button>
               </span>
             </div>
           </div>
 
           <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-            <span>Rate: <strong id="batteryRateKw" class="text-[#0698c4]">+5.98 kW</strong></span>
+            <span>Rate: <strong id="batteryRateKw" class="text-[#0698c4]">0.00 kW</strong></span>
             <span>LiFePO4 Thermal Pack</span>
           </div>
         </div>

@@ -22,11 +22,12 @@ class PolarEnergyOptimizer:
         self.cumulative_diesel_saved_liters = 4280.0 # Initial historical base for demo
         self.cumulative_co2_avoided_kg = round(4280.0 * 2.68, 1)
 
-    def calculate_battery_derating(self, battery_temp_c: float, soc_pct: float, nominal_capacity_kwh: float) -> Tuple[float, float, float]:
+    def calculate_battery_derating(self, battery_temp_c: float, soc_pct: float, nominal_capacity_kwh: float, min_reserve_pct: float = BATTERY_MIN_SOC_PCT) -> Tuple[float, float, float]:
         """
         Calculates temperature-dependent battery derating factor and max charge/discharge limits.
         Below -20°C, LiFePO4 internal impedance rises sharply, derating effective kW throughput.
         Below -35°C, discharge is locked out completely without pre-heaters.
+        Enforces dynamic protected battery reserve floor (min_reserve_pct).
         """
         # 1. Temperature derating factor
         if battery_temp_c >= BATTERY_DERATE_TEMP_C:
@@ -39,14 +40,14 @@ class PolarEnergyOptimizer:
             
         effective_capacity_kwh = nominal_capacity_kwh * temp_factor
         
-        # 2. Maximum discharge rate (0.7C nominal, scaled by temp and available SoC headroom)
+        # 2. Maximum discharge rate (0.7C nominal, scaled by temp and available SoC headroom above reserve floor)
         max_c_rate = 0.7
         nominal_max_kw = nominal_capacity_kwh * max_c_rate
         
-        if soc_pct <= BATTERY_MIN_SOC_PCT or temp_factor < 0.1:
+        if soc_pct <= min_reserve_pct or temp_factor < 0.1:
             max_discharge_kw = 0.0
         else:
-            soc_headroom = (soc_pct - BATTERY_MIN_SOC_PCT) / (100.0 - BATTERY_MIN_SOC_PCT)
+            soc_headroom = max(0.0, (soc_pct - min_reserve_pct) / max(1.0, 100.0 - min_reserve_pct))
             max_discharge_kw = nominal_max_kw * temp_factor * min(1.0, soc_headroom * 1.5)
             
         # 3. Maximum charge rate (charging sub-zero batteries causes lithium plating if too fast)
@@ -54,7 +55,7 @@ class PolarEnergyOptimizer:
         if soc_pct >= BATTERY_MAX_SOC_PCT:
             max_charge_kw = 0.0
         else:
-            charge_headroom = (BATTERY_MAX_SOC_PCT - soc_pct) / (BATTERY_MAX_SOC_PCT - BATTERY_MIN_SOC_PCT)
+            charge_headroom = max(0.0, (BATTERY_MAX_SOC_PCT - soc_pct) / max(1.0, BATTERY_MAX_SOC_PCT - min_reserve_pct))
             max_charge_kw = (nominal_capacity_kwh * 0.5) * charge_temp_factor * min(1.0, charge_headroom * 1.2)
             
         return round(temp_factor, 3), round(max_discharge_kw, 1), round(max_charge_kw, 1)
@@ -79,11 +80,12 @@ class PolarEnergyOptimizer:
         q_load_th = float(telemetry.get("thermal_load_kwth", 65.0))
         battery_temp_c = float(telemetry.get("battery_temp_c", -12.0))
         soc_pct = float(telemetry.get("battery_soc_pct", 75.0))
+        min_reserve_pct = float(telemetry.get("battery_reserve_pct", BATTERY_MIN_SOC_PCT))
         genset_1_fault = bool(telemetry.get("genset_1_fault", False))
         
-        # Calculate battery derated limits
+        # Calculate battery derated limits adhering to protected reserve floor
         temp_factor, max_batt_dis, max_batt_chg = self.calculate_battery_derating(
-            battery_temp_c, soc_pct, station["battery_capacity_kwh"]
+            battery_temp_c, soc_pct, station["battery_capacity_kwh"], min_reserve_pct=min_reserve_pct
         )
 
         # Diesel capacities
@@ -141,6 +143,12 @@ class PolarEnergyOptimizer:
             p_solar = max(0.0, float(x[3]))
             p_dis = max(0.0, float(x[4]))
             p_chg = max(0.0, float(x[5]))
+
+            # Deadband filter (0.8 kW): prevent micro-cycling between charge and discharge on white noise
+            if p_dis < 0.8:
+                p_dis = 0.0
+            if p_chg < 0.8:
+                p_chg = 0.0
             q_aux = max(0.0, float(x[6]))
             p_curt = max(0.0, float(x[7]))
         else:

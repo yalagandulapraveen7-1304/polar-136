@@ -7,9 +7,14 @@ import time
 import math
 import random
 import datetime
+import json
+import tempfile
+from pathlib import Path
 import httpx
 from typing import Dict, Any, Optional
 from backend.config import STATIONS
+
+OVERRIDE_STORE_PATH = Path(tempfile.gettempdir()) / "polarops_overrides.json"
 
 class DataIngestionDriver:
     def __init__(self, station_id: str = "MAITRI", mode: str = "DEMO_MODE"):
@@ -37,6 +42,38 @@ class DataIngestionDriver:
         self.override_battery_soc: Optional[float] = None
         self.battery_reserve_pct: float = 20.0
 
+        # Auto-restore active overrides across cold starts or serverless instances
+        self._load_persisted_overrides()
+
+    def _persist_overrides(self):
+        """Save active overrides to disk for serverless/cold-start survival"""
+        try:
+            data = {
+                "ambient_temp_c": self.override_temp_c,
+                "wind_speed_ms": self.override_wind_ms,
+                "solar_irradiance_wm2": self.override_solar_wm2,
+                "load_multiplier": self.override_load_mult,
+                "fault_genset_1": self.fault_genset_1,
+                "fault_battery_heater": self.fault_battery_heater,
+                "battery_soc_pct": self.override_battery_soc,
+                "battery_reserve_pct": self.battery_reserve_pct,
+            }
+            with open(OVERRIDE_STORE_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f)
+        except Exception:
+            pass
+
+    def _load_persisted_overrides(self):
+        """Load active overrides from disk if present"""
+        try:
+            if OVERRIDE_STORE_PATH.exists():
+                with open(OVERRIDE_STORE_PATH, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    if isinstance(data, dict):
+                        self.apply_overrides(data, persist=False)
+        except Exception:
+            pass
+
     def set_station(self, station_id: str):
         if station_id in STATIONS:
             self.station_id = station_id
@@ -46,7 +83,7 @@ class DataIngestionDriver:
         if mode in ["DEMO_MODE", "SCADA_MODE"]:
             self.mode = mode
 
-    def apply_overrides(self, overrides: Dict[str, Any]):
+    def apply_overrides(self, overrides: Dict[str, Any], persist: bool = True):
         """Commander manual injection sliders and fault toggles"""
         if "ambient_temp_c" in overrides and overrides["ambient_temp_c"] is not None:
             self.override_temp_c = float(overrides["ambient_temp_c"])
@@ -66,6 +103,9 @@ class DataIngestionDriver:
         if "battery_reserve_pct" in overrides and overrides["battery_reserve_pct"] is not None:
             self.battery_reserve_pct = float(overrides["battery_reserve_pct"])
 
+        if persist:
+            self._persist_overrides()
+
     def clear_overrides(self):
         self.override_temp_c = None
         self.override_wind_ms = None
@@ -75,6 +115,11 @@ class DataIngestionDriver:
         self.fault_battery_heater = False
         self.override_battery_soc = None
         self.battery_reserve_pct = 20.0
+        try:
+            if OVERRIDE_STORE_PATH.exists():
+                OVERRIDE_STORE_PATH.unlink(missing_ok=True)
+        except Exception:
+            pass
 
     def _fetch_open_meteo_weather(self) -> Dict[str, float]:
         """Fetch real-time polar weather from Open-Meteo for Antarctica station coords"""
