@@ -21,6 +21,9 @@ const state = {
   sliderTemp: -26.3,
   sliderWind: 24.9,
   sliderLoadMult: 1.0,
+  activeOverrides: null,
+  lastValidSoc: null,
+  lastValidReserve: null,
   auditLogs: [
     {
       time: '12:00:15',
@@ -515,12 +518,26 @@ function renderTelemetry(data) {
   document.documentElement.style.setProperty('--turbine-speed', `${rotorSpeed}s`);
 
   // 4. Battery Reserve & Derating
-  if (t.battery_soc_pct !== undefined && t.battery_soc_pct !== null) {
+  // Check if active user overrides are in effect (authoritative over serverless node desync)
+  const userSocOverride = (state.activeOverrides && state.activeOverrides.battery_soc_pct !== undefined && state.activeOverrides.battery_soc_pct !== null)
+    ? parseFloat(state.activeOverrides.battery_soc_pct)
+    : null;
+  const userReserveOverride = (state.activeOverrides && state.activeOverrides.battery_reserve_pct !== undefined && state.activeOverrides.battery_reserve_pct !== null)
+    ? parseFloat(state.activeOverrides.battery_reserve_pct)
+    : null;
+
+  if (userSocOverride !== null) {
+    state.lastValidSoc = userSocOverride;
+  } else if (t.battery_soc_pct !== undefined && t.battery_soc_pct !== null) {
     state.lastValidSoc = t.battery_soc_pct;
   }
-  if (t.battery_reserve_pct !== undefined && t.battery_reserve_pct !== null) {
+
+  if (userReserveOverride !== null) {
+    state.lastValidReserve = userReserveOverride;
+  } else if (t.battery_reserve_pct !== undefined && t.battery_reserve_pct !== null) {
     state.lastValidReserve = t.battery_reserve_pct;
   }
+
   const soc = state.lastValidSoc !== undefined ? state.lastValidSoc : 76.5;
   const battReserve = state.lastValidReserve !== undefined ? state.lastValidReserve : 20.0;
   const battTemp = t.battery_temp_c !== undefined ? t.battery_temp_c : -6.1;
@@ -777,7 +794,30 @@ function initHttpFallback() {
   const pollStatus = async () => {
     if (!state.wsConnected) {
       try {
-        const res = await fetch('/api/status');
+        let url = '/api/status';
+        if (state.activeOverrides) {
+          const params = new URLSearchParams();
+          if (state.activeOverrides.battery_soc_pct !== undefined && state.activeOverrides.battery_soc_pct !== null) {
+            params.append('override_soc', state.activeOverrides.battery_soc_pct);
+          }
+          if (state.activeOverrides.battery_reserve_pct !== undefined && state.activeOverrides.battery_reserve_pct !== null) {
+            params.append('override_reserve', state.activeOverrides.battery_reserve_pct);
+          }
+          if (state.activeOverrides.ambient_temp_c !== undefined && state.activeOverrides.ambient_temp_c !== null) {
+            params.append('override_temp', state.activeOverrides.ambient_temp_c);
+          }
+          if (state.activeOverrides.wind_speed_ms !== undefined && state.activeOverrides.wind_speed_ms !== null) {
+            params.append('override_wind', state.activeOverrides.wind_speed_ms);
+          }
+          if (state.activeOverrides.load_multiplier !== undefined && state.activeOverrides.load_multiplier !== null) {
+            params.append('override_load', state.activeOverrides.load_multiplier);
+          }
+          if (state.tripGen1) params.append('fault_genset_1', 'true');
+          if (state.faultBess) params.append('fault_battery_heater', 'true');
+          const qs = params.toString();
+          if (qs) url += `?${qs}`;
+        }
+        const res = await fetch(url);
         if (res.ok) {
           const status = await res.json();
           renderTelemetry(status);
@@ -1249,6 +1289,7 @@ function setupCommanderOverrides() {
     const saved = localStorage.getItem('polarops_overrides');
     if (saved) {
       const parsed = JSON.parse(saved);
+      state.activeOverrides = parsed;
       if (parsed.battery_reserve_pct !== undefined) {
         state.lastValidReserve = parsed.battery_reserve_pct;
         if (sliderBattReserve) {
@@ -1291,6 +1332,8 @@ function setupCommanderOverrides() {
       state.tripGen1 = false;
       state.faultBess = false;
       state.lastValidReserve = 20.0;
+      state.lastValidSoc = 76.5;
+      state.activeOverrides = null;
       try {
         localStorage.removeItem('polarops_overrides');
       } catch (e) {}
@@ -1339,6 +1382,9 @@ function setupCommanderOverrides() {
         battery_soc_pct: socVal
       };
 
+      // Set active overrides in global state immediately
+      state.activeOverrides = payload;
+
       // Immediately pin state so the UI stays stable without waiting for next poll
       if (reserveVal !== undefined) {
         state.lastValidReserve = reserveVal;
@@ -1347,6 +1393,12 @@ function setupCommanderOverrides() {
       }
       if (socVal !== undefined) {
         state.lastValidSoc = socVal;
+        const batterySocBig = document.getElementById('batterySocBig');
+        if (batterySocBig) batterySocBig.textContent = `${Math.round(socVal)}%`;
+        const batteryPctText = document.getElementById('batteryPctText');
+        if (batteryPctText) batteryPctText.textContent = `${Math.round(socVal)}%`;
+        const batteryFillBar = document.getElementById('batteryFillBar');
+        if (batteryFillBar) batteryFillBar.style.width = `${Math.min(100, Math.max(5, socVal))}%`;
       }
 
       // Persist to localStorage for client durability

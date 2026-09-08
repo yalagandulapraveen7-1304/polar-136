@@ -7,10 +7,10 @@ LightGBM 24h forecaster, Guardrail safety overrides, Groq LLM integration, and S
 import os
 import asyncio
 import datetime
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -182,8 +182,36 @@ class ChatRequest(BaseModel):
 
 # ----------------- REST Endpoints -----------------
 @app.get("/api/status")
-async def get_status():
-    snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+async def get_status(
+    override_soc: Optional[float] = Query(None),
+    override_reserve: Optional[float] = Query(None),
+    override_temp: Optional[float] = Query(None),
+    override_wind: Optional[float] = Query(None),
+    override_load: Optional[float] = Query(None),
+    fault_genset_1: Optional[bool] = Query(None),
+    fault_battery_heater: Optional[bool] = Query(None),
+):
+    query_overrides = {}
+    if override_soc is not None:
+        query_overrides["battery_soc_pct"] = override_soc
+    if override_reserve is not None:
+        query_overrides["battery_reserve_pct"] = override_reserve
+    if override_temp is not None:
+        query_overrides["ambient_temp_c"] = override_temp
+    if override_wind is not None:
+        query_overrides["wind_speed_ms"] = override_wind
+    if override_load is not None:
+        query_overrides["load_multiplier"] = override_load
+    if fault_genset_1 is not None:
+        query_overrides["fault_genset_1"] = fault_genset_1
+    if fault_battery_heater is not None:
+        query_overrides["fault_battery_heater"] = fault_battery_heater
+
+    if query_overrides:
+        ingestion_driver.apply_overrides(query_overrides)
+
+    # In serverless environments, always compute a fresh snapshot so overrides are never stale
+    snapshot = compute_system_snapshot()
     return {
         **snapshot,
         "status": "ONLINE",
@@ -211,11 +239,13 @@ async def switch_mode(req: ModeSwitchRequest):
 @app.post("/api/commander/override")
 async def commander_override(req: CommanderOverrideRequest):
     ingestion_driver.apply_overrides(req.model_dump(exclude_unset=True))
+    compute_system_snapshot()
     return {"status": "SUCCESS", "message": "Commander overrides applied to digital twin."}
 
 @app.post("/api/commander/reset")
 async def commander_reset():
     ingestion_driver.clear_overrides()
+    compute_system_snapshot()
     return {"status": "SUCCESS", "message": "Overrides cleared, nominal polar physics restored."}
 
 @app.post("/api/chat")

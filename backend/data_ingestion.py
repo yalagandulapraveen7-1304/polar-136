@@ -283,6 +283,8 @@ class DataIngestionDriver:
         Standardizes incoming data into a single unified JSON payload.
         Handles DEMO_MODE API vs SCADA_MODE Modbus registers.
         """
+        # Ensure latest overrides are refreshed from disk on every cycle
+        self._load_persisted_overrides()
         station = STATIONS[self.station_id]
         
         # 1. Weather acquisition
