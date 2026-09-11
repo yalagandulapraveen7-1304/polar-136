@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVARA // AI Polar Energy Management System (PolarOPS)</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="bg-[#f4fafc] text-slate-800 antialiased selection:bg-[#05c5ff] selection:text-white min-h-screen overflow-x-hidden w-full">
+
+  <!-- =========================================================================
+       MAIN DASHBOARD CONTAINER (Max width 1600px, Clean Arctic Ice Layout)
+       ========================================================================= -->
+  <div class="w-full max-w-[1600px] mx-auto p-3 sm:p-4 lg:p-5 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
+
+    <!-- FLOATING TOP NAVIGATION PILL -->
+    <header id="mainNavHeader" class="w-full floating-nav px-3.5 sm:px-5 py-2.5 z-30 relative transition-all duration-300">
+      <div class="flex items-center justify-between w-full">
+        
+        <!-- Brand Identity -->
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center shadow-sm shrink-0">
+            <i class="fa-solid fa-snowflake text-xs sm:text-sm text-white"></i>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold tracking-tight text-base sm:text-lg text-[#127694] leading-none">NOVARA</span>
+            <span class="text-[9px] sm:text-[10px] tracking-wider uppercase font-bold px-1.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4]">POLAR EMS</span>
+          </div>
+        </div>
+
+        <!-- Station Selector Pills (Visible on md+ tablets and desktop) -->
+        <div class="hidden md:flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+          <button id="btn-bharati" class="station-pill active" data-station="BHARATI">
+            Bharati
+          </button>
+          <button id="btn-maitri" class="station-pill" data-station="MAITRI">
+            Maitri
+          </button>
+        </div>
+
+        <!-- Center Navigation Links (Visible on lg+) -->
+        <nav class="hidden lg:flex items-center gap-1 bg-white/80 p-1 rounded-full border border-[#9ae5fe]/60 shadow-inner">
+          <button class="nav-pill active" data-nav="overview">
+            <i class="fa-solid fa-table-cells-large text-xs"></i> Overview
+          </button>
+          <button class="nav-pill" id="navBtnForecast" data-nav="forecast">
+            <i class="fa-solid fa-chart-line text-xs"></i> Forecast (Full)
+          </button>
+          <button class="nav-pill" id="navBtnDispatch" data-nav="dispatch">
+            <i class="fa-solid fa-code-fork text-xs"></i> Dispatch
+          </button>
+          <button class="nav-pill" id="navBtnAssistant" data-nav="assistant">
+            <i class="fa-solid fa-robot text-xs"></i> Assistant
+          </button>
+          <button class="nav-pill" id="navBtnMaintenance" data-nav="maintenance">
+            <i class="fa-solid fa-shield-halved text-xs"></i> Maintenance
+          </button>
+        </nav>
+
+        <!-- Right Header Actions -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <!-- Dual Mode Pill Toggle (Desktop & Tablet) -->
+          <div class="hidden sm:flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
+            <button id="btn-mode-demo" class="mode-pill active" title="Live NASA/Open-Meteo Antarctic Weather API">
+              API
+            </button>
+            <button id="btn-mode-scada" class="mode-pill" title="Modbus TCP / MQTT Registers">
+              SCADA
+            </button>
+          </div>
+
+          <!-- Manual Override Entry Button (Desktop & Tablet) -->
+          <button id="btnOpenManualModal" class="hidden sm:flex text-[11px] font-bold text-[#127694] hover:text-[#0698c4] transition items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-[#9ae5fe] shadow-sm">
+            <i class="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
+            <span>Manual Entry</span>
+          </button>
+
+          <!-- Live UTC Station Clock (Desktop only) -->
+          <div class="hidden xl:flex items-center gap-1.5 text-slate-500 font-mono text-[10px] bg-white/90 px-3 py-1.5 rounded-full border border-[#9ae5fe]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+            <span id="stationClock">2026-09-07 16:11:29 UTC</span>
+          </div>
+
+          <!-- Mobile Station Badge Pill (< md) -->
+          <div class="flex md:hidden items-center gap-0.5 bg-[#e5f6fd] p-0.5 rounded-full border border-[#9ae5fe] text-[10px]">
+            <button id="btn-bharati-mobile-pill" class="station-pill-mini active" data-station="BHARATI">Bharati</button>
+            <button id="btn-maitri-mobile-pill" class="station-pill-mini" data-station="MAITRI">Maitri</button>
+          </div>
+
+          <!-- BURGER BUTTON (Visible on mobile & tablet: < lg) -->
+          <button id="btnBurgerMenu" class="lg:hidden p-2 rounded-xl bg-white/95 hover:bg-[#e5f6fd] active:scale-95 border border-[#9ae5fe] text-[#127694] transition-all flex items-center justify-center shadow-sm" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i id="burgerIcon" class="fa-solid fa-bars text-sm transition-transform duration-200"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- COLLAPSIBLE MOBILE & TABLET DRAWER (ABSOLUTE OVERLAY, ZERO PAGE REFLOW) -->
+      <div id="mobileNavDrawer" class="mobile-drawer-overlay lg:hidden flex flex-col gap-3 p-3.5 sm:p-4">
+        <!-- Navigation Grid: 2 columns on mobile, 3 columns on tablet -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <button type="button" class="mobile-nav-btn active" id="mobileNavOverview">
+            <i class="fa-solid fa-table-cells-large text-base text-[#0698c4]"></i>
+            <span>Overview</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavForecast">
+            <i class="fa-solid fa-chart-line text-base text-[#0698c4]"></i>
+            <span>Full Forecast</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavDispatch">
+            <i class="fa-solid fa-code-fork text-base text-[#0698c4]"></i>
+            <span>Dispatch Matrix</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavAssistant">
+            <i class="fa-solid fa-robot text-base text-[#0698c4]"></i>
+            <span>AI Assistant</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavMaintenance">
+            <i class="fa-solid fa-shield-halved text-base text-[#0698c4]"></i>
+            <span>Maintenance</span>
+          </button>
+          <button type="button" class="mobile-nav-btn" id="mobileNavManual">
+            <i class="fa-solid fa-sliders text-base text-[#05c5ff]"></i>
+            <span>Manual Entry</span>
+          </button>
+        </div>
+
+        <!-- Quick Switch Bar for Station & Mode (Mobile & Tablet) -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-[#9ae5fe]/40">
+          <div class="flex items-center justify-between sm:justify-start gap-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Station:</span>
+            <div class="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+              <button id="btn-bharati-mobile" class="station-pill active" data-station="BHARATI">Bharati</button>
+              <button id="btn-maitri-mobile" class="station-pill" data-station="MAITRI">Maitri</button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between sm:justify-start gap-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase">Stream:</span>
+            <div class="flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
+              <button id="btn-mode-demo-mobile" class="mode-pill active">API Weather</button>
+              <button id="btn-mode-scada-mobile" class="mode-pill">SCADA PLC</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Clock & Live Status -->
+        <div class="flex items-center justify-between text-[10px] text-slate-500 font-mono bg-white/80 px-3 py-1.5 rounded-xl border border-[#9ae5fe]/60">
+          <span class="flex items-center gap-1.5 font-sans font-semibold text-emerald-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+            Microgrid Online
+          </span>
+          <span id="stationClockMobile">--:--:-- UTC</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================================
+         CORE GRID LAYOUT
+         Left Column: Hero Section + 3 Bottom Cards (Col Span 9)
+         Right Column: 3 Stacked Status Cards (Col Span 3)
+         ========================================================================= -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 lg:gap-5">
+
+      <!-- =====================================================================
+           LEFT MAIN AREA: HERO SECTION + 3 BOTTOM CARDS
+           ===================================================================== -->
+      <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
+
+        <!-- ===================================================================
+             TOP-LEFT HERO BOX
+             Branding + Safety Mode + 3 Live Stats + Windmill Graphic + Copilot Bar
+             =================================================================== -->
+        <div class="novara-card p-4 sm:p-6 flex flex-col justify-between overflow-hidden bg-gradient-to-b from-white via-[#f7fcfe] to-[#edf8fc] relative">
+          
+          <!-- Inner Top Grid: Telemetry & Windmill Visual Card -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center mb-4">
+            
+            <!-- Left Info Block: Branding & Key Glance Stats -->
+            <div class="md:col-span-7 flex flex-col justify-between">
+              <div>
+                <!-- Risk Mode & Station Coordinate Badge -->
+                <div class="flex flex-wrap items-center gap-2 mb-2.5">
+                  <div id="riskModeBadge" class="badge-risk-conservative px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="riskModeText">CONSERVATIVE TIER</span>
+                  </div>
+                  <span id="stationLocationBadge" class="text-[11px] font-semibold text-slate-500 bg-white/80 px-2.5 py-1 rounded-full border border-[#9ae5fe]/60">
+                    Bharati Station • 69°24'S, 76°11'E
+                  </span>
+                </div>
+
+                <!-- Hero Title & Subtitle -->
+                <div class="mb-3">
+                  <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#127694]">
+                    NOVARA
+                  </h1>
+                  <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                    AI-driven polar energy management system
+                  </p>
+                </div>
+              </div>
+
+              <!-- 3 Key Live Glance Stats -->
+              <div class="grid grid-cols-3 gap-1.5 sm:gap-3 mt-1">
+                <div class="bg-white/95 rounded-2xl p-2 sm:p-3 border border-[#9ae5fe] shadow-sm">
+                  <div class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Station Load</div>
+                  <div id="valTotalDemandKw" class="text-sm sm:text-lg font-extrabold text-[#127694] truncate">40.4 kW</div>
+                  <div class="text-[8px] sm:text-[9px] text-slate-500 truncate">Demand: <span id="valRequiredKw" class="font-semibold text-slate-700">40.4 kW</span></div>
+                </div>
+                <div class="bg-white/95 rounded-2xl p-2 sm:p-3 border border-[#9ae5fe] shadow-sm">
+                  <div class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Outside Temp</div>
+                  <div id="valOutsideTemp" class="text-sm sm:text-lg font-extrabold text-slate-800 truncate">-26.3°C</div>
+                  <div class="text-[8px] sm:text-[9px] text-slate-500 truncate">Chill: <span id="valWindChill" class="font-semibold text-slate-700">-48.0°C</span></div>
+                </div>
+                <div class="bg-white/95 rounded-2xl p-2 sm:p-3 border border-[#9ae5fe] shadow-sm">
+                  <div class="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Fuel Autonomy</div>
+                  <div id="valFuelDaysHero" class="text-sm sm:text-lg font-extrabold text-[#0698c4] truncate">26.6 Days</div>
+                  <div class="text-[8px] sm:text-[9px] text-slate-500 truncate"><span id="valFuelPctHero">75%</span> Tank Reserve</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Visual Card: Animated Wind Turbine Silhouette -->
+            <div class="md:col-span-5 flex flex-col justify-center">
+              <div class="bg-white/90 rounded-2xl border border-[#9ae5fe] p-3.5 sm:p-4 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[165px]">
+                
+                <!-- Card Header -->
+                <div class="flex items-center justify-between z-10">
+                  <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-wind text-xs text-[#05c5ff]"></i>
+                    <span class="text-[10px] font-bold text-[#127694] tracking-wider uppercase">Renewable Harvest</span>
+                  </div>
+                  <span id="renewableStatusTag" class="text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full">
+                    Active
+                  </span>
+                </div>
+
+                <!-- Animated Wind Turbine Silhouette SVG -->
+                <div class="absolute right-2 bottom-1 w-32 h-36 opacity-35 pointer-events-none flex items-center justify-center">
+                  <svg viewBox="0 0 100 120" class="w-full h-full text-[#4499b3]" fill="currentColor">
+                    <!-- Mast / Tower -->
+                    <path d="M48 50 L45 120 L55 120 L52 50 Z" opacity="0.85" />
+                    <circle cx="50" cy="50" r="4.5" />
+                    <!-- Rotating 3-blade propeller -->
+                    <g id="turbineRotorGroup" class="animate-turbine origin-center" style="transform-origin: 50px 50px;">
+                      <!-- Blade 1 (up) -->
+                      <path d="M50 50 C48 35, 46 15, 50 2 C54 15, 52 35, 50 50 Z" />
+                      <!-- Blade 2 (bottom right 120 deg) -->
+                      <path d="M50 50 C63 58, 80 68, 91 75 C82 82, 65 72, 50 50 Z" />
+                      <!-- Blade 3 (bottom left 240 deg) -->
+                      <path d="M50 50 C37 58, 20 68, 9 75 C18 82, 35 72, 50 50 Z" />
+                    </g>
+                  </svg>
+                </div>
+
+                <!-- Live Generation Metrics -->
+                <div class="space-y-2 z-10 mt-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-[#05c5ff]"></span> Wind Output
+                    </span>
+                    <span id="valWindKw" class="font-extrabold text-[#0698c4]">44.88 kW</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-500 font-medium flex items-center gap-1.5">
+                      <span class="w-2 h-2 rounded-full bg-[#4499b3]"></span> Solar PV
+                    </span>
+                    <span id="valSolarKw" class="font-extrabold text-[#4499b3]">1.34 kW</span>
+                  </div>
+                  <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1.5 border-t border-[#9ae5fe]/40">
+                    <span>Wind: <strong id="valWindSpeed" class="text-slate-700">24.9 m/s</strong></span>
+                    <span>Solar: <strong id="valSolarIrradiance" class="text-slate-700">131 W/m²</strong></span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ===================================================================
+               HERO BOTTOM: NOVARA AI COPILOT COMMAND BAR
+               =================================================================== -->
+          <div class="w-full mt-auto pt-1 relative z-10">
+            <form id="copilotForm" class="copilot-command-pill px-3.5 sm:px-4 py-2 flex items-center gap-2 sm:gap-3">
+              <i class="fa-solid fa-magnifying-glass text-xs text-[#05c5ff] shrink-0"></i>
+              <input 
+                type="text" 
+                id="copilotInput"
+                placeholder="Ask Novara AI co-pilot about microgrid dispatch, fuel autonomy, or battery health..." 
+                class="flex-1 bg-transparent text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none min-w-0"
+              />
+              <button type="submit" id="btnCopilotSubmit" class="px-3.5 py-1.5 rounded-full bg-[#0698c4] hover:bg-[#05c5ff] text-white font-bold text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                <span class="hidden sm:inline">Ask Copilot</span>
+              </button>
+              <button type="button" id="btnOpenCopilotModal" title="Expand Full Chatbot Dialog" class="p-1.5 rounded-full text-slate-400 hover:text-[#0698c4] hover:bg-slate-100 transition shrink-0">
+                <i class="fa-solid fa-up-right-and-down-left-from-center text-xs"></i>
+              </button>
+            </form>
+
+            <!-- Quick Suggestion Prompt Chips -->
+            <div class="flex flex-wrap items-center gap-1.5 mt-2 px-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase mr-1">Quick Prompts:</span>
+              <button type="button" class="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#9ae5fe] text-[#127694] hover:bg-[#c2f0fe] transition" data-q="Why did you choose this microgrid dispatch mix?">
+                Dispatch Reasoning
+              </button>
+              <button type="button" class="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#9ae5fe] text-[#127694] hover:bg-[#c2f0fe] transition" data-q="How long will our fuel reserves last if a storm hits?">
+                Storm Autonomy
+              </button>
+              <button type="button" class="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#9ae5fe] text-[#127694] hover:bg-[#c2f0fe] transition" data-q="What is the station battery state of charge and health?">
+                Battery Health
+              </button>
+            </div>
+
+            <!-- Inline Expandable Copilot Response Box (Hidden initially until user asks) -->
+            <div id="copilotResponseBox" class="mt-2.5 p-3.5 rounded-2xl bg-white/95 border border-[#05c5ff]/50 shadow-md hidden">
+              <div class="flex items-center justify-between pb-1.5 mb-1.5 border-b border-[#9ae5fe]/40">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-[#127694]">
+                  <i class="fa-solid fa-robot text-xs text-[#05c5ff]"></i>
+                  <span>Novara AI Copilot Response</span>
+                </div>
+                <button id="btnCloseCopilotResponse" type="button" title="Close response" class="text-slate-400 hover:text-slate-700 p-0.5">
+                  <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+              </div>
+              <p id="copilotResponseText" class="text-xs text-slate-700 leading-relaxed"></p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ===================================================================
+             BOTTOM ROW: 3 CARDS (B1, B2, B3)
+             =================================================================== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+          
+          <!-- CARD B1: AI Fuel Optimization -->
+          <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+                    <i class="fa-solid fa-chart-pie text-xs"></i>
+                  </div>
+                  <span class="font-bold text-xs text-[#127694]">AI Fuel Optimization</span>
+                </div>
+                <span class="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  7-Day Sim
+                </span>
+              </div>
+              <p class="text-[10px] text-slate-400 mb-3">LP dispatch optimization vs naive baseline generator burn.</p>
+            </div>
+
+            <!-- Big Percentage Metric -->
+            <div class="text-center my-1 bg-[#f0faff] py-2.5 px-3 rounded-2xl border border-[#9ae5fe]/60">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Fuel Saved</div>
+              <div id="fuelSavedPct" class="text-2xl font-black text-emerald-600 my-0.5">+9.4%</div>
+              <div class="text-[10px] font-semibold text-slate-600">
+                <span id="fuelSavedLiters">133.0 L</span> conserved • <span id="co2SavedKg">352 kg</span> CO₂
+              </div>
+            </div>
+
+            <!-- Side-by-Side Comparison -->
+            <div class="grid grid-cols-2 gap-2 mt-3 pt-2 border-t border-slate-100 text-center">
+              <div class="p-1.5 rounded-xl bg-white border border-[#9ae5fe]/70">
+                <div class="text-[9px] font-bold text-[#0698c4] uppercase">With AI</div>
+                <div id="fuelOptimizedLiters" class="text-xs font-black text-slate-800">1,280 L</div>
+              </div>
+              <div class="p-1.5 rounded-xl bg-white border border-slate-200">
+                <div class="text-[9px] font-bold text-slate-400 uppercase">Without AI</div>
+                <div id="fuelBaselineLiters" class="text-xs font-black text-slate-600">1,413 L</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD B2: Demo Scenarios -->
+          <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-xs"></i>
+                  </div>
+                  <span class="font-bold text-xs text-[#127694]">Demo Scenarios</span>
+                </div>
+                <span id="activeScenarioLabel" class="text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full">
+                  Live Normal
+                </span>
+              </div>
+              <p class="text-[10px] text-slate-400 mb-2.5">Simulate extreme polar contingencies in 1-tap.</p>
+            </div>
+
+            <!-- 2x2 Interactive Scenario Buttons -->
+            <div class="grid grid-cols-2 gap-2 my-1">
+              <button type="button" class="scenario-btn p-2 rounded-xl border border-[#9ae5fe] bg-white hover:bg-[#f0faff] text-left transition flex flex-col gap-1 shadow-sm" data-scenario="blizzard">
+                <div class="flex items-center justify-between">
+                  <i class="fa-solid fa-wind text-xs text-[#0698c4]"></i>
+                  <span class="text-[8px] font-extrabold uppercase px-1 rounded bg-rose-50 text-rose-600">Storm</span>
+                </div>
+                <span class="text-[11px] font-bold text-slate-800">Cat-3 Blizzard</span>
+                <span class="text-[9px] text-slate-400">-52°C, 34 m/s</span>
+              </button>
+
+              <button type="button" class="scenario-btn p-2 rounded-xl border border-[#9ae5fe] bg-white hover:bg-[#f0faff] text-left transition flex flex-col gap-1 shadow-sm" data-scenario="trip">
+                <div class="flex items-center justify-between">
+                  <i class="fa-solid fa-triangle-exclamation text-xs text-amber-500"></i>
+                  <span class="text-[8px] font-extrabold uppercase px-1 rounded bg-amber-50 text-amber-600">Fault</span>
+                </div>
+                <span class="text-[11px] font-bold text-slate-800">Gen-Set Trip</span>
+                <span class="text-[9px] text-slate-400">Battery Takeover</span>
+              </button>
+
+              <button type="button" class="scenario-btn p-2 rounded-xl border border-[#9ae5fe] bg-white hover:bg-[#f0faff] text-left transition flex flex-col gap-1 shadow-sm" data-scenario="night">
+                <div class="flex items-center justify-between">
+                  <i class="fa-solid fa-moon text-xs text-[#127694]"></i>
+                  <span class="text-[8px] font-extrabold uppercase px-1 rounded bg-slate-100 text-slate-600">Winter</span>
+                </div>
+                <span class="text-[11px] font-bold text-slate-800">Polar Night</span>
+                <span class="text-[9px] text-slate-400">Zero Solar, Deficit</span>
+              </button>
+
+              <button type="button" class="scenario-btn p-2 rounded-xl border border-[#9ae5fe] bg-white hover:bg-[#f0faff] text-left transition flex flex-col gap-1 shadow-sm" data-scenario="dawn">
+                <div class="flex items-center justify-between">
+                  <i class="fa-solid fa-sun text-xs text-amber-500"></i>
+                  <span class="text-[8px] font-extrabold uppercase px-1 rounded bg-emerald-50 text-emerald-600">Harvest</span>
+                </div>
+                <span class="text-[11px] font-bold text-slate-800">Spring Sunrise</span>
+                <span class="text-[9px] text-slate-400">High PV, Recharging</span>
+              </button>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <button id="btnResetScenario" type="button" class="text-[10px] font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition">
+                <i class="fa-solid fa-rotate-left text-xs"></i> Reset Auto
+              </button>
+              <button id="btnOpenForecastModal" type="button" class="text-[10px] font-bold text-[#0698c4] hover:text-[#05c5ff] flex items-center gap-1 transition bg-[#e5f6fd] px-2.5 py-1 rounded-full border border-[#9ae5fe]">
+                <span>Full Forecast Modal</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD B3: Microgrid Energy Flow -->
+          <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+                    <i class="fa-solid fa-diagram-project text-xs"></i>
+                  </div>
+                  <span class="font-bold text-xs text-[#127694]">Microgrid Energy Flow</span>
+                </div>
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Balanced
+                </span>
+              </div>
+              <p class="text-[10px] text-slate-400 mb-2">Real-time bus dispatch from sources to station load.</p>
+            </div>
+
+            <!-- Clean Abstract Flow Pipeline -->
+            <div class="flex items-center justify-between gap-1 my-1 bg-[#f0faff] p-2 sm:p-2.5 rounded-2xl border border-[#9ae5fe]/60">
+              
+              <!-- Source: Renewables -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-white border border-[#9ae5fe] flex items-center justify-center text-[#0698c4] shadow-sm">
+                  <i class="fa-solid fa-sun text-xs text-[#0698c4]"></i>
+                </div>
+                <span class="text-[9px] font-bold text-slate-500 mt-1">Renewables</span>
+                <span id="flowRenewablesKw" class="text-[10px] font-black text-[#0698c4]">46.2 kW</span>
+              </div>
+
+              <!-- Flow Arrow 1 -->
+              <div class="flex items-center text-[#05c5ff]">
+                <i class="fa-solid fa-arrow-right text-xs animate-pulse"></i>
+              </div>
+
+              <!-- Node: Battery Buffer -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-white border border-[#9ae5fe] flex items-center justify-center text-[#127694] shadow-sm">
+                  <i class="fa-solid fa-car-battery text-xs text-[#127694]"></i>
+                </div>
+                <span class="text-[9px] font-bold text-slate-500 mt-1">Battery Buffer</span>
+                <span id="flowBatteryKw" class="text-[10px] font-black text-[#127694]">0.0 kW</span>
+              </div>
+
+              <!-- Flow Arrow 2 -->
+              <div class="flex items-center text-[#05c5ff]">
+                <i class="fa-solid fa-arrow-right text-xs animate-pulse"></i>
+              </div>
+
+              <!-- Sink: Station Load -->
+              <div class="flex flex-col items-center text-center">
+                <div class="w-8 h-8 rounded-xl bg-white border border-[#9ae5fe] flex items-center justify-center text-slate-800 shadow-sm">
+                  <i class="fa-solid fa-house-signal text-xs text-slate-800"></i>
+                </div>
+                <span class="text-[9px] font-bold text-slate-500 mt-1">Station Load</span>
+                <span id="flowLoadKw" class="text-[10px] font-black text-slate-800">40.4 kW</span>
+              </div>
+
+            </div>
+
+            <div class="text-[9px] text-slate-400 pt-2 border-t border-slate-100 flex items-center justify-between">
+              <span>Diesel Gen Support: <strong id="flowGenKw" class="text-slate-700">0.0 kW</strong></span>
+              <button id="btnOpenDispatchModal" type="button" class="text-[10px] font-bold text-[#0698c4] hover:text-[#05c5ff] flex items-center gap-1 transition bg-[#e5f6fd] px-2 py-0.5 rounded-full border border-[#9ae5fe]">
+                <span>Full Matrix</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- =====================================================================
+           RIGHT COLUMN: 3 STACKED STATUS CARDS
+           ===================================================================== -->
+      <div class="lg:col-span-4 xl:col-span-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-3.5 sm:gap-4 lg:gap-5">
+
+        <!-- CARD R1: Station Battery & Reserve -->
+        <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+                  <i class="fa-solid fa-car-battery text-xs"></i>
+                </div>
+                <span class="font-bold text-xs text-[#127694]">Station Battery & Reserve</span>
+              </div>
+              <span id="batteryStatusSub" class="text-[9px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                Buffer Standby
+              </span>
+            </div>
+            
+            <div class="flex items-baseline justify-between my-2">
+              <div class="flex items-baseline gap-2">
+                <span id="batterySocBig" class="text-2xl font-black text-slate-800">77%</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Current SoC</span>
+              </div>
+              <span class="text-xs font-semibold text-slate-400">Capacity: <strong id="batteryCapacityKwh" class="text-slate-700">94.6 kWh</strong></span>
+            </div>
+          </div>
+
+          <!-- Cylinder Battery Bar -->
+          <div class="space-y-1.5 my-2">
+            <div class="cylinder-battery-container">
+              <div id="batteryFillBar" class="cylinder-battery-fill" style="width: 77%;">
+                <span id="batteryPctText" class="battery-pct-label">77%</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-500">
+              <span>Cell Temp: <strong id="batteryCellTemp">-6.1°C</strong></span>
+              <span class="flex items-center gap-1">Protected Floor: <strong id="batteryReservePctText" class="text-[#127694] font-black">20% Reserve</strong>
+                <button type="button" id="btnQuickAdjustReserve" title="Adjust protected battery reserve floor" class="text-[9px] font-bold text-[#0698c4] hover:text-[#05c5ff] bg-[#e0f7fe] hover:bg-[#c2f0fe] px-1.5 py-0.5 rounded transition">Manual</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+            <span>Rate: <strong id="batteryRateKw" class="text-[#0698c4]">0.00 kW</strong></span>
+            <span>LiFePO4 Thermal Pack</span>
+          </div>
+        </div>
+
+        <!-- CARD R2: Diesel Fuel Reserves & Generator -->
+        <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+                  <i class="fa-solid fa-gas-pump text-xs"></i>
+                </div>
+                <span class="font-bold text-xs text-[#127694]">Diesel Fuel & Gen-Set</span>
+              </div>
+              <span id="genStatusBadge" class="text-[9px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+                GEN STANDBY
+              </span>
+            </div>
+
+            <div class="flex items-baseline justify-between my-2">
+              <span id="valFuelLitersBig" class="text-2xl font-black text-slate-800">4,477 L</span>
+              <span id="valFuelPctText" class="text-xs font-bold text-[#0698c4]">75% Capacity</span>
+            </div>
+          </div>
+
+          <!-- Fuel Progress Bar -->
+          <div class="space-y-1.5 my-2">
+            <div class="w-full h-2 rounded-full bg-[#e5f6fd] overflow-hidden border border-[#9ae5fe]/60">
+              <div id="fuelProgressFill" class="h-full bg-gradient-to-r from-[#0698c4] to-[#05c5ff] rounded-full transition-all duration-500" style="width: 75%;"></div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-500">
+              <span>Burn Rate: <strong id="valFuelBurnRate">0.00 L/h</strong></span>
+              <span>Efficiency: <strong id="valGenEfficiency" class="text-[#0698c4]">85%</strong></span>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+            <span>Gen Output: <strong id="valGenKw" class="text-slate-700">0.0 kW</strong></span>
+            <span>Autonomy: <strong id="valFuelDaysRight" class="text-[#127694]">26.6 Days</strong></span>
+          </div>
+        </div>
+
+        <!-- CARD R3: Station Health & Contingency Manual Override -->
+        <div class="novara-card p-4 sm:p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+                  <i class="fa-solid fa-shield-halved text-xs"></i>
+                </div>
+                <span class="font-bold text-xs text-[#127694]">Station Health & Controls</span>
+              </div>
+              <button id="btnOpenMaintenanceDirect" type="button" class="text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full hover:bg-[#9ae5fe] transition">
+                Diagnostics ➔
+              </button>
+            </div>
+
+            <!-- Health Score & Comms -->
+            <div class="space-y-2 my-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-500">Device Health Score:</span>
+                <span id="valDeviceHealth" class="font-black text-emerald-600">84% (Optimal)</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-500">Satellite Telemetry:</span>
+                <span id="valCommStatus" class="font-bold text-[#0698c4] flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                </span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-500">Active Polar Crew:</span>
+                <span id="valCrewCount" class="font-bold text-slate-700">22 Personnel</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open Manual Override Modal Button -->
+          <div class="pt-3 border-t border-slate-100 flex flex-col gap-2">
+            <button id="btnTriggerModalSecondary" type="button" class="w-full py-2 px-3 rounded-xl text-xs font-bold border border-[#9ae5fe] bg-white hover:bg-[#f0faff] text-[#127694] transition flex items-center justify-center gap-2 shadow-sm">
+              <i class="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
+              <span>Inject Contingency / Override</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================================
+       MODAL 1: FULL MULTI-HORIZON FORECAST POP-UP
+       ========================================================================= -->
+  <div id="modal-forecast-full" class="modal-backdrop hidden">
+    <div class="modal-content p-5 sm:p-6 max-w-[960px]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <div>
+          <h2 class="text-base font-extrabold text-[#127694] flex items-center gap-2">
+            <i class="fa-solid fa-chart-line text-xs text-[#05c5ff]"></i>
+            Predictive Energy Horizon & Climate Modeling
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">AI projected station demand vs katabatic wind and solar PV generation curve.</p>
+        </div>
+        <button id="btnCloseForecastModal" type="button" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Horizon Selector Pills -->
+      <div class="flex flex-wrap items-center gap-1.5 p-1 bg-[#f0faff] rounded-2xl border border-[#9ae5fe]/60 mb-3">
+        <button type="button" class="horizon-pill" data-horizon="6h">6 Hours</button>
+        <button type="button" class="horizon-pill" data-horizon="12h">12 Hours</button>
+        <button type="button" class="horizon-pill" data-horizon="24h">24 Hours</button>
+        <button type="button" class="horizon-pill" data-horizon="48h">48 Hours</button>
+        <button type="button" class="horizon-pill" data-horizon="7d">7 Days</button>
+        <button type="button" class="horizon-pill active" data-horizon="12m">12 Months</button>
+        <button type="button" class="horizon-pill" data-horizon="yearwise">Year-wise</button>
+      </div>
+
+      <!-- Horizon Telemetry Cards Summary -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-3">
+        <div class="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">Peak Demand</div>
+          <div id="horizonPeakLoad" class="text-sm font-extrabold text-[#127694]">57.5 kW</div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">Min Renewable Window</div>
+          <div id="horizonMinRenewable" class="text-sm font-extrabold text-[#0698c4]">16 kW</div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">Renewable Fraction</div>
+          <div id="horizonAvgRenewable" class="text-sm font-extrabold text-emerald-600">50%</div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">Projected Fuel Burn</div>
+          <div id="horizonFuelLiters" class="text-sm font-extrabold text-slate-800">58,400 L</div>
+        </div>
+      </div>
+
+      <!-- Large Forecast Line Chart -->
+      <div class="w-full h-72 relative bg-white p-2 rounded-2xl border border-slate-100">
+        <canvas id="forecastFullCanvas"></canvas>
+      </div>
+
+      <div class="mt-3 p-2.5 bg-[#f8fcfe] rounded-xl border border-[#9ae5fe]/60 flex items-center justify-between text-xs text-slate-600">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info text-xs text-[#0698c4]"></i>
+          <span id="horizonInsightText">Annual polar cycle: Continuous 24h sunlight in Dec/Jan transitions to polar night winter (May-Aug) with high heating demand.</span>
+        </span>
+        <span class="text-[10px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full">AI Confidence: 94.2%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: FULL MICROGRID DISPATCH MATRIX & DECISION AUDIT
+       (INCLUDES REAL-TIME ENERGY FLOW MATRIX AFTER LIVE SOURCE MIX DISTRIBUTION)
+       ========================================================================= -->
+  <div id="modal-dispatch-full" class="modal-backdrop hidden">
+    <div class="modal-content p-5 sm:p-6 max-w-[960px] max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#05c5ff] to-[#127694] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+            <i class="fa-solid fa-code-fork text-xs"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-extrabold text-[#127694]">Autonomous AI Microgrid Power Dispatch Matrix</h2>
+            <p class="text-xs text-slate-500">Linear Programming (LP) real-time bus balance, generation mix, and circuit routing</p>
+          </div>
+        </div>
+        <button id="btnCloseDispatchModal" type="button" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Active LP Optimization Reasoning Banner -->
+      <div class="p-3.5 rounded-2xl bg-gradient-to-r from-[#e5f6fd] to-[#f0faff] border border-[#9ae5fe] mb-4">
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-xs font-bold text-[#127694] flex items-center gap-1.5">
+            <i class="fa-solid fa-microchip text-xs text-[#0698c4]"></i>
+            Active LP Optimization Reasoning
+          </span>
+          <span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+            Optimal Solution Found
+          </span>
+        </div>
+        <p id="dispatchFullExplanation" class="text-xs text-slate-700 leading-relaxed font-medium">
+          Meeting 40.36kW load with 40.36kW renewables, 0.0kW battery, 0.0kW generator. Operating in conservative mode - battery reserve increased for safety.
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-2.5 border-t border-[#9ae5fe]/60 text-center">
+          <div class="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Renewable Dispatch</div>
+            <div id="dispRenewableKw" class="text-sm font-black text-[#0698c4]">46.00 kW</div>
+          </div>
+          <div class="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Battery Buffer</div>
+            <div id="dispBatteryKw" class="text-sm font-black text-[#127694]">0.00 kW</div>
+          </div>
+          <div class="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Generator Output</div>
+            <div id="dispGenKw" class="text-sm font-black text-slate-800">0.00 kW</div>
+          </div>
+          <div class="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Generator Saved</div>
+            <div id="dispFuelSavedKw" class="text-sm font-black text-emerald-600">~0.00 kW</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Source Mix Distribution -->
+      <div class="mb-4">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Live Source Mix Distribution</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+          <div class="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Solar PV</div>
+            <div id="dispSolarPct" class="text-lg font-black text-[#4499b3] my-0.5">3%</div>
+            <div class="text-[10px] text-slate-500"><span id="dispSolarKw">1.34</span> kW active</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Wind Turbines</div>
+            <div id="dispWindPct" class="text-lg font-black text-[#05c5ff] my-0.5">97%</div>
+            <div class="text-[10px] text-slate-500"><span id="dispWindKw">44.66</span> kW active</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Battery Buffer</div>
+            <div id="dispBattPct" class="text-lg font-black text-[#127694] my-0.5">0%</div>
+            <div class="text-[10px] text-slate-500"><span id="dispBattKw">0.00</span> kW active</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+            <div class="text-[9px] font-bold text-slate-400 uppercase">Diesel Gen-Set</div>
+            <div id="dispGenPct" class="text-lg font-black text-slate-800 my-0.5">0%</div>
+            <div class="text-[10px] text-slate-500"><span id="dispGenKwVal">0.00</span> kW active</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           REAL-TIME ENERGY FLOW MATRIX
+           Explicitly added after Live Source Mix Distribution!
+           ===================================================================== -->
+      <div class="mb-4 bg-[#f8fcfe] p-3.5 rounded-2xl border border-[#9ae5fe]">
+        <div class="flex items-center justify-between pb-2 border-b border-[#9ae5fe]/60">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
+              <i class="fa-solid fa-diagram-project text-xs"></i>
+            </div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#127694]">Real-Time Energy Flow Matrix</h3>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-mono">
+            <span class="text-slate-500">Elec Load: <strong id="matrix-elec-load" class="text-[#0698c4] font-bold">40.4 kWe</strong></span>
+            <span class="text-slate-400">|</span>
+            <span class="text-slate-500">Thermal Load: <strong id="matrix-thermal-load" class="text-rose-500 font-bold">62.0 kWth</strong></span>
+          </div>
+        </div>
+
+        <!-- Canvas for dynamic particle flow vectors -->
+        <div class="relative w-full flex items-center justify-center my-2.5 bg-white rounded-xl border border-slate-100 overflow-hidden shadow-inner min-h-[300px]">
+          <canvas id="energy-flow-canvas" class="w-full h-[300px]"></canvas>
+        </div>
+
+        <!-- Matrix Power Gauges Bottom Bar with Dedicated Icons -->
+        <div class="grid grid-cols-4 gap-2 pt-2 border-t border-[#9ae5fe]/60 text-center font-mono">
+          <div class="bg-white p-2 rounded-xl border border-[#05c5ff]/40 shadow-sm flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1.5 text-[#05c5ff] text-xs font-bold mb-0.5">
+              <i class="fa-solid fa-fan text-xs"></i>
+              <span class="text-[10px] tracking-wider uppercase">Windmill</span>
+            </div>
+            <span id="flow-wind-val" class="text-xs sm:text-sm font-black text-slate-800">44.88 kW</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-amber-500/40 shadow-sm flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1.5 text-amber-500 text-xs font-bold mb-0.5">
+              <i class="fa-solid fa-solar-panel text-xs"></i>
+              <span class="text-[10px] tracking-wider uppercase">Solar PV</span>
+            </div>
+            <span id="flow-solar-val" class="text-xs sm:text-sm font-black text-slate-800">1.34 kW</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-emerald-500/40 shadow-sm flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1.5 text-emerald-600 text-xs font-bold mb-0.5">
+              <i class="fa-solid fa-car-battery text-xs"></i>
+              <span class="text-[10px] tracking-wider uppercase">Battery</span>
+            </div>
+            <span id="flow-battery-val" class="text-xs sm:text-sm font-black text-slate-800">0.00 kW</span>
+          </div>
+          <div class="bg-white p-2 rounded-xl border border-rose-500/40 shadow-sm flex flex-col items-center justify-center">
+            <div class="flex items-center gap-1.5 text-rose-500 text-xs font-bold mb-0.5">
+              <i class="fa-solid fa-gears text-xs"></i>
+              <span class="text-[10px] tracking-wider uppercase">Generator</span>
+            </div>
+            <span id="flow-diesel-val" class="text-xs sm:text-sm font-black text-slate-800">0.00 kW</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Microgrid Bus Circuit Routing -->
+      <div class="mb-4">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Microgrid Bus Circuit Routing</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="p-3 rounded-2xl bg-white border border-emerald-200 shadow-sm">
+            <div class="flex items-center justify-between text-xs font-bold text-emerald-800 mb-1">
+              <span>Priority 1: Life Support</span>
+              <span class="text-[9px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Non-Curtailable</span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-800"><span id="dispLoadHeat">26.4</span> kW</div>
+            <p class="text-[10px] text-slate-500 mt-1">Habitat HVAC, water recovery, emergency medical</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-white border border-amber-200 shadow-sm">
+            <div class="flex items-center justify-between text-xs font-bold text-amber-800 mb-1">
+              <span>Priority 2: Science Labs</span>
+              <span class="text-[9px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">Sheddable</span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-800"><span id="dispLoadLab">11.5</span> kW</div>
+            <p class="text-[10px] text-slate-500 mt-1">Atmospheric lidar, core drill refrigeration, telemetry</p>
+          </div>
+          <div class="p-3 rounded-2xl bg-white border border-cyan-200 shadow-sm">
+            <div class="flex items-center justify-between text-xs font-bold text-[#0698c4] mb-1">
+              <span>Priority 3: Lighting</span>
+              <span class="text-[9px] bg-[#c2f0fe] text-[#0698c4] px-2 py-0.5 rounded-full font-bold">Essential</span>
+            </div>
+            <div class="text-sm font-extrabold text-slate-800"><span id="dispLoadLight">2.5</span> kW</div>
+            <p class="text-[10px] text-slate-500 mt-1">Perimeter lighting, runway beacon, crew galley</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Automated Decision Audit Log Table -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Automated Decision Audit Log</label>
+            <span class="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> LIVE SYNC
+            </span>
+          </div>
+          <span class="text-[9px] font-mono text-slate-400">Timestamped SQLite Ledger (sems_logs.db)</span>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-slate-200 max-h-56 overflow-y-auto shadow-sm">
+          <table class="w-full min-w-[540px] text-left text-xs">
+            <thead class="bg-slate-50/95 backdrop-blur-sm border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase sticky top-0 z-10">
+              <tr>
+                <th class="py-2.5 px-3">Time (UTC)</th>
+                <th class="py-2.5 px-3">Station</th>
+                <th class="py-2.5 px-3">Event / Action</th>
+                <th class="py-2.5 px-3">Safety Reasoning</th>
+                <th class="py-2.5 px-3">Tier</th>
+              </tr>
+            </thead>
+            <tbody id="dispatchAuditTableBody" class="divide-y divide-slate-100 bg-white font-sans">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: FULL AI COPILOT CHATBOT DIALOG
+       ========================================================================= -->
+  <div id="modal-copilot-full" class="modal-backdrop hidden">
+    <div class="modal-content p-5 sm:p-6 max-w-[850px] max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#05c5ff] to-[#0698c4] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+            <i class="fa-solid fa-robot text-sm"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-extrabold text-[#127694]">Novara AI Polar Station Co-Pilot</h2>
+            <p class="text-xs text-slate-400">Contextually synchronized with live station telemetry & LP dispatch model</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] font-bold px-2.5 py-1 rounded-full bg-[#c2f0fe] text-[#0698c4] border border-[#9ae5fe]">
+            Live Synced
+          </span>
+          <button id="btnCloseCopilotModal" type="button" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Tactical Chips -->
+      <div class="flex flex-wrap gap-1.5 mb-3 shrink-0">
+        <button type="button" class="ai-modal-chip text-[10px] px-2.5 py-1 rounded-full bg-[#f0faff] hover:bg-[#c2f0fe] text-[#127694] border border-[#9ae5fe] transition font-semibold" data-prompt="Why did you choose this microgrid dispatch mix?">
+          Dispatch Reasoning
+        </button>
+        <button type="button" class="ai-modal-chip text-[10px] px-2.5 py-1 rounded-full bg-[#f0faff] hover:bg-[#c2f0fe] text-[#127694] border border-[#9ae5fe] transition font-semibold" data-prompt="How long will our fuel reserves last if a storm hits?">
+          Fuel Autonomy in Storm
+        </button>
+        <button type="button" class="ai-modal-chip text-[10px] px-2.5 py-1 rounded-full bg-[#f0faff] hover:bg-[#c2f0fe] text-[#127694] border border-[#9ae5fe] transition font-semibold" data-prompt="What is the station battery state of charge and health?">
+          Battery State of Health
+        </button>
+        <button type="button" class="ai-modal-chip text-[10px] px-2.5 py-1 rounded-full bg-[#f0faff] hover:bg-[#c2f0fe] text-[#127694] border border-[#9ae5fe] transition font-semibold" data-prompt="Explain current fuel savings with optimizer vs baseline.">
+          Fuel Savings vs Baseline
+        </button>
+      </div>
+
+      <!-- Chat Thread Messages Scroll Area -->
+      <div id="copilotModalChatThread" class="flex-1 overflow-y-auto p-4 bg-[#f8fcfe] rounded-2xl border border-[#9ae5fe]/60 mb-3 space-y-3 min-h-[260px] max-h-[400px]">
+        <!-- Initial assistant greeting -->
+        <div class="flex items-start gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-[#0698c4] text-white flex items-center justify-center text-xs shrink-0 mt-0.5">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div class="bg-white p-3 rounded-2xl border border-[#9ae5fe]/70 shadow-sm max-w-[85%]">
+            <p class="text-xs text-slate-700 leading-relaxed">
+              Hello Commander. I am Novara's real-time AI microgrid co-pilot. I continuously analyze station telemetry, weather forecasts, battery chemistry, and fuel burn rates to advise on optimal dispatch actions and polar contingencies. How can I assist you?
+            </p>
+            <span class="text-[9px] text-slate-400 font-mono mt-1 block">Telemetry synchronized • LP model active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form id="copilotModalForm" class="flex items-center gap-2 shrink-0">
+        <input 
+          type="text" 
+          id="copilotModalInput" 
+          placeholder="Ask Novara about generator load, renewable dispatch, or battery buffer..." 
+          class="flex-1 px-4 py-2.5 rounded-xl border border-[#9ae5fe] bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#05c5ff] transition"
+        />
+        <button type="submit" id="btnCopilotModalSend" class="px-4 py-2.5 rounded-xl bg-[#0698c4] hover:bg-[#05c5ff] text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span>Send</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: STATION HEALTH & PREVENTIVE MAINTENANCE DIAGNOSTICS
+       ========================================================================= -->
+  <div id="modal-maintenance-full" class="modal-backdrop hidden">
+    <div class="modal-content p-5 sm:p-6 max-w-[900px] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+        <div>
+          <h2 class="text-base font-extrabold text-[#127694] flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-xs text-[#05c5ff]"></i>
+            Station Health & Preventive Maintenance Diagnostics
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5">Real-time degradation telemetry, failure prevention ETA, and sub-system health.</p>
+        </div>
+        <button id="btnCloseMaintenanceModal" type="button" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Maintenance High-Level Telemetry Row -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+        <div class="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">Station Health Score</div>
+          <div id="maintScore" class="text-xl font-black text-emerald-600 my-0.5">84%</div>
+          <div id="maintStatusPill" class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block">STABLE</div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">Degradation Rate</div>
+          <div id="maintTrend" class="text-xl font-black text-slate-800 my-0.5">-0.03%/h</div>
+          <div class="text-[9px] text-slate-500">Normal thermal wear</div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">ETA to Warning</div>
+          <div id="maintHoursWarning" class="text-xl font-black text-[#0698c4] my-0.5">724.3 Hours</div>
+          <div class="text-[9px] text-slate-500">~5.8 Polar Days</div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+          <div class="text-[9px] font-bold text-slate-400 uppercase">ETA to Critical</div>
+          <div id="maintHoursCritical" class="text-xl font-black text-[#127694] my-0.5">> 2,000 Hours</div>
+          <div class="text-[9px] text-slate-500">Overhaul Window Safe</div>
+        </div>
+      </div>
+
+      <!-- AI Maintenance Diagnostic Message -->
+      <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl mb-4 flex items-start gap-2.5">
+        <i class="fa-solid fa-circle-check text-base text-emerald-600 shrink-0 mt-0.5"></i>
+        <div>
+          <div class="text-xs font-bold text-emerald-900">AI Diagnostic Status</div>
+          <p id="maintMessage" class="text-xs text-emerald-800 mt-0.5 leading-relaxed">
+            Device health stable (84.0%). Battery pack thermal heating jacket is maintaining nominal LiFePO4 cell core parameters.
+          </p>
+        </div>
+      </div>
+
+      <!-- Subsystem Diagnostics 4-Card Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+        
+        <!-- Subsystem 1: Wind Turbines -->
+        <div class="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-[#127694] flex items-center gap-1.5">
+              <i class="fa-solid fa-wind text-xs text-[#05c5ff]"></i>
+              Wind Turbine Subsystem
+            </span>
+            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">94% Health</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex justify-between"><span>Bearing Vibration:</span> <strong class="text-slate-800">0.24 mm/s (Normal)</strong></div>
+            <div class="flex justify-between"><span>Blade De-icing Coils:</span> <strong class="text-[#0698c4]">Active (Auto)</strong></div>
+            <div class="flex justify-between"><span>Sub-Zero Lubrication:</span> <strong class="text-slate-800">Synthetic Polar ISO 32</strong></div>
+          </div>
+        </div>
+
+        <!-- Subsystem 2: LiFePO4 Thermal Pack -->
+        <div class="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-[#127694] flex items-center gap-1.5">
+              <i class="fa-solid fa-car-battery text-xs text-[#127694]"></i>
+              LiFePO4 Storage Bank
+            </span>
+            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">89% Health</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex justify-between"><span>Cell Core Temp:</span> <strong class="text-slate-800">-8.6°C (Thermal Pack Safe)</strong></div>
+            <div class="flex justify-between"><span>Cell Voltage Delta:</span> <strong class="text-[#0698c4]">12 mV (Balanced)</strong></div>
+            <div class="flex justify-between"><span>Total Lifetime Cycles:</span> <strong class="text-slate-800">1,420 / 6,000 Cycles</strong></div>
+          </div>
+        </div>
+
+        <!-- Subsystem 3: Diesel Gen-Sets -->
+        <div class="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-[#127694] flex items-center gap-1.5">
+              <i class="fa-solid fa-gas-pump text-xs text-[#0698c4]"></i>
+              Diesel Generator Units
+            </span>
+            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">85% Health</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex justify-between"><span>Gen-Set 1 (Active):</span> <strong class="text-slate-800">Oil: 4.2 bar • Coolant: 82°C</strong></div>
+            <div class="flex justify-between"><span>Gen-Set 2 (Standby):</span> <strong class="text-[#0698c4]">Block Pre-Heater ON</strong></div>
+            <div class="flex justify-between"><span>Injector Pressure:</span> <strong class="text-slate-800">1,850 bar (Clean)</strong></div>
+          </div>
+        </div>
+
+        <!-- Subsystem 4: Inverter & Microgrid Bus -->
+        <div class="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-[#127694] flex items-center gap-1.5">
+              <i class="fa-solid fa-wave-square text-xs text-[#05c5ff]"></i>
+              Inverter Bus & STS
+            </span>
+            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">98% Health</span>
+          </div>
+          <div class="space-y-1.5 text-xs text-slate-600">
+            <div class="flex justify-between"><span>Harmonic Distortion (THD):</span> <strong class="text-slate-800">1.8% (&lt; 5% Spec)</strong></div>
+            <div class="flex justify-between"><span>Grid Frequency:</span> <strong class="text-[#0698c4]">50.02 Hz Synced</strong></div>
+            <div class="flex justify-between"><span>Transfer Switch Time:</span> <strong class="text-slate-800">&lt; 4 ms (Uninterrupted)</strong></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actionable Checklist -->
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span>Routine Filter Replacement: <strong>Scheduled in 18 Days</strong></span>
+        <button id="btnAckMaintenance" type="button" class="px-3.5 py-1.5 rounded-xl bg-[#0698c4] hover:bg-[#05c5ff] text-white font-bold transition shadow-sm">
+          Acknowledge Telemetry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 5: COMMANDER OVERRIDE CONTROLS & CONTINGENCY INJECTION
+       (PRESERVES 100% OF POLAROPS SLIDERS & FAULT INJECTION FEATURES)
+       ========================================================================= -->
+  <div id="modal-manual" class="modal-backdrop hidden">
+    <div class="modal-content p-4 sm:p-5 max-w-[700px] max-h-[86vh] flex flex-col">
+      <!-- Sticky Header -->
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 mb-2.5 shrink-0">
+        <div>
+          <h2 class="text-sm sm:text-base font-extrabold text-[#127694] flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
+            Commander Override Controls & Contingency Injection
+          </h2>
+          <p class="text-[11px] text-slate-500 mt-0.5">Inject polar weather contingencies or equipment faults directly into live SEMS physics.</p>
+        </div>
+        <button id="btnCloseManualModal" type="button" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Scrollable Form Body -->
+      <form id="commanderOverrideForm" class="flex-1 overflow-y-auto pr-1 space-y-2.5">
+        
+        <!-- 2-Column Responsive Grid for Sliders -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+
+          <!-- Ambient Temperature Slider -->
+          <div class="bg-[#f8fcfe] p-2.5 rounded-2xl border border-[#9ae5fe]/70 flex flex-col justify-between">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-temperature-empty text-[#0698c4]"></i> Ambient Temp:</span>
+              <strong id="slider-temp-val" class="font-mono text-[#0698c4] text-xs sm:text-sm">-26.3°C</strong>
+            </div>
+            <input type="range" id="slider-temp" min="-50" max="5" step="0.5" value="-26.3" class="w-full cursor-pointer">
+            <div class="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+              <span>-50°C (Blizzard)</span>
+              <span>0°C</span>
+              <span>+5°C (Warm)</span>
+            </div>
+          </div>
+
+          <!-- Wind Velocity Slider -->
+          <div class="bg-[#f8fcfe] p-2.5 rounded-2xl border border-[#9ae5fe]/70 flex flex-col justify-between">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-wind text-[#0698c4]"></i> Wind Velocity:</span>
+              <strong id="slider-wind-val" class="font-mono text-[#0698c4] text-xs sm:text-sm">24.9 m/s</strong>
+            </div>
+            <input type="range" id="slider-wind" min="0" max="35" step="0.5" value="24.9" class="w-full cursor-pointer">
+            <div class="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+              <span>0 m/s (Calm)</span>
+              <span>12 m/s (Rated)</span>
+              <span>&gt;25 m/s (Brake)</span>
+            </div>
+          </div>
+
+          <!-- Station Load Multiplier Slider -->
+          <div class="bg-[#f8fcfe] p-2.5 rounded-2xl border border-[#9ae5fe]/70 flex flex-col justify-between">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[#0698c4]"></i> Station Load Multiplier:</span>
+              <strong id="slider-load-mult-val" class="font-mono text-[#0698c4] text-xs sm:text-sm">1.0x</strong>
+            </div>
+            <input type="range" id="slider-load-mult" min="0.5" max="2.0" step="0.1" value="1.0" class="w-full cursor-pointer">
+            <div class="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+              <span>0.5x (Night Base)</span>
+              <span>1.0x (Nominal)</span>
+              <span>2.0x (Peak Surge)</span>
+            </div>
+          </div>
+
+          <!-- Manual Protected Battery Reserve Slider -->
+          <div class="bg-[#f8fcfe] p-2.5 rounded-2xl border border-[#9ae5fe]/70 flex flex-col justify-between">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-[#0698c4]"></i> Protected Reserve Floor:</span>
+              <strong id="slider-batt-reserve-val" class="font-mono text-[#0698c4] text-xs sm:text-sm">20%</strong>
+            </div>
+            <input type="range" id="slider-batt-reserve" min="10" max="50" step="1" value="20" class="w-full cursor-pointer">
+            <div class="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+              <span>10% (Low Margin)</span>
+              <span>20% (Standard)</span>
+              <span>50% (High Life-Support)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Manual Battery SoC Level Slider (Full Width) -->
+        <div class="bg-[#f8fcfe] p-2.5 rounded-2xl border border-[#9ae5fe]/70">
+          <div class="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-car-battery text-[#0698c4]"></i> Manual Battery SoC Level:</span>
+            <strong id="slider-batt-soc-val" class="font-mono text-[#0698c4] text-xs sm:text-sm">74%</strong>
+          </div>
+          <input type="range" id="slider-batt-soc" min="10" max="100" step="1" value="74" class="w-full cursor-pointer">
+          <div class="flex justify-between text-[9px] text-slate-400 mt-1 font-mono">
+            <span>10% (Critical Reserve Inhibit)</span>
+            <span>50% (Nominal Storage)</span>
+            <span>100% (Fully Saturated)</span>
+          </div>
+        </div>
+
+        <!-- Hardware Fault Injection Toggles -->
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Actuator & Hardware Fault Injections</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button type="button" id="btn-trip-gen1" class="p-2 rounded-2xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+              <i class="fa-solid fa-triangle-exclamation text-rose-500 text-xs"></i>
+              <span>Trip Genset 1</span>
+            </button>
+            <button type="button" id="btn-fault-bess" class="p-2 rounded-2xl bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm">
+              <i class="fa-solid fa-snowflake text-amber-500 text-xs"></i>
+              <span>BESS Freeze Fault</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="text-[9px] text-slate-400 italic">
+          * Fault injection immediately tests deterministic safety guardrails, spinning reserve, and MPC dispatch recovery.
+        </div>
+
+        <!-- Sticky Action Buttons Footer -->
+        <div class="sticky bottom-0 bg-white pt-2.5 pb-0.5 border-t border-slate-100 flex items-center justify-between shrink-0 mt-2">
+          <button type="button" id="btn-reset-overrides" class="px-3.5 py-1.5 rounded-xl text-xs font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate-left text-xs"></i>
+            <span>Reset to Nominal</span>
+          </button>
+          <button type="submit" id="btn-apply-overrides" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-[#0698c4] hover:bg-[#05c5ff] text-white transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-check text-xs"></i>
+            <span>Apply Overrides</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿# Environments and Secrets
+# Environments and Secrets
 .env
 .env.local
 *.env
@@ -29,3 +29,12 @@ scratch/
 Thumbs.db
 .vercel
 .env*
+
+# Node & Frontend
+node_modules/
+*/node_modules/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
