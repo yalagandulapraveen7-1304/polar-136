@@ -321,21 +321,21 @@ export default function ForecastFullModal({ isOpen, onClose }) {
   const currentTargetMeta = TARGETS.find(t => t.id === selectedTarget) || TARGETS[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-slate-900/95 border border-sky-500/30 text-slate-100 shadow-[0_0_50px_rgba(2,132,199,0.25)] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-50/40 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-white border border-[#bcecfc] text-slate-800 shadow-2xl(2,132,199,0.25)] overflow-hidden">
         
         {/* Header Strip */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-700 flex items-center justify-center text-white shadow-lg">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0699C6] to-[#05C5FF] flex items-center justify-center text-white shadow-lg">
               <i className="fa-solid fa-chart-line text-lg"></i>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black tracking-tight text-white uppercase">
+                <h2 className="text-lg font-black tracking-tight text-[#127694] uppercase">
                   Predictive Intelligence & Forecasting Center
                 </h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-sky-500/20 text-[#127694] border border-sky-500/40">
                   LightGBM Quantiles (P10/P50/P90)
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
@@ -350,7 +350,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-700/50"
+            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition border border-slate-200"
           >
             <i className="fa-solid fa-xmark text-sm"></i>
           </button>
@@ -365,13 +365,13 @@ export default function ForecastFullModal({ isOpen, onClose }) {
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-slate-800 bg-slate-950/40 overflow-x-auto text-xs font-bold">
+        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] overflow-x-auto text-xs font-bold">
           <button
             onClick={() => setActiveTab('quantiles')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'quantiles'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-chart-area"></i>
@@ -383,7 +383,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'deviation'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-arrows-split-up-and-left"></i>
@@ -400,7 +400,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'reserve'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-shield-halved"></i>
@@ -412,7 +412,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'benchmark'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-scale-balanced"></i>
@@ -424,7 +424,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'mlops'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-dna"></i>
@@ -433,17 +433,17 @@ export default function ForecastFullModal({ isOpen, onClose }) {
         </div>
 
         {/* Tab Content Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white text-slate-800">
 
           {/* TAB 1: PROBABILISTIC QUANTILES */}
           {activeTab === 'quantiles' && (
             <div className="space-y-6 animate-fadeIn">
               {/* Target & Horizon Selector Controls */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-[#f0faff] p-4 rounded-2xl border border-slate-200">
                 {/* Target Variables */}
                 <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i className="fa-solid fa-crosshairs text-sky-400"></i>
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i className="fa-solid fa-crosshairs text-[#0699C6]"></i>
                     <span>Prediction Target</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -454,7 +454,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
                           selectedTarget === t.id
                             ? 'bg-sky-500 text-slate-950 shadow-sm'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-700 hover:text-white'
                         }`}
                       >
                         <i className={`fa-solid ${t.icon} text-[10px]`}></i>
@@ -466,8 +466,8 @@ export default function ForecastFullModal({ isOpen, onClose }) {
 
                 {/* Horizon Durations */}
                 <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <i className="fa-solid fa-clock text-sky-400"></i>
+                  <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i className="fa-solid fa-clock text-[#0699C6]"></i>
                     <span>Forecast Horizon</span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -478,11 +478,11 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                           selectedHorizon === h.id
                             ? 'bg-sky-500 text-slate-950 shadow-sm'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-700 hover:text-white'
                         }`}
                       >
                         <span>{h.label}</span>
-                        <span className={`text-[9px] px-1 py-0.2 rounded ${selectedHorizon === h.id ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-900 text-slate-400'}`}>
+                        <span className={`text-[9px] px-1 py-0.2 rounded ${selectedHorizon === h.id ? 'bg-slate-100/20 text-slate-950' : 'bg-slate-100 text-slate-600'}`}>
                           {h.category}
                         </span>
                       </button>
@@ -492,11 +492,11 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               </div>
 
               {/* Chart Visualizer */}
-              <div className="bg-slate-950/70 p-5 rounded-3xl border border-sky-500/20 relative shadow-inner">
+              <div className="bg-[#f0faff] p-5 rounded-3xl border border-sky-500/20 relative shadow-inner">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <h3 className="font-extrabold text-sm text-white uppercase flex items-center gap-2">
-                      <i className={`fa-solid ${currentTargetMeta.icon} text-sky-400`}></i>
+                      <i className={`fa-solid ${currentTargetMeta.icon} text-[#0699C6]`}></i>
                       <span>{currentTargetMeta.label} ({currentTargetMeta.unit}) — {selectedHorizon} Horizon</span>
                     </h3>
                     {forecastData && (
@@ -529,7 +529,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Canvas Render */}
-                <div className="w-full h-72 rounded-2xl bg-slate-900/60 p-2 flex items-center justify-center relative overflow-hidden">
+                <div className="w-full h-72 rounded-2xl bg-slate-50 p-2 flex items-center justify-center relative overflow-hidden">
                   <canvas
                     ref={canvasRef}
                     width={960}
@@ -537,7 +537,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     className="w-full h-full object-contain"
                   />
                   {isLoading && (
-                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center text-sky-400 text-xs font-bold gap-2">
+                    <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center text-[#0699C6] text-xs font-bold gap-2">
                       <i className="fa-solid fa-spinner fa-spin"></i>
                       <span>Running LightGBM Quantile Inference...</span>
                     </div>
@@ -555,38 +555,38 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               {/* Quantile Metric Readout Strip */}
               {forecastData && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                  <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       P10 Downside Bound
                     </div>
-                    <div className="text-xl font-black text-sky-300 font-mono">
+                    <div className="text-xl font-black text-[#127694] font-mono">
                       {forecastData.p10[0]} <span className="text-xs font-sans text-slate-400">{currentTargetMeta.unit}</span>
                     </div>
                     <div className="text-[10px] text-slate-400 mt-1">10% Probability of occurrence below this floor</div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-sky-950/40 border border-sky-500/40">
-                    <div className="text-[10px] font-extrabold text-sky-300 uppercase tracking-wider mb-1">
+                  <div className="p-4 rounded-2xl bg-[#e5f6fd]/40 border border-sky-500/40">
+                    <div className="text-[10px] font-extrabold text-[#127694] uppercase tracking-wider mb-1">
                       P50 Central Expected
                     </div>
                     <div className="text-xl font-black text-white font-mono">
                       {forecastData.p50[0]} <span className="text-xs font-sans text-sky-200">{currentTargetMeta.unit}</span>
                     </div>
-                    <div className="text-[10px] text-sky-300 mt-1">Median operational baseline for MILP dispatch</div>
+                    <div className="text-[10px] text-[#127694] mt-1">Median operational baseline for MILP dispatch</div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                  <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       P90 Peak Stress Bound
                     </div>
-                    <div className="text-xl font-black text-cyan-300 font-mono">
+                    <div className="text-xl font-black text-[#127694] font-mono">
                       {forecastData.p90[0]} <span className="text-xs font-sans text-slate-400">{currentTargetMeta.unit}</span>
                     </div>
                     <div className="text-[10px] text-slate-400 mt-1">Conservative reserve & stress-testing scenario</div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                  <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                       Prediction Interval Width (Δ)
                     </div>
                     <div className="text-xl font-black text-amber-300 font-mono">
@@ -610,7 +610,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     <span>Forecast Deviation Alert Triggered ({deviationData.active_alert_count} Active Divergence Event)</span>
                   </div>
                   {deviationData.alerts.map((al, idx) => (
-                    <div key={idx} className="p-2.5 rounded-xl bg-slate-950/60 border border-amber-500/30 text-xs flex items-center justify-between">
+                    <div key={idx} className="p-2.5 rounded-xl bg-[#f0faff] border border-amber-500/30 text-xs flex items-center justify-between">
                       <div>
                         <span className="font-bold text-white">{al.message}</span>
                         <div className="text-[11px] text-slate-400 mt-0.5">Mitigation: {al.mitigation}</div>
@@ -626,7 +626,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               {/* Comparison Cards Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {deviationData.comparison_cards.map(c => (
-                  <div key={c.target} className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-3">
+                  <div key={c.target} className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="font-extrabold text-xs text-white uppercase tracking-tight">
                         {c.target.replace(/_/g, ' ')}
@@ -643,19 +643,19 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="p-2 rounded-xl bg-slate-100">
                         <div className="text-[10px] text-slate-400">Actual Realized</div>
                         <div className="text-base font-black font-mono text-emerald-300">{c.actual}</div>
                       </div>
-                      <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="p-2 rounded-xl bg-slate-100">
                         <div className="text-[10px] text-slate-400">P50 Forecast</div>
-                        <div className="text-base font-black font-mono text-sky-300">{c.forecast_p50}</div>
+                        <div className="text-base font-black font-mono text-[#127694]">{c.forecast_p50}</div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 text-xs">
                       <span className="text-slate-400">Residual (Δ): <strong className="font-mono text-white">{c.residual_delta > 0 ? `+${c.residual_delta}` : c.residual_delta}</strong></span>
-                      <span className={`font-mono font-bold ${c.pct_deviation >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
+                      <span className={`font-mono font-bold ${c.pct_deviation >= 0 ? 'text-rose-400' : 'text-[#0699C6]'}`}>
                         {c.pct_deviation > 0 ? `+${c.pct_deviation}%` : `${c.pct_deviation}%`}
                       </span>
                     </div>
@@ -664,7 +664,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               </div>
 
               {/* High-Impact Forecast Events Timeline */}
-              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-4">
+              <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
                     <i className="fa-solid fa-bolt-lightning text-amber-400"></i>
@@ -675,12 +675,12 @@ export default function ForecastFullModal({ isOpen, onClose }) {
 
                 <div className="space-y-2.5">
                   {eventsData.map(ev => (
-                    <div key={ev.id} className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-start justify-between gap-4">
+                    <div key={ev.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
                         <span className={`px-2.5 py-1 rounded-lg text-xs font-mono font-black ${
                           ev.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' :
                           ev.severity === 'WARNING' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
-                          'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                          'bg-sky-500/20 text-[#127694] border border-sky-500/40'
                         }`}>
                           {ev.offset}
                         </span>
@@ -688,11 +688,11 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                           <div className="text-xs font-bold text-white flex items-center gap-2">
                             <span>{ev.event}</span>
                             <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
-                              ev.severity === 'CRITICAL' ? 'bg-rose-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                              ev.severity === 'CRITICAL' ? 'bg-rose-500 text-slate-950' : 'bg-slate-100 text-slate-700'
                             }`}>{ev.severity}</span>
                           </div>
                           <div className="text-[11px] text-slate-400 mt-1">Impact: {ev.operational_impact}</div>
-                          <div className="text-[11px] text-sky-300 font-semibold mt-0.5">Action: {ev.suggested_action}</div>
+                          <div className="text-[11px] text-[#127694] font-semibold mt-0.5">Action: {ev.suggested_action}</div>
                         </div>
                       </div>
                     </div>
@@ -708,7 +708,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               {/* Formula & Advisory Banner */}
               <div className="p-5 rounded-3xl bg-gradient-to-r from-sky-950/60 to-slate-950/80 border border-sky-500/30 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-sky-400">
+                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#0699C6]">
                     <i className="fa-solid fa-calculator"></i>
                     <span>Dynamic Spinning Reserve Math: {reserveAdvisory.formula}</span>
                   </div>
@@ -718,13 +718,13 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     Status: {reserveAdvisory.urgency} URGENCY
                   </span>
                 </div>
-                <p className="text-sm font-bold text-slate-100">
+                <p className="text-sm font-bold text-slate-800">
                   {reserveAdvisory.recommendation}
                 </p>
               </div>
 
               {/* 6-Hour Step Trajectory Grid */}
-              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-4">
+              <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-4">
                 <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
                   <i className="fa-solid fa-battery-three-quarters text-emerald-400"></i>
                   <span>6-Hour Lookahead: Demand P90 vs Renewable P10 & Battery Reserve Projection</span>
@@ -732,16 +732,16 @@ export default function ForecastFullModal({ isOpen, onClose }) {
 
                 <div className="grid grid-cols-7 gap-2 text-center">
                   {reserveAdvisory.hours.map((hr, idx) => (
-                    <div key={hr} className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                      <span className="text-xs font-mono font-bold text-sky-400">{hr}</span>
+                    <div key={hr} className="p-3 rounded-2xl bg-slate-100 border border-slate-200 space-y-2">
+                      <span className="text-xs font-mono font-bold text-[#0699C6]">{hr}</span>
                       
                       <div className="space-y-1 text-[11px]">
                         <div className="text-slate-400">P90 Dem: <span className="font-mono text-white font-bold">{reserveAdvisory.demand_p90[idx]} kW</span></div>
                         <div className="text-slate-400">P10 Ren: <span className="font-mono text-emerald-300 font-bold">{reserveAdvisory.renewable_p10[idx]} kW</span></div>
-                        <div className="text-slate-400">R_req: <span className="font-mono text-cyan-300 font-bold">{reserveAdvisory.spinning_reserve_required_kw[idx]} kW</span></div>
+                        <div className="text-slate-400">R_req: <span className="font-mono text-[#127694] font-bold">{reserveAdvisory.spinning_reserve_required_kw[idx]} kW</span></div>
                       </div>
 
-                      <div className="pt-2 border-t border-slate-800">
+                      <div className="pt-2 border-t border-slate-200">
                         <div className="text-[10px] text-slate-400">SoC Proj</div>
                         <div className={`text-xs font-black font-mono ${reserveAdvisory.projected_bess_soc_pct[idx] <= 30 ? 'text-rose-400' : 'text-emerald-300'}`}>
                           {reserveAdvisory.projected_bess_soc_pct[idx]}%
@@ -757,7 +757,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
           {/* TAB 4: MODEL BENCHMARK & PINBALL LOSS */}
           {activeTab === 'benchmark' && benchmarkData && (
             <div className="space-y-6 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200 flex items-center justify-between">
                 <div>
                   <h4 className="font-extrabold text-sm text-white uppercase tracking-tight">
                     Dual Model Head-to-Head Benchmark
@@ -766,15 +766,15 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     Comparing Primary LightGBM Quantile Regressors vs Project A Gradient Boosting Benchmark on Chronological Test Set
                   </p>
                 </div>
-                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/20 text-[#127694] border border-sky-500/40">
                   {benchmarkData.evaluation_scope}
                 </span>
               </div>
 
               {/* Benchmark Metrics Table */}
-              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+              <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-[#f0faff]">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900 text-slate-400 font-bold border-b border-slate-800">
+                  <thead className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
                     <tr>
                       <th className="py-3 px-4">Prediction Target</th>
                       <th className="py-3 px-3">LGBM MAE</th>
@@ -786,27 +786,27 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                       <th className="py-3 px-4">80% Interval Coverage</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                  <tbody className="divide-y divide-slate-100/60 font-mono">
                     {benchmarkData.metrics.map(m => (
-                      <tr key={m.target} className="hover:bg-slate-900/40 transition">
+                      <tr key={m.target} className="hover:bg-slate-50 transition">
                         <td className="py-2.5 px-4 font-sans font-bold text-white">
                           {m.target.replace(/_/g, ' ')}
                         </td>
-                        <td className="py-2.5 px-3 text-sky-300 font-bold">{m.lightgbm_mae}</td>
+                        <td className="py-2.5 px-3 text-[#127694] font-bold">{m.lightgbm_mae}</td>
                         <td className="py-2.5 px-3 text-slate-400">{m.gradient_boost_mae}</td>
                         <td className="py-2.5 px-3">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            m.mae_improvement_pct >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'
+                            m.mae_improvement_pct >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-100 text-slate-600'
                           }`}>
                             {m.mae_improvement_pct >= 0 ? `+${m.mae_improvement_pct}%` : `${m.mae_improvement_pct}%`}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 text-slate-300">{m.lightgbm_pinball_p10}</td>
+                        <td className="py-2.5 px-3 text-slate-700">{m.lightgbm_pinball_p10}</td>
                         <td className="py-2.5 px-3 text-sky-200 font-bold">{m.lightgbm_pinball_p50}</td>
-                        <td className="py-2.5 px-3 text-slate-300">{m.lightgbm_pinball_p90}</td>
+                        <td className="py-2.5 px-3 text-slate-700">{m.lightgbm_pinball_p90}</td>
                         <td className="py-2.5 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-16 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                            <div className="w-16 h-1.5 rounded-full bg-slate-100 overflow-hidden">
                               <div
                                 className="h-full bg-sky-400 rounded-full"
                                 style={{ width: `${Math.min(100, m.lightgbm_coverage_80)}%` }}
@@ -827,11 +827,11 @@ export default function ForecastFullModal({ isOpen, onClose }) {
           {activeTab === 'mlops' && mlopsData && (
             <div className="space-y-6 animate-fadeIn">
               {/* Feature PSI Drift Meters */}
-              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-4">
+              <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
-                      <i className="fa-solid fa-gauge-high text-sky-400"></i>
+                      <i className="fa-solid fa-gauge-high text-[#0699C6]"></i>
                       <span>Population Stability Index (PSI) Covariate Drift Monitor</span>
                     </h4>
                     <p className="text-xs text-slate-400">
@@ -847,10 +847,10 @@ export default function ForecastFullModal({ isOpen, onClose }) {
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {Object.entries(mlopsData.feature_psi).map(([feat, d]) => (
-                    <div key={feat} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">{feat.replace(/_/g, ' ')}</div>
+                    <div key={feat} className="p-3.5 rounded-2xl bg-slate-100 border border-slate-200 space-y-1">
+                      <div className="text-[10px] text-slate-500 uppercase font-bold">{feat.replace(/_/g, ' ')}</div>
                       <div className="text-lg font-black font-mono text-white">{d.psi}</div>
-                      <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-800">
+                      <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-200">
                         <span className="text-slate-400">Status</span>
                         <span className={`font-bold ${d.status === 'STABLE' ? 'text-emerald-300' : 'text-amber-300'}`}>{d.status}</span>
                       </div>
@@ -862,7 +862,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               {/* Champion vs Challenger Shadow Governance */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Champion Card */}
-                <div className="p-5 rounded-3xl bg-slate-950/60 border border-emerald-500/40 space-y-3">
+                <div className="p-5 rounded-3xl bg-[#f0faff] border border-emerald-500/40 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 uppercase border border-emerald-500/40">
                       Active Production Champion
@@ -871,22 +871,22 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                   </div>
                   <h3 className="text-base font-black text-white">{mlopsData.champion_model.name}</h3>
                   <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                    <div className="p-2 rounded-xl bg-slate-900">
+                    <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">MAE</div>
                       <div className="font-bold text-white">{mlopsData.champion_model.mae}</div>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-900">
+                    <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">Pinball</div>
-                      <div className="font-bold text-sky-300">{mlopsData.champion_model.pinball_loss}</div>
+                      <div className="font-bold text-[#127694]">{mlopsData.champion_model.pinball_loss}</div>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-900">
+                    <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">Coverage</div>
                       <div className="font-bold text-emerald-300">{mlopsData.champion_model.coverage_80}%</div>
                     </div>
                   </div>
                   <button
                     onClick={handleRollbackChampion}
-                    className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition"
+                    className="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition"
                   >
                     <i className="fa-solid fa-rotate-left mr-1.5"></i>
                     Rollback to Previous Stable Release
@@ -894,24 +894,24 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Challenger Card */}
-                <div className="p-5 rounded-3xl bg-slate-950/60 border border-sky-500/40 space-y-3">
+                <div className="p-5 rounded-3xl bg-[#f0faff] border border-sky-500/40 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-500/20 text-sky-300 uppercase border border-sky-500/40">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-500/20 text-[#127694] uppercase border border-sky-500/40">
                       Candidate Challenger (Shadow Mode)
                     </span>
-                    <i className="fa-solid fa-flask text-sky-400"></i>
+                    <i className="fa-solid fa-flask text-[#0699C6]"></i>
                   </div>
                   <h3 className="text-base font-black text-white">{mlopsData.challenger_model.name}</h3>
                   <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                    <div className="p-2 rounded-xl bg-slate-900">
+                    <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">MAE</div>
                       <div className="font-bold text-emerald-300">{mlopsData.challenger_model.mae}</div>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-900">
+                    <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">Pinball</div>
-                      <div className="font-bold text-sky-300">{mlopsData.challenger_model.pinball_loss}</div>
+                      <div className="font-bold text-[#127694]">{mlopsData.challenger_model.pinball_loss}</div>
                     </div>
-                    <div className="p-2 rounded-xl bg-slate-900">
+                    <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">Coverage</div>
                       <div className="font-bold text-emerald-300">{mlopsData.challenger_model.coverage_80}%</div>
                     </div>
@@ -927,7 +927,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               </div>
 
               {/* Historical Forecast Audit Trail Log */}
-              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-3">
+              <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
                     <i className="fa-solid fa-file-shield text-slate-400"></i>
@@ -936,9 +936,9 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                   <span className="text-xs text-slate-400">Showing last {auditLogData.length} records</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/60">
+                <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50">
                   <table className="w-full text-left text-xs font-mono">
-                    <thead className="bg-slate-900 text-slate-400 font-bold border-b border-slate-800">
+                    <thead className="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
                       <tr>
                         <th className="py-2.5 px-3">Archived Timestamp</th>
                         <th className="py-2.5 px-3">Target</th>
@@ -951,18 +951,18 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                         <th className="py-2.5 px-3">Error (Δ)</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y divide-slate-100/60">
                       {auditLogData.map((a, idx) => (
-                        <tr key={idx} className="hover:bg-slate-800/40 transition">
+                        <tr key={idx} className="hover:bg-slate-50 transition">
                           <td className="py-2 px-3 text-slate-400">{a.timestamp}</td>
                           <td className="py-2 px-3 font-sans font-bold text-white">{a.target.replace(/_/g, ' ')}</td>
-                          <td className="py-2 px-2 text-sky-300">{a.model}</td>
+                          <td className="py-2 px-2 text-[#127694]">{a.model}</td>
                           <td className="py-2 px-2">{a.horizon_hours}h</td>
                           <td className="py-2 px-2 text-slate-400">{a.p10}</td>
                           <td className="py-2 px-2 text-white font-bold">{a.p50}</td>
                           <td className="py-2 px-2 text-slate-400">{a.p90}</td>
                           <td className="py-2 px-2 text-emerald-300 font-bold">{a.actual}</td>
-                          <td className={`py-2 px-3 font-bold ${a.residual_error >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
+                          <td className={`py-2 px-3 font-bold ${a.residual_error >= 0 ? 'text-rose-400' : 'text-[#0699C6]'}`}>
                             {a.residual_error >= 0 ? `+${a.residual_error}` : a.residual_error}
                           </td>
                         </tr>

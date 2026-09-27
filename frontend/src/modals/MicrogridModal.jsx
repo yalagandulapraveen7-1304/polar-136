@@ -162,7 +162,7 @@ export default function MicrogridModal({
 
       // Draw Nodes
       Object.values(nodes).forEach((n) => {
-        ctx.fillStyle = '#0f172a';
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.roundRect(n.x - 48, n.y - 20, 96, 40, 8);
         ctx.fill();
@@ -171,12 +171,12 @@ export default function MicrogridModal({
         ctx.stroke();
 
         ctx.font = 'bold 9px monospace';
-        ctx.fillStyle = '#94a3b8';
+        ctx.fillStyle = '#64748b';
         ctx.textAlign = 'center';
         ctx.fillText(n.label, n.x, n.y - 4);
 
         ctx.font = 'bold 11px monospace';
-        ctx.fillStyle = '#f8fafc';
+        ctx.fillStyle = '#0f172a';
         ctx.fillText(n.val, n.x, n.y + 12);
       });
 
@@ -239,26 +239,26 @@ export default function MicrogridModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900/95 border border-cyan-500/40 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col text-slate-100 overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-50/40 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white border border-[#bcecfc] rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col text-slate-800 overflow-hidden font-sans">
         
         {/* Modal Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-500/20 bg-slate-900/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#05C5FF] flex items-center justify-center shadow-md text-white font-bold text-lg">
               <i className="fa-solid fa-network-wired"></i>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black tracking-wide text-cyan-300">POLAR MICROGRID MANAGEMENT SYSTEM</h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30">
+                <h2 className="text-lg font-black tracking-wide text-[#127694]">POLAR MICROGRID MANAGEMENT SYSTEM</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc]">
                   {currentStation.name}
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/30">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   {bal.system_status || 'STABLE'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono">
+              <p className="text-xs text-slate-500 font-mono">
                 Coordinating Renewables, Storage, Dual Diesel Generators (35% Min Load), CHP Heating & Blackout Defense
               </p>
             </div>
@@ -266,7 +266,7 @@ export default function MicrogridModal({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-700"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition border border-slate-200"
           >
             <i className="fa-solid fa-xmark text-sm"></i>
           </button>
@@ -286,7 +286,7 @@ export default function MicrogridModal({
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 px-6 pt-3 border-b border-slate-800 bg-slate-900/40 overflow-x-auto">
+        <div className="flex items-center gap-1 px-6 pt-3 border-b border-[#bcecfc]/40 bg-[#f8fcfe] overflow-x-auto">
           {[
             { id: 'balance', label: '1. Live Microgrid Flow', icon: 'fa-diagram-project' },
             { id: 'advisor', label: '2. Forecast-Aware Dispatch', icon: 'fa-brain' },
@@ -299,8 +299,8 @@ export default function MicrogridModal({
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-bold transition whitespace-nowrap border-b-2 ${
                 activeTab === tab.id
-                  ? 'border-cyan-400 text-cyan-300 bg-slate-800/80 shadow-sm'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'border-[#0699C6] text-[#127694] bg-white shadow-xs'
+                  : 'border-transparent text-slate-500 hover:text-[#0699C6] hover:bg-slate-100/60'
               }`}
             >
               <i className={`fa-solid ${tab.icon} text-xs`}></i>
@@ -310,7 +310,7 @@ export default function MicrogridModal({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-6 overflow-y-auto flex-1 space-y-6 bg-white text-slate-800">
 
           {/* ============================================================== */}
           {/* TAB 1: LIVE ENERGY BALANCE & ANIMATED VECTOR FLOW              */}
@@ -319,18 +319,18 @@ export default function MicrogridModal({
             <div className="space-y-6 animate-fadeIn">
               {/* Tactical Readout Banner */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Generation</div>
-                  <div className="text-xl font-mono font-black text-cyan-300 mt-1">
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Generation</div>
+                  <div className="text-xl font-mono font-black text-[#127694] mt-1">
                     {bal.total_generation_kw || 0} <span className="text-xs text-slate-400 font-sans">kW</span>
                   </div>
-                  <div className="text-[10px] text-cyan-400 font-semibold mt-0.5">
+                  <div className="text-[10px] text-[#0699C6] font-semibold mt-0.5">
                     Elec: {bal.total_electrical_gen_kw || 0} kW + CHP: {bal.chp_thermal_recovered_kwth || 0} kWth
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Demand</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Demand</div>
                   <div className="text-xl font-mono font-black text-amber-300 mt-1">
                     {bal.total_demand_kw || 0} <span className="text-xs text-slate-400 font-sans">kW</span>
                   </div>
@@ -339,8 +339,8 @@ export default function MicrogridModal({
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Surplus / Deficit</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Surplus / Deficit</div>
                   <div className="text-xl font-mono font-black text-emerald-400 mt-1">
                     {bal.surplus_deficit_kw >= 0 ? `+${bal.surplus_deficit_kw}` : bal.surplus_deficit_kw} <span className="text-xs text-slate-400 font-sans">kW</span>
                   </div>
@@ -349,8 +349,8 @@ export default function MicrogridModal({
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Station State</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Station State</div>
                   <div className="text-sm font-black text-purple-300 mt-2 truncate uppercase">
                     {bal.operating_state || 'BALANCED'}
                   </div>
@@ -359,8 +359,8 @@ export default function MicrogridModal({
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Life Support Floor</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Life Support Floor</div>
                   <div className="text-xl font-mono font-black text-rose-400 mt-1">
                     20.0 <span className="text-xs text-slate-400 font-sans">kW</span>
                   </div>
@@ -371,11 +371,11 @@ export default function MicrogridModal({
               </div>
 
               {/* Central Dynamic Energy Flow Canvas */}
-              <div className="bg-slate-950/80 rounded-2xl border border-cyan-500/30 p-4 relative overflow-hidden shadow-inner">
+              <div className="bg-white rounded-2xl shadow-xs border border-cyan-500/30 p-4 relative overflow-hidden shadow-inner">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span className="text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider">
+                    <span className="text-xs font-mono font-bold text-[#127694] uppercase tracking-wider">
                       Real-Time Vector Microgrid Dispatch Topology
                     </span>
                   </div>
@@ -390,36 +390,36 @@ export default function MicrogridModal({
 
               {/* Equipment Configuration Summary */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                  <div className="flex items-center gap-2 text-xs font-bold text-cyan-400 mb-2">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#0699C6] mb-2">
                     <i className="fa-solid fa-wind"></i> RENEWABLE INFRASTRUCTURE
                   </div>
-                  <div className="text-xs text-slate-300 space-y-1.5 font-mono">
+                  <div className="text-xs text-slate-700 space-y-1.5 font-mono">
                     <div className="flex justify-between"><span>Wind Turbine Capacity:</span><span className="font-bold text-white">{currentStation.windCapacity} kW</span></div>
                     <div className="flex justify-between"><span>Solar PV Array:</span><span className="font-bold text-white">{currentStation.solarCapacity} kW</span></div>
                     <div className="flex justify-between"><span>Storm Cut-Out Speed:</span><span className="font-bold text-amber-300">25.0 m/s</span></div>
                   </div>
                 </div>
 
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
                   <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 mb-2">
                     <i className="fa-solid fa-car-battery"></i> STORAGE & INVERTER
                   </div>
-                  <div className="text-xs text-slate-300 space-y-1.5 font-mono">
+                  <div className="text-xs text-slate-700 space-y-1.5 font-mono">
                     <div className="flex justify-between"><span>Battery Energy Storage:</span><span className="font-bold text-white">{currentStation.batteryCapacity} kWh</span></div>
                     <div className="flex justify-between"><span>Inverter Rating:</span><span className="font-bold text-white">{currentStation.inverterRating || 80} kW</span></div>
                     <div className="flex justify-between"><span>Emergency Reserve Floor:</span><span className="font-bold text-emerald-400">20.0% SoC</span></div>
                   </div>
                 </div>
 
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
                   <div className="flex items-center gap-2 text-xs font-bold text-amber-400 mb-2">
                     <i className="fa-solid fa-gears"></i> DIESEL GENERATORS & CHP
                   </div>
-                  <div className="text-xs text-slate-300 space-y-1.5 font-mono">
+                  <div className="text-xs text-slate-700 space-y-1.5 font-mono">
                     <div className="flex justify-between"><span>Genset 1 (Base):</span><span className="font-bold text-white">{currentStation.genset1Capacity} kW (35% min load)</span></div>
                     <div className="flex justify-between"><span>Genset 2 (Peaking):</span><span className="font-bold text-white">{currentStation.genset2Capacity} kW (35% min load)</span></div>
-                    <div className="flex justify-between"><span>CHP Heat Ratio:</span><span className="font-bold text-cyan-300">1.20 kWth / kWe</span></div>
+                    <div className="flex justify-between"><span>CHP Heat Ratio:</span><span className="font-bold text-[#127694]">1.20 kWth / kWe</span></div>
                   </div>
                 </div>
               </div>
@@ -432,26 +432,26 @@ export default function MicrogridModal({
           {activeTab === 'advisor' && (
             <div className="space-y-6 animate-fadeIn">
               {/* Quantile Forecast Context */}
-              <div className="bg-slate-800/50 p-4 rounded-xl border border-cyan-500/20">
+              <div className="bg-[#f0faff] p-4 rounded-xl border border-[#bcecfc]/70">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-cyan-300 flex items-center gap-2">
-                    <i className="fa-solid fa-chart-area text-cyan-400"></i>
+                  <h3 className="text-sm font-bold text-[#127694] flex items-center gap-2">
+                    <i className="fa-solid fa-chart-area text-[#0699C6]"></i>
                     PROBABILISTIC QUANTILE LOOKAHEAD (P10 / P50 / P90)
                   </h3>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-500/30">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc]">
                     2-Hour Rolling Horizon
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
-                    <div className="text-[10px] font-bold text-slate-400 uppercase">P50 Expected Wind</div>
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">P50 Expected Wind</div>
                     <div className="text-lg font-mono font-bold text-white mt-1">
                       {recommendation?.predicted_state_2h?.predicted_wind_p50_kw || 18.0} kW
                     </div>
                     <div className="text-[10px] text-slate-400 mt-0.5">Median planning baseline for MILP solver</div>
                   </div>
 
-                  <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <div className="text-[10px] font-bold text-amber-400 uppercase">P10 Conservative Wind</div>
                     <div className="text-lg font-mono font-bold text-amber-300 mt-1">
                       {recommendation?.predicted_state_2h?.predicted_wind_p10_kw || 8.0} kW
@@ -459,12 +459,12 @@ export default function MicrogridModal({
                     <div className="text-[10px] text-amber-400/80 mt-0.5">Stress bound; requires spinning reserve</div>
                   </div>
 
-                  <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-700/60">
-                    <div className="text-[10px] font-bold text-cyan-400 uppercase">Predicted Deficit</div>
-                    <div className="text-lg font-mono font-bold text-cyan-300 mt-1">
+                  <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="text-[10px] font-bold text-[#0699C6] uppercase">Predicted Deficit</div>
+                    <div className="text-lg font-mono font-bold text-[#127694] mt-1">
                       {recommendation?.predicted_state_2h?.projected_renewable_deficit_kw || 28.0} kW
                     </div>
-                    <div className="text-[10px] text-cyan-400/80 mt-0.5">Renewable shortfall to absorb</div>
+                    <div className="text-[10px] text-[#0699C6]/80 mt-0.5">Renewable shortfall to absorb</div>
                   </div>
                 </div>
               </div>
@@ -473,11 +473,11 @@ export default function MicrogridModal({
               <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 p-5 rounded-2xl border border-cyan-500/40 shadow-xl space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-[#127694] flex items-center justify-center font-bold">
                       <i className="fa-solid fa-wand-magic-sparkles text-sm"></i>
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider font-mono">
+                      <span className="text-[10px] font-bold text-[#0699C6] uppercase tracking-wider font-mono">
                         Optimization Recommendation ID: {recommendation?.recommendation_id || 'REC-CURRENT'}
                       </span>
                       <h4 className="text-base font-bold text-white">
@@ -487,39 +487,39 @@ export default function MicrogridModal({
                   </div>
                   <button
                     onClick={() => handleAcceptDispatch(recommendation?.recommendation_id)}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/30 transition transform active:scale-95 flex items-center gap-2"
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#0699C6] to-[#05C5FF] hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/30 transition transform active:scale-95 flex items-center gap-2"
                   >
                     <i className="fa-solid fa-circle-check"></i>
                     ACCEPT DISPATCH
                   </button>
                 </div>
 
-                <div className="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 text-xs text-slate-300 leading-relaxed font-mono">
-                  <span className="text-cyan-400 font-bold uppercase">Operational Rationale: </span>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70 text-xs text-slate-700 leading-relaxed font-mono">
+                  <span className="text-[#0699C6] font-bold uppercase">Operational Rationale: </span>
                   {recommendation?.operational_reason || 'Wind generation is forecast to decline during the next 2 hours. Preserving battery SoC above 20% guarantees critical life-support reserve without requiring an inefficient cold-start on Generator 2.'}
                 </div>
 
                 {/* Expected Impacts Matrix */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                  <div className="bg-[#f0faff] p-3 rounded-lg border border-slate-200/50">
                     <div className="text-[10px] text-slate-400 font-bold uppercase">Fuel Impact</div>
                     <div className="text-sm font-mono font-bold text-emerald-400 mt-1">-18.4 L avoided</div>
                     <div className="text-[10px] text-slate-400">Cold-start avoided</div>
                   </div>
 
-                  <div className="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                  <div className="bg-[#f0faff] p-3 rounded-lg border border-slate-200/50">
                     <div className="text-[10px] text-slate-400 font-bold uppercase">Reserve Margin</div>
-                    <div className="text-sm font-mono font-bold text-cyan-300 mt-1">+6.8% preserved</div>
+                    <div className="text-sm font-mono font-bold text-[#127694] mt-1">+6.8% preserved</div>
                     <div className="text-[10px] text-slate-400">Guarantees 20% floor</div>
                   </div>
 
-                  <div className="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                  <div className="bg-[#f0faff] p-3 rounded-lg border border-slate-200/50">
                     <div className="text-[10px] text-slate-400 font-bold uppercase">Green Utilization</div>
                     <div className="text-sm font-mono font-bold text-purple-300 mt-1">98.4% harvested</div>
                     <div className="text-[10px] text-slate-400">Near-zero curtailment</div>
                   </div>
 
-                  <div className="bg-slate-800/40 p-3 rounded-lg border border-slate-700/50">
+                  <div className="bg-[#f0faff] p-3 rounded-lg border border-slate-200/50">
                     <div className="text-[10px] text-slate-400 font-bold uppercase">Reliability Tier</div>
                     <div className="text-sm font-mono font-bold text-emerald-300 mt-1">HIGH (P90)</div>
                     <div className="text-[10px] text-slate-400">Stress bound satisfied</div>
@@ -537,7 +537,7 @@ export default function MicrogridModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Generator 1 Card */}
-                <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60 space-y-4">
+                <div className="bg-[#f0faff] p-5 rounded-2xl border border-slate-200/60 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
@@ -549,22 +549,22 @@ export default function MicrogridModal({
                       </div>
                     </div>
                     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
-                      gens?.genset_1?.status === 'ONLINE' ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'
+                      gens?.genset_1?.status === 'ONLINE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
                     }`}>
                       ● {gens?.genset_1?.status || 'ONLINE'}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                       <div className="text-[9px] text-slate-400 font-bold uppercase">Output</div>
-                      <div className="text-base font-mono font-black text-cyan-300 mt-0.5">{gens?.genset_1?.output_kw || 0} kW</div>
+                      <div className="text-base font-mono font-black text-[#127694] mt-0.5">{gens?.genset_1?.output_kw || 0} kW</div>
                     </div>
-                    <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                       <div className="text-[9px] text-slate-400 font-bold uppercase">Capacity</div>
                       <div className="text-base font-mono font-black text-white mt-0.5">{gens?.genset_1?.capacity_kw || currentStation.genset1Capacity} kW</div>
                     </div>
-                    <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                       <div className="text-[9px] text-slate-400 font-bold uppercase">Load</div>
                       <div className="text-base font-mono font-black text-amber-300 mt-0.5">{gens?.genset_1?.current_load_pct || 0}%</div>
                     </div>
@@ -576,7 +576,7 @@ export default function MicrogridModal({
                       <span className="text-slate-400">Loading vs 35% Wet-Stacking Floor</span>
                       <span className="text-amber-400 font-bold">Min: {gens?.genset_1?.min_loading_kw || 105} kW (35%)</span>
                     </div>
-                    <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden flex border border-slate-800">
+                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200">
                       <div className="w-[35%] bg-rose-500/40 border-r border-rose-500 flex items-center justify-center text-[8px] text-rose-300 font-bold">
                         DANGER
                       </div>
@@ -587,16 +587,16 @@ export default function MicrogridModal({
                     </div>
                   </div>
 
-                  <div className="text-xs text-slate-300 space-y-1.5 font-mono pt-2 border-t border-slate-700/60">
+                  <div className="text-xs text-slate-700 space-y-1.5 font-mono pt-2 border-t border-slate-200/60">
                     <div className="flex justify-between"><span>Specific Fuel Rate:</span><span className="font-bold text-white">{gens?.genset_1?.fuel_rate_l_per_h || 0} L/h</span></div>
                     <div className="flex justify-between"><span>Continuous Runtime:</span><span className="font-bold text-white">{gens?.genset_1?.runtime_minutes || 0} min</span></div>
                     <div className="flex justify-between"><span>Anti-Wet-Stacking Rule:</span><span className="text-emerald-400 font-bold">60 min Lock Complied</span></div>
-                    <div className="flex justify-between"><span>CHP Recovered Heat:</span><span className="text-cyan-300 font-bold">{gens?.genset_1?.thermal_output_kwth || 0} kWth</span></div>
+                    <div className="flex justify-between"><span>CHP Recovered Heat:</span><span className="text-[#127694] font-bold">{gens?.genset_1?.thermal_output_kwth || 0} kWth</span></div>
                   </div>
                 </div>
 
                 {/* Generator 2 Card */}
-                <div className="bg-slate-800/50 p-5 rounded-2xl border border-slate-700/60 space-y-4">
+                <div className="bg-[#f0faff] p-5 rounded-2xl border border-slate-200/60 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
@@ -608,22 +608,22 @@ export default function MicrogridModal({
                       </div>
                     </div>
                     <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
-                      gens?.genset_2?.status === 'ONLINE' ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'
+                      gens?.genset_2?.status === 'ONLINE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
                     }`}>
                       ● {gens?.genset_2?.status || 'STANDBY'}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
-                    <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                       <div className="text-[9px] text-slate-400 font-bold uppercase">Output</div>
-                      <div className="text-base font-mono font-black text-cyan-300 mt-0.5">{gens?.genset_2?.output_kw || 0} kW</div>
+                      <div className="text-base font-mono font-black text-[#127694] mt-0.5">{gens?.genset_2?.output_kw || 0} kW</div>
                     </div>
-                    <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                       <div className="text-[9px] text-slate-400 font-bold uppercase">Capacity</div>
                       <div className="text-base font-mono font-black text-white mt-0.5">{gens?.genset_2?.capacity_kw || currentStation.genset2Capacity} kW</div>
                     </div>
-                    <div className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200">
                       <div className="text-[9px] text-slate-400 font-bold uppercase">Load</div>
                       <div className="text-base font-mono font-black text-amber-300 mt-0.5">{gens?.genset_2?.current_load_pct || 0}%</div>
                     </div>
@@ -635,7 +635,7 @@ export default function MicrogridModal({
                       <span className="text-slate-400">Loading vs 35% Wet-Stacking Floor</span>
                       <span className="text-amber-400 font-bold">Min: {gens?.genset_2?.min_loading_kw || 70} kW (35%)</span>
                     </div>
-                    <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden flex border border-slate-800">
+                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex border border-slate-200">
                       <div className="w-[35%] bg-rose-500/40 border-r border-rose-500 flex items-center justify-center text-[8px] text-rose-300 font-bold">
                         DANGER
                       </div>
@@ -646,34 +646,34 @@ export default function MicrogridModal({
                     </div>
                   </div>
 
-                  <div className="text-xs text-slate-300 space-y-1.5 font-mono pt-2 border-t border-slate-700/60">
+                  <div className="text-xs text-slate-700 space-y-1.5 font-mono pt-2 border-t border-slate-200/60">
                     <div className="flex justify-between"><span>Standby Readiness:</span><span className="text-emerald-400 font-bold">PRE-HEATED & READY</span></div>
                     <div className="flex justify-between"><span>Health Score:</span><span className="font-bold text-white">{gens?.genset_2?.health_pct || 98}%</span></div>
                     <div className="flex justify-between"><span>Auto-Start Threshold:</span><span className="text-amber-300 font-bold">Load &gt; {currentStation.genset1Capacity} kW</span></div>
-                    <div className="flex justify-between"><span>CHP Recovered Heat:</span><span className="text-cyan-300 font-bold">{gens?.genset_2?.thermal_output_kwth || 0} kWth</span></div>
+                    <div className="flex justify-between"><span>CHP Recovered Heat:</span><span className="text-[#127694] font-bold">{gens?.genset_2?.thermal_output_kwth || 0} kWth</span></div>
                   </div>
                 </div>
 
               </div>
 
               {/* CHP Thermal Coordination Diagram */}
-              <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                <h4 className="text-xs font-bold text-[#127694] uppercase tracking-wider mb-2 flex items-center gap-2">
                   <i className="fa-solid fa-fire-flame-curved text-orange-400"></i>
                   COMBINED HEAT & POWER (CHP) THERMAL CO-GENERATION LOOP
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
-                  <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-[#f8fcfe] p-3 rounded-xl border border-slate-200">
                     <span className="text-slate-400">Captured Engine Heat:</span>
                     <div className="text-base font-bold text-orange-400 mt-1">{bal.chp_thermal_recovered_kwth || 0} kWth</div>
                     <span className="text-[10px] text-slate-500">1.20 kWth per kWe generated</span>
                   </div>
-                  <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-[#f8fcfe] p-3 rounded-xl border border-slate-200">
                     <span className="text-slate-400">Auxiliary Heat Required:</span>
                     <div className="text-base font-bold text-rose-300 mt-1">{bal.auxiliary_thermal_kwth || 0} kWth</div>
                     <span className="text-[10px] text-slate-500">Electric heating element</span>
                   </div>
-                  <div className="bg-slate-900/60 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-[#f8fcfe] p-3 rounded-xl border border-slate-200">
                     <span className="text-slate-400">Thermal Supply vs Demand:</span>
                     <div className="text-base font-bold text-emerald-400 mt-1">100.0% SATISFIED</div>
                     <span className="text-[10px] text-emerald-300">Living quarters protected</span>
@@ -689,14 +689,14 @@ export default function MicrogridModal({
           {activeTab === 'blackout' && (
             <div className="space-y-6 animate-fadeIn">
               {/* Emergency Status Banner */}
-              <div className="bg-slate-800/60 p-4 rounded-xl border border-rose-500/30 flex items-center justify-between flex-wrap gap-3">
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-lg">
                     <i className="fa-solid fa-triangle-exclamation"></i>
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-white">BLACKOUT DEFENSE & HIERARCHICAL LOAD SHEDDING</h3>
-                    <p className="text-xs text-slate-400 font-mono">
+                    <p className="text-xs text-slate-500 font-mono">
                       State: <span className="font-bold text-rose-400 uppercase">{mg.emergency_state || 'NORMAL'}</span> · Total Shedding: <span className="text-amber-300 font-bold">{bal.total_shed_kw || 0} kW</span>
                     </p>
                   </div>
@@ -712,7 +712,7 @@ export default function MicrogridModal({
                   </button>
                   <button
                     onClick={handleResetEmergency}
-                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition"
+                    className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition"
                   >
                     RESTORE NOMINAL
                   </button>
@@ -721,25 +721,25 @@ export default function MicrogridModal({
 
               {/* 3-Tier Load Shedding Breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-[#f8fcfe] p-3.5 rounded-xl border border-slate-200">
                   <div className="text-[10px] text-amber-400 font-bold uppercase">Tier 1: Non-Essential</div>
                   <div className="text-lg font-mono font-bold text-white mt-1">25.0 kW</div>
                   <div className="text-[10px] text-slate-400 mt-1">External floodlights, auxiliary heating (First to shed)</div>
                 </div>
 
-                <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-[#f8fcfe] p-3.5 rounded-xl border border-slate-200">
                   <div className="text-[10px] text-amber-400 font-bold uppercase">Tier 2: Flexible Loads</div>
                   <div className="text-lg font-mono font-bold text-white mt-1">45.0 kW</div>
                   <div className="text-[10px] text-slate-400 mt-1">Scientific freezers, snowmelter, water recycling</div>
                 </div>
 
-                <div className="bg-slate-800/40 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-[#f8fcfe] p-3.5 rounded-xl border border-slate-200">
                   <div className="text-[10px] text-amber-400 font-bold uppercase">Tier 3: Non-Critical</div>
                   <div className="text-lg font-mono font-bold text-white mt-1">30.0 kW</div>
                   <div className="text-[10px] text-slate-400 mt-1">Deep core drills, auxiliary workshop tools</div>
                 </div>
 
-                <div className="bg-rose-950/30 p-3.5 rounded-xl border border-rose-500/50">
+                <div className="bg-rose-50/30 p-3.5 rounded-xl border border-rose-500/50">
                   <div className="text-[10px] text-rose-400 font-bold uppercase flex items-center gap-1">
                     <i className="fa-solid fa-lock text-[9px]"></i> CRITICAL LIFE SUPPORT
                   </div>
@@ -750,16 +750,16 @@ export default function MicrogridModal({
 
               {/* Blackout Defense Event Log */}
               {blackoutLogs.length > 0 && (
-                <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-2">
-                  <div className="text-xs font-mono font-bold text-cyan-300 uppercase tracking-wider mb-2">
+                <div className="bg-[#f0faff] p-4 rounded-xl border border-[#bcecfc]/70 space-y-2">
+                  <div className="text-xs font-mono font-bold text-[#127694] uppercase tracking-wider mb-2">
                     Automated Blackout Defense Sequential Execution Trace:
                   </div>
                   <div className="space-y-1.5 font-mono text-xs">
                     {blackoutLogs.map((log) => (
-                      <div key={log.step} className="flex items-start gap-2.5 bg-slate-900/60 p-2 rounded border border-slate-800">
-                        <span className="text-cyan-400 font-bold">[{log.time}]</span>
-                        <span className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] text-amber-300 font-bold">{log.event}</span>
-                        <span className="text-slate-300">{log.detail}</span>
+                      <div key={log.step} className="flex items-start gap-2.5 bg-slate-50 p-2 rounded border border-slate-200">
+                        <span className="text-[#0699C6] font-bold">[{log.time}]</span>
+                        <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] text-amber-300 font-bold">{log.event}</span>
+                        <span className="text-slate-700">{log.detail}</span>
                       </div>
                     ))}
                   </div>
@@ -775,10 +775,10 @@ export default function MicrogridModal({
             <div className="space-y-6 animate-fadeIn">
               {/* Range Selector */}
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="text-xs font-mono font-bold text-cyan-300 uppercase">
+                <span className="text-xs font-mono font-bold text-[#127694] uppercase">
                   Multi-Horizon Performance Aggregations:
                 </span>
-                <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                   {['24H', '7D', '30D', '12M'].map((rng) => (
                     <button
                       key={rng}
@@ -797,15 +797,15 @@ export default function MicrogridModal({
 
               {/* KPI Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Total Generation</div>
                   <div className="text-lg font-mono font-bold text-white mt-1">
                     {analyticsData?.totals?.total_generation_kwh?.toLocaleString() || 0} kWh
                   </div>
-                  <div className="text-[10px] text-cyan-400 mt-0.5">Green: {analyticsData?.totals?.renewable_fraction_pct || 0}%</div>
+                  <div className="text-[10px] text-[#0699C6] mt-0.5">Green: {analyticsData?.totals?.renewable_fraction_pct || 0}%</div>
                 </div>
 
-                <div className="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Diesel Fuel Saved</div>
                   <div className="text-lg font-mono font-bold text-emerald-400 mt-1">
                     {analyticsData?.totals?.fuel_saved_liters?.toLocaleString() || 0} L
@@ -813,7 +813,7 @@ export default function MicrogridModal({
                   <div className="text-[10px] text-emerald-300 mt-0.5">CO2 Avoided: {analyticsData?.totals?.co2_avoided_kg?.toLocaleString() || 0} kg</div>
                 </div>
 
-                <div className="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Battery Throughput</div>
                   <div className="text-lg font-mono font-bold text-purple-300 mt-1">
                     {analyticsData?.totals?.battery_throughput_kwh?.toLocaleString() || 0} kWh
@@ -821,7 +821,7 @@ export default function MicrogridModal({
                   <div className="text-[10px] text-purple-400 mt-0.5">Displaced generator starts</div>
                 </div>
 
-                <div className="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60">
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs">
                   <div className="text-[10px] text-slate-400 font-bold uppercase">Renewable Curtailment</div>
                   <div className="text-lg font-mono font-bold text-amber-400 mt-1">
                     {analyticsData?.totals?.curtailed_energy_kwh?.toLocaleString() || 0} kWh
@@ -832,21 +832,21 @@ export default function MicrogridModal({
 
               {/* Side-by-Side Station Profile Comparison Matrix */}
               {comparisonData && (
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                  <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <i className="fa-solid fa-code-compare text-cyan-400"></i>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                  <h4 className="text-xs font-bold text-[#127694] uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <i className="fa-solid fa-code-compare text-[#0699C6]"></i>
                     ANTARCTIC STATION PROFILE COMPARISON MATRIX: MAITRI vs BHARATI
                   </h4>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs font-mono">
-                      <thead className="bg-slate-900/80 text-slate-400 text-[10px] uppercase">
+                      <thead className="bg-slate-50 text-slate-400 text-[10px] uppercase">
                         <tr>
                           <th className="p-2.5">Parameter</th>
-                          <th className="p-2.5 text-cyan-300">MAITRI (Queen Maud Land)</th>
+                          <th className="p-2.5 text-[#127694]">MAITRI (Queen Maud Land)</th>
                           <th className="p-2.5 text-amber-300">BHARATI (Larsemann Hills)</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800 text-slate-300">
+                      <tbody className="divide-y divide-slate-100 text-slate-700">
                         <tr>
                           <td className="p-2 text-slate-400">Diesel Generator 1</td>
                           <td className="p-2 font-bold text-white">{comparisonData.MAITRI.diesel_generator_1_kw} kW</td>
@@ -864,8 +864,8 @@ export default function MicrogridModal({
                         </tr>
                         <tr>
                           <td className="p-2 text-slate-400">Wind Turbine Capacity</td>
-                          <td className="p-2 text-cyan-400 font-bold">{comparisonData.MAITRI.wind_capacity_kw} kW</td>
-                          <td className="p-2 text-cyan-400 font-bold">{comparisonData.BHARATI.wind_capacity_kw} kW</td>
+                          <td className="p-2 text-[#0699C6] font-bold">{comparisonData.MAITRI.wind_capacity_kw} kW</td>
+                          <td className="p-2 text-[#0699C6] font-bold">{comparisonData.BHARATI.wind_capacity_kw} kW</td>
                         </tr>
                         <tr>
                           <td className="p-2 text-slate-400">Solar PV Capacity</td>
@@ -898,14 +898,14 @@ export default function MicrogridModal({
         </div>
 
         {/* Modal Bottom Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-800 bg-slate-900/60 text-xs font-mono text-slate-400">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200 bg-slate-50 text-xs font-mono text-slate-400">
           <div className="flex items-center gap-3">
             <span>STATION: <strong className="text-white">{currentStation.name}</strong></span>
             <span>BALANCE: <strong className="text-emerald-400">{bal.system_status || 'STABLE'}</strong></span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition border border-slate-700"
+            className="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition border border-slate-200"
           >
             Close
           </button>

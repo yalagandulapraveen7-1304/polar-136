@@ -35,6 +35,7 @@ from backend.forecasting.predictive_engine import PolarPredictiveEngine
 from backend.intelligence.ai_system import PolarIntelligenceSystem
 from backend.intelligence.copilot import PolarCopilotSystem
 from backend.intelligence.alert_engine import PolarAlertIntelligenceSystem
+from backend.scenarios.scenario_engine import PolarScenarioControlEngine, PRESET_DEFINITIONS, PARAM_BOUNDS
 
 # Global Singletons
 ingestion_driver = DataIngestionDriver(station_id=DEFAULT_STATION, mode=SEMS_MODE)
@@ -54,6 +55,7 @@ microgrid_manager = PolarMicrogridManager(station_id=DEFAULT_STATION)
 weather_engine = PolarWeatherEngine(station_id=DEFAULT_STATION)
 copilot_system = PolarCopilotSystem(get_snapshot_fn=lambda: current_system_snapshot if current_system_snapshot else compute_system_snapshot())
 alert_system = PolarAlertIntelligenceSystem(station_id=DEFAULT_STATION)
+scenario_engine = PolarScenarioControlEngine(station_id=DEFAULT_STATION)
 
 # Connected WebSocket clients
 active_websockets: List[WebSocket] = []
@@ -260,7 +262,15 @@ def compute_system_snapshot() -> Dict[str, Any]:
             "thresholds": alert_system.thresholds
         }
 
-    # 19. Assemble Unified Payload
+    # 19. Scenario & Comparative Analysis Engine (Section 11)
+    try:
+        scenario_snapshot = scenario_engine.compute_comparative_analysis(
+            nominal_telemetry=telemetry
+        )
+    except Exception:
+        scenario_snapshot = {}
+
+    # 20. Assemble Unified Payload
     payload = {
         "telemetry": telemetry,
         "dispatch": safe_dispatch,
@@ -288,6 +298,7 @@ def compute_system_snapshot() -> Dict[str, Any]:
         "ai_intelligence": ai_intelligence_snapshot,
         "copilot": copilot_snapshot,
         "alert_intelligence": alert_snapshot,
+        "scenario_control": scenario_snapshot,
         "cloud_ai_active": ai_service.is_cloud_enabled()
     }
     current_system_snapshot = payload
@@ -379,6 +390,13 @@ class AlertAcknowledgeRequest(BaseModel):
     alert_id: str
     acknowledged_by: Optional[str] = "Operator"
 
+class ScenarioApplyRequest(BaseModel):
+    params: Dict[str, Any]
+    scenario_name: Optional[str] = None
+
+class ScenarioPresetRequest(BaseModel):
+    preset_id: str
+
 # ----------------- REST Endpoints -----------------
 @app.get("/api/status")
 async def get_status(
@@ -438,6 +456,7 @@ async def switch_station(req: StationSwitchRequest):
         predictive_engine.set_station(req.station_id)
         ai_engine.set_station(req.station_id)
         alert_system.set_station(req.station_id)
+        scenario_engine.set_station(req.station_id)
         
         # Compute updated snapshot immediately
         snapshot = compute_system_snapshot()
@@ -458,12 +477,15 @@ async def switch_mode(req: ModeSwitchRequest):
 
 @app.post("/api/commander/override")
 async def commander_override(req: CommanderOverrideRequest):
-    ingestion_driver.apply_overrides(req.model_dump(exclude_unset=True))
+    params = req.model_dump(exclude_unset=True)
+    scenario_engine.apply_scenario(params, scenario_name="COMMANDER_MANUAL_INPUT")
+    ingestion_driver.apply_overrides(params)
     compute_system_snapshot()
-    return {"status": "SUCCESS", "message": "Commander overrides applied to digital twin."}
+    return {"status": "SUCCESS", "message": "Commander overrides applied to digital twin.", "run_id": scenario_engine.run_id}
 
 @app.post("/api/commander/reset")
 async def commander_reset():
+    scenario_engine.reset_scenario()
     ingestion_driver.clear_overrides()
     compute_system_snapshot()
     return {"status": "SUCCESS", "message": "Overrides cleared, nominal polar physics restored."}
@@ -1049,8 +1071,15 @@ async def handle_copilot_action(req: CopilotActionRequest):
 @app.get("/api/alerts/live")
 async def get_live_alerts():
     """Returns current active operational and predictive alerts with 4-part explanations"""
-    snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
-    return snapshot.get("alert_intelligence", {})
+    if current_system_snapshot and "alert_intelligence" in current_system_snapshot:
+        return current_system_snapshot["alert_intelligence"]
+    t = ingestion_driver.ingest()
+    return alert_system.evaluate_live_alerts(
+        telemetry=t,
+        dispatch={"p_diesel_1_kw": 180.0, "p_diesel_2_kw": 0.0, "p_wind_kw": 104.0, "p_solar_kw": 86.0, "spinning_reserve_kw": 120.0},
+        forecast_data=predictive_engine.compute_telemetry_deviations(t),
+        mlops_data={}
+    )
 
 @app.post("/api/alerts/acknowledge")
 async def acknowledge_alert(req: AlertAcknowledgeRequest):
@@ -1076,12 +1105,128 @@ async def get_alert_history(limit: int = 50):
 @app.get("/api/alerts/compound")
 async def get_compound_events():
     """Returns compound risk event evaluation across 7 polar multi-failure scenarios"""
-    snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
-    alert_intel = snapshot.get("alert_intelligence", {})
+    if current_system_snapshot and "alert_intelligence" in current_system_snapshot:
+        alert_intel = current_system_snapshot["alert_intelligence"]
+        return {
+            "compound_risk": alert_intel.get("compound_risk", {}),
+            "root_cause_tree": alert_intel.get("root_cause_tree", {})
+        }
+    t = ingestion_driver.ingest()
     return {
-        "compound_risk": alert_intel.get("compound_risk", {}),
-        "root_cause_tree": alert_intel.get("root_cause_tree", {})
+        "compound_risk": alert_system.evaluate_compound_events(t, {}),
+        "root_cause_tree": alert_system._build_root_cause_hierarchy(
+            t_amb=float(t.get("ambient_temp_c", -28.0)),
+            load_kw=float(t.get("station_load_kwe", 412.0)),
+            soc=float(t.get("battery_soc_pct", 77.0)),
+            g1_kw=180.0
+        )
     }
+
+# ----------------- Section 11: Real-Time Override & Scenario Control Endpoints -----------------
+@app.post("/api/scenarios/apply")
+async def apply_scenario_override(req: ScenarioApplyRequest):
+    """
+    Applies validated manual engineering inputs or contingencies.
+    Rejects out-of-bounds parameters and blocks direct physical override if SCADA_MODE is active.
+    """
+    if ingestion_driver.mode == "SCADA_MODE":
+        return JSONResponse(
+            status_code=403,
+            content={
+                "status": "REJECTED",
+                "message": "SCADA MODE ● LIVE READ-ONLY: Direct manual parameter modification rejected to protect physical hardware."
+            }
+        )
+    
+    # 1. Parameter Validation via Scenario Control Engine
+    res = scenario_engine.apply_scenario(req.params, scenario_name=req.scenario_name)
+    if not res.get("success", False):
+        return JSONResponse(status_code=422, content=res)
+    
+    # 2. Inject into Data Ingestion Driver
+    ingestion_driver.apply_overrides(res["active_params"])
+    compute_system_snapshot()
+    
+    return {
+        "status": "SUCCESS",
+        "message": f"Scenario parameters applied successfully under Run ID {res['run_id']}.",
+        "run_id": res["run_id"],
+        "active_params": res["active_params"],
+        "audit_entry": res["audit_entry"],
+        "comparison": scenario_engine.compute_comparative_analysis(nominal_telemetry=ingestion_driver.ingest())
+    }
+
+@app.post("/api/scenarios/preset")
+async def apply_scenario_preset(req: ScenarioPresetRequest):
+    """
+    Loads predefined engineering stress presets (Polar Vortex, 21-Day Outage, Severe Cold, etc.)
+    """
+    if ingestion_driver.mode == "SCADA_MODE":
+        return JSONResponse(
+            status_code=403,
+            content={
+                "status": "REJECTED",
+                "message": "SCADA MODE ● LIVE READ-ONLY: Preset modifications rejected to protect physical hardware."
+            }
+        )
+    
+    res = scenario_engine.load_preset(req.preset_id)
+    if not res.get("success", False):
+        return JSONResponse(status_code=400, content=res)
+        
+    ingestion_driver.apply_overrides(res["active_params"])
+    compute_system_snapshot()
+    
+    return {
+        "status": "SUCCESS",
+        "preset_id": req.preset_id,
+        "run_id": res["run_id"],
+        "active_params": res["active_params"],
+        "preset_meta": res.get("preset_meta", {}),
+        "comparison": scenario_engine.compute_comparative_analysis(nominal_telemetry=ingestion_driver.ingest())
+    }
+
+@app.post("/api/scenarios/reset")
+async def reset_scenario_override():
+    """Restores nominal polar physics and clears all active contingencies"""
+    res = scenario_engine.reset_scenario()
+    ingestion_driver.clear_overrides()
+    compute_system_snapshot()
+    return {
+        "status": "SUCCESS",
+        "message": "All parameter overrides cleared. System restored to nominal polar physics.",
+        "run_id": res["run_id"],
+        "active_params": {},
+        "comparison": scenario_engine.compute_comparative_analysis(nominal_telemetry=ingestion_driver.ingest())
+    }
+
+@app.get("/api/scenarios/comparison")
+async def get_scenario_comparison():
+    """Returns real-time side-by-side comparative analysis of Baseline vs Scenario"""
+    return scenario_engine.compute_comparative_analysis(nominal_telemetry=ingestion_driver.ingest())
+
+@app.get("/api/scenarios/three-week-outage")
+async def get_three_week_winter_outage_benchmark():
+    """Returns Project A 21-day (504 hours) Genset 1 winter failure simulation proof"""
+    return scenario_engine.simulate_21_day_winter_failure()
+
+@app.get("/api/scenarios/presets")
+async def list_scenario_presets():
+    """Returns catalog of standard engineering stress presets and valid parameter bounds"""
+    return {
+        "presets": PRESET_DEFINITIONS,
+        "bounds": PARAM_BOUNDS
+    }
+
+@app.get("/api/scenarios/timeline")
+async def get_scenario_audit_timeline():
+    """Returns chronological scenario modification audit log"""
+    return {"audit_timeline": scenario_engine.audit_timeline}
+
+@app.get("/api/scenarios/export")
+async def export_scenario_configuration():
+    """Exports full scenario configuration and reproducibility envelope as JSON"""
+    return scenario_engine.export_scenario_json()
 
 # ----------------- WebSocket Endpoint -----------------
 @app.websocket("/ws/telemetry")

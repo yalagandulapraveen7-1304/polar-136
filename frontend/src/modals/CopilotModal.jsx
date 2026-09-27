@@ -271,29 +271,29 @@ export default function CopilotModal({ isOpen, onClose }) {
   return (
     <div
       id="modal-copilot-full"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-50/40 backdrop-blur-sm animate-fadeIn"
       onClick={(e) => {
         if (e.target.id === 'modal-copilot-full') onClose();
       }}
     >
-      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-slate-900/95 border border-sky-500/30 text-slate-100 shadow-[0_0_50px_rgba(2,132,199,0.25)] overflow-hidden">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-white border border-[#bcecfc] text-slate-800 shadow-2xl(2,132,199,0.25)] overflow-hidden">
         
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between px-6 py-3.5 border-b border-slate-800 bg-slate-950/60 gap-3">
+        <div className="flex flex-wrap items-center justify-between px-6 py-3.5 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-400 to-blue-700 flex items-center justify-center text-white shadow-lg">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0699C6] to-[#05C5FF] flex items-center justify-center text-white shadow-lg">
               <i className="fa-solid fa-robot text-lg"></i>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black tracking-tight text-white uppercase">
+                <h2 className="text-lg font-black tracking-tight text-[#127694] uppercase">
                   Polar AI Operational Copilot
                 </h2>
                 
                 {/* Two-Layer Mode Badge */}
-                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-slate-800 border border-slate-700">
+                <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-slate-100 border border-slate-200">
                   <span className="text-slate-400">Mode:</span>
-                  <span className={`flex items-center gap-1 ${activeModeDisplay === 'CLOUD' ? 'text-cyan-300' : 'text-amber-300'}`}>
+                  <span className={`flex items-center gap-1 ${activeModeDisplay === 'CLOUD' ? 'text-[#127694]' : 'text-amber-300'}`}>
                     <span className={`w-2 h-2 rounded-full ${activeModeDisplay === 'CLOUD' ? 'bg-cyan-400 animate-pulse' : 'bg-amber-400'}`}></span>
                     {activeModeDisplay === 'CLOUD' ? 'CLOUD' : 'LOCAL FALLBACK'}
                   </span>
@@ -311,7 +311,7 @@ export default function CopilotModal({ isOpen, onClose }) {
 
           <div className="flex items-center gap-3">
             {/* Mode Toggle Button */}
-            <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
+            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px] font-bold">
               <button
                 type="button"
                 onClick={() => setCopilotMode('auto')}
@@ -336,22 +336,22 @@ export default function CopilotModal({ isOpen, onClose }) {
             </div>
 
             {/* Role Selector */}
-            <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-xl border border-slate-800 text-xs">
-              <i className="fa-solid fa-user-shield text-sky-400 text-xs"></i>
+            <div className="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-xl border border-slate-200 text-xs">
+              <i className="fa-solid fa-user-shield text-[#0699C6] text-xs"></i>
               <select
                 value={userRole}
                 onChange={(e) => setUserRole(e.target.value)}
-                className="bg-transparent text-xs font-bold text-slate-200 focus:outline-none cursor-pointer"
+                className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
               >
-                <option value="Viewer" className="bg-slate-900 text-slate-200">Viewer (Read-Only)</option>
-                <option value="Operator" className="bg-slate-900 text-slate-200">Operator (Actions Allowed)</option>
-                <option value="Commander" className="bg-slate-900 text-slate-200">Commander (Full Admin)</option>
+                <option value="Viewer" className="bg-slate-100 text-slate-800">Viewer (Read-Only)</option>
+                <option value="Operator" className="bg-slate-100 text-slate-800">Operator (Actions Allowed)</option>
+                <option value="Commander" className="bg-slate-100 text-slate-800">Commander (Full Admin)</option>
               </select>
             </div>
 
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-700/50"
+              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition border border-slate-200"
             >
               <i className="fa-solid fa-xmark text-sm"></i>
             </button>
@@ -376,13 +376,13 @@ export default function CopilotModal({ isOpen, onClose }) {
         )}
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-slate-800 bg-slate-950/40 overflow-x-auto text-xs font-bold">
+        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] overflow-x-auto text-xs font-bold">
           <button
             onClick={() => setActiveTab('chat')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'chat'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-comment-dots"></i>
@@ -394,7 +394,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'anomalies'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-satellite-dish"></i>
@@ -409,7 +409,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'digital_twin'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-brain"></i>
@@ -424,7 +424,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'counterfactual'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-flask-vial"></i>
@@ -436,7 +436,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'mlops'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-dna"></i>
@@ -448,7 +448,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'audit'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                : 'text-slate-400 hover:text-white hover:bg-slate-50'
             }`}
           >
             <i className="fa-solid fa-clipboard-list"></i>
@@ -467,22 +467,22 @@ export default function CopilotModal({ isOpen, onClose }) {
               {proactiveInsights.length > 0 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {proactiveInsights.slice(0, 2).map((ins, i) => (
-                    <div key={i} className="p-3 rounded-2xl bg-slate-950/70 border border-sky-500/30 flex items-start gap-3 relative overflow-hidden">
-                      <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 border border-sky-500/40 flex items-center justify-center shrink-0 text-xs font-bold">
+                    <div key={i} className="p-3 rounded-2xl bg-[#f0faff] border border-sky-500/30 flex items-start gap-3 relative overflow-hidden">
+                      <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-[#0699C6] border border-sky-500/40 flex items-center justify-center shrink-0 text-xs font-bold">
                         <i className="fa-solid fa-bolt"></i>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black text-sky-400 uppercase tracking-wider">
+                          <span className="text-[10px] font-black text-[#0699C6] uppercase tracking-wider">
                             Proactive AI Insight · {ins.title}
                           </span>
                           <span className="text-[9px] font-mono text-slate-400">Live Engine</span>
                         </div>
-                        <p className="text-xs text-slate-200 font-semibold mt-0.5">
+                        <p className="text-xs text-slate-700 font-semibold mt-0.5">
                           {ins.observation}
                         </p>
                         <p className="text-[11px] text-slate-400 mt-0.5">
-                          <strong className="text-slate-300">Action:</strong> {ins.system_recommendation}
+                          <strong className="text-slate-700">Action:</strong> {ins.system_recommendation}
                         </p>
                       </div>
                     </div>
@@ -493,7 +493,7 @@ export default function CopilotModal({ isOpen, onClose }) {
               {/* Chat Thread */}
               <div
                 ref={chatThreadRef}
-                className="h-[380px] overflow-y-auto space-y-4 p-4 rounded-2xl bg-slate-950/80 border border-slate-800 scroll-smooth"
+                className="h-[380px] overflow-y-auto space-y-4 p-4 rounded-2xl bg-[#f0faff] border border-slate-200 scroll-smooth"
               >
                 {messages.map((m, idx) => (
                   <div
@@ -501,7 +501,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                     className={`flex items-start gap-2.5 ${m.sender === 'commander' ? 'justify-end' : 'justify-start'}`}
                   >
                     {m.sender === 'ai' && (
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-md">
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0699C6] to-[#05C5FF] text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-md">
                         <i className="fa-solid fa-robot"></i>
                       </div>
                     )}
@@ -509,11 +509,11 @@ export default function CopilotModal({ isOpen, onClose }) {
                     <div className={`max-w-[85%] sm:max-w-[78%] flex flex-col gap-1.5 ${m.sender === 'commander' ? 'items-end' : 'items-start'}`}>
                       {/* Sender Meta */}
                       <div className="flex items-center gap-2 px-1 text-[10px] font-mono text-slate-400">
-                        <span className="font-bold text-slate-300">{m.sender === 'commander' ? `Operator (${m.role || userRole})` : 'Polar AI Copilot'}</span>
+                        <span className="font-bold text-slate-700">{m.sender === 'commander' ? `Operator (${m.role || userRole})` : 'Polar AI Copilot'}</span>
                         <span>·</span>
                         <span>{m.time}</span>
                         {m.sender === 'ai' && (
-                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.mode === 'CLOUD' ? 'bg-cyan-500/20 text-cyan-300' : 'bg-amber-500/20 text-amber-300'}`}>
+                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.mode === 'CLOUD' ? 'bg-cyan-500/20 text-[#127694]' : 'bg-amber-500/20 text-amber-300'}`}>
                             {m.mode || 'LOCAL_FALLBACK'}
                           </span>
                         )}
@@ -524,20 +524,20 @@ export default function CopilotModal({ isOpen, onClose }) {
                         className={`px-4 py-3 rounded-2xl text-xs leading-relaxed ${
                           m.sender === 'commander'
                             ? 'bg-sky-500 text-slate-950 font-bold rounded-tr-none shadow-md'
-                            : 'bg-slate-900/90 text-slate-100 border border-slate-800 rounded-tl-none font-medium'
+                            : 'bg-slate-100/90 text-slate-800 border border-slate-200 rounded-tl-none font-medium'
                         }`}
                       >
-                        <div className="whitespace-pre-line font-medium text-slate-100">
+                        <div className="whitespace-pre-line font-medium text-slate-800">
                           {m.answer}
                         </div>
 
                         {/* Collapsible 4-Part Evidence Breakdown for AI messages */}
                         {m.sender === 'ai' && (m.evidence || m.impact || m.recommendation) && (
-                          <div className="mt-3 pt-2.5 border-t border-slate-800/80 space-y-2">
+                          <div className="mt-3 pt-2.5 border-t border-slate-200/80 space-y-2">
                             <button
                               type="button"
                               onClick={() => toggleCardExpand(idx)}
-                              className="text-[11px] font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1.5"
+                              className="text-[11px] font-bold text-[#0699C6] hover:text-[#127694] flex items-center gap-1.5"
                             >
                               <i className={`fa-solid ${expandedCards[idx] ? 'fa-chevron-up' : 'fa-chevron-down'} text-[10px]`}></i>
                               <span>{expandedCards[idx] ? 'Hide Engineering Evidence & Impact' : 'Show Engineering Evidence & Impact'}</span>
@@ -546,21 +546,21 @@ export default function CopilotModal({ isOpen, onClose }) {
                             {expandedCards[idx] && (
                               <div className="grid grid-cols-1 gap-2 pt-1 animate-fadeIn text-[11px]">
                                 {m.evidence && (
-                                  <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800">
-                                    <span className="text-[10px] font-black text-cyan-400 uppercase tracking-wider block">Evidence:</span>
-                                    <span className="text-slate-300">{m.evidence}</span>
+                                  <div className="p-2 rounded-xl bg-[#f0faff] border border-slate-200">
+                                    <span className="text-[10px] font-black text-[#0699C6] uppercase tracking-wider block">Evidence:</span>
+                                    <span className="text-slate-700">{m.evidence}</span>
                                   </div>
                                 )}
                                 {m.impact && (
-                                  <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800">
+                                  <div className="p-2 rounded-xl bg-[#f0faff] border border-slate-200">
                                     <span className="text-[10px] font-black text-amber-400 uppercase tracking-wider block">Operational Impact:</span>
-                                    <span className="text-slate-300">{m.impact}</span>
+                                    <span className="text-slate-700">{m.impact}</span>
                                   </div>
                                 )}
                                 {m.recommendation && (
-                                  <div className="p-2 rounded-xl bg-slate-950/70 border border-slate-800">
+                                  <div className="p-2 rounded-xl bg-[#f0faff] border border-slate-200">
                                     <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider block">Validated Recommendation:</span>
-                                    <span className="text-slate-300">{m.recommendation}</span>
+                                    <span className="text-slate-700">{m.recommendation}</span>
                                   </div>
                                 )}
                               </div>
@@ -571,7 +571,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                                 <span className="text-[9px] font-bold text-slate-500 uppercase">Sources:</span>
                                 {m.sources.map((s, si) => (
-                                  <span key={si} className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800">
+                                  <span key={si} className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-400 border border-slate-200">
                                     ● {s}
                                   </span>
                                 ))}
@@ -580,12 +580,12 @@ export default function CopilotModal({ isOpen, onClose }) {
 
                             {/* Action Card */}
                             {m.action_card && (
-                              <div className="mt-2 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/40 flex items-center justify-between gap-3">
+                              <div className="mt-2 p-2.5 rounded-xl bg-[#e5f6fd]/40 border border-sky-500/40 flex items-center justify-between gap-3">
                                 <div>
-                                  <span className="text-[10px] font-black text-sky-300 uppercase tracking-wider block">
+                                  <span className="text-[10px] font-black text-[#127694] uppercase tracking-wider block">
                                     Recommended Action
                                   </span>
-                                  <span className="text-xs font-bold text-slate-200">{m.action_card.action}</span>
+                                  <span className="text-xs font-bold text-slate-700">{m.action_card.action}</span>
                                   <span className="text-[10px] text-slate-400 block">{m.action_card.reason}</span>
                                 </div>
                                 <button
@@ -603,7 +603,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                     </div>
 
                     {m.sender === 'commander' && (
-                      <div className="w-8 h-8 rounded-xl bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center shrink-0 text-xs font-bold">
+                      <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 flex items-center justify-center shrink-0 text-xs font-bold">
                         <i className="fa-solid fa-user"></i>
                       </div>
                     )}
@@ -611,7 +611,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                 ))}
 
                 {isSending && (
-                  <div className="flex items-center gap-2 text-sky-400 text-xs font-bold animate-pulse p-2">
+                  <div className="flex items-center gap-2 text-[#0699C6] text-xs font-bold animate-pulse p-2">
                     <i className="fa-solid fa-spinner fa-spin"></i>
                     <span>AI Copilot verifying telemetry and formulating response...</span>
                   </div>
@@ -628,7 +628,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                     key={i}
                     type="button"
                     onClick={() => handleSend(qp)}
-                    className="px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold transition border border-slate-700/50"
+                    className="px-2.5 py-1 rounded-lg bg-[#f0faff] hover:bg-slate-700 text-slate-700 hover:text-white text-[11px] font-semibold transition border border-slate-200"
                   >
                     {qp}
                   </button>
@@ -642,7 +642,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                   value={inputVal}
                   onChange={(e) => setInputVal(e.target.value)}
                   placeholder="Ask Polar AI about microgrid status, diesel justification, 6h forecast, battery derating, or contingencies..."
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 placeholder-slate-500 text-xs focus:outline-none focus:border-sky-500 transition"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#f0faff] border border-slate-200 text-slate-800 placeholder-slate-400 text-xs focus:outline-none focus:border-sky-500 transition"
                 />
                 <button
                   type="submit"
@@ -660,22 +660,22 @@ export default function CopilotModal({ isOpen, onClose }) {
           {activeTab === 'anomalies' && (
             <div className="space-y-4 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Isolation Forest Anomaly Score</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Isolation Forest Anomaly Score</span>
                   <div className="text-2xl font-black text-white mt-1">
                     {anomalyData?.score !== undefined ? anomalyData.score.toFixed(3) : '0.052'}
                   </div>
                   <span className="text-[10px] text-emerald-400 font-bold">10-Dimensional Vector Monitored</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Operational Context Filter</span>
-                  <div className="text-sm font-black text-sky-400 mt-2">
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Operational Context Filter</span>
+                  <div className="text-sm font-black text-[#0699C6] mt-2">
                     ACTIVE (False-alarm suppression)
                   </div>
                   <span className="text-[10px] text-slate-400">Solar shortfall &amp; load steps mitigated</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unified Operational Risk</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Unified Operational Risk</span>
                   <div className="text-2xl font-black text-emerald-400 mt-1">
                     NORMAL (24.5/100)
                   </div>
@@ -685,27 +685,27 @@ export default function CopilotModal({ isOpen, onClose }) {
 
               {/* 4-Part XAI Card */}
               {anomalyData?.xai_card && (
-                <div className="p-4 rounded-2xl bg-slate-950/70 border border-sky-500/30 space-y-2">
-                  <div className="text-xs font-bold text-sky-400 uppercase flex items-center gap-1.5">
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-sky-500/30 space-y-2">
+                  <div className="text-xs font-bold text-[#0699C6] uppercase flex items-center gap-1.5">
                     <i className="fa-solid fa-microchip"></i>
                     <span>Explainable AI Diagnostic</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-                      <strong className="text-sky-300 block mb-1">What Happened:</strong>
-                      <span className="text-slate-300">{anomalyData.xai_card.what}</span>
+                    <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
+                      <strong className="text-[#127694] block mb-1">What Happened:</strong>
+                      <span className="text-slate-700">{anomalyData.xai_card.what}</span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
-                      <strong className="text-cyan-300 block mb-1">Why Detected:</strong>
-                      <span className="text-slate-300">{anomalyData.xai_card.why}</span>
+                    <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
+                      <strong className="text-[#127694] block mb-1">Why Detected:</strong>
+                      <span className="text-slate-700">{anomalyData.xai_card.why}</span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
                       <strong className="text-amber-300 block mb-1">What Could Happen:</strong>
-                      <span className="text-slate-300">{anomalyData.xai_card.next}</span>
+                      <span className="text-slate-700">{anomalyData.xai_card.next}</span>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
                       <strong className="text-emerald-300 block mb-1">Recommended Action:</strong>
-                      <span className="text-slate-300">{anomalyData.xai_card.action}</span>
+                      <span className="text-slate-700">{anomalyData.xai_card.action}</span>
                     </div>
                   </div>
                 </div>
@@ -716,22 +716,22 @@ export default function CopilotModal({ isOpen, onClose }) {
           {/* TAB 3: DIGITAL TWIN & RESIDUALS (SECTION 8) */}
           {activeTab === 'digital_twin' && (
             <div className="space-y-4 animate-fadeIn">
-              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs text-slate-300">
+              <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200 text-xs text-slate-700">
                 <strong>Physics-Coupled Machine Learning:</strong> First-principles thermodynamic baselines (Lumped capacitance battery thermal, Diesel quadratic SFC, UA degree-day heat demand) with Ridge ML residual correctors clamped to strict ±15% physical safety limits.
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Battery Cell Temperature</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Battery Cell Temperature</span>
                   <div className="text-lg font-black text-white mt-1">Physics: 21.4°C | ML: +0.38°C</div>
                   <div className="text-xs text-emerald-400 font-bold mt-1">Hybrid: 21.78°C (±15% Safe)</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Diesel SFC Fuel Rate</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Diesel SFC Fuel Rate</span>
                   <div className="text-lg font-black text-white mt-1">Physics: 48.2 L/h | ML: -0.82 L/h</div>
                   <div className="text-xs text-emerald-400 font-bold mt-1">Hybrid: 47.38 L/h (±15% Safe)</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Station Heating Demand</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Station Heating Demand</span>
                   <div className="text-lg font-black text-white mt-1">Physics: 142 kWth | ML: +3.2 kWth</div>
                   <div className="text-xs text-emerald-400 font-bold mt-1">Hybrid: 145.2 kWth (±15% Safe)</div>
                 </div>
@@ -753,7 +753,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                     className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
                       selectedScenario === sc.id
                         ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                        : 'bg-slate-950/80 text-slate-300 hover:text-white border border-slate-800'
+                        : 'bg-[#f0faff] text-slate-700 hover:text-white border border-slate-200'
                     }`}
                   >
                     <i className={`fa-solid ${sc.icon}`}></i>
@@ -763,25 +763,25 @@ export default function CopilotModal({ isOpen, onClose }) {
               </div>
 
               {simulationResult && (
-                <div className="p-4 rounded-2xl bg-slate-950/70 border border-sky-500/30 space-y-3">
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-sky-500/30 space-y-3">
                   <div className="text-sm font-black text-white flex items-center gap-2">
-                    <i className="fa-solid fa-microchip text-sky-400"></i>
+                    <i className="fa-solid fa-microchip text-[#0699C6]"></i>
                     <span>Simulated Contingency Result: {simulationResult.scenario_name || selectedScenario}</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Battery Response:</span>
                       <span className="text-white font-bold">{simulationResult.battery_response || '+42 kW discharge'}</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Generator Status:</span>
                       <span className="text-white font-bold">{simulationResult.genset_status || 'G2 Started & Synced'}</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Reserve Margin:</span>
                       <span className="text-amber-400 font-bold">{simulationResult.reserve_margin || '77% -> 51%'}</span>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Life Support:</span>
                       <span className="text-emerald-400 font-bold">{simulationResult.life_support || '100% PROTECTED'}</span>
                     </div>
@@ -795,24 +795,24 @@ export default function CopilotModal({ isOpen, onClose }) {
           {activeTab === 'mlops' && (
             <div className="space-y-4 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Sensor Data Quality</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Sensor Data Quality</span>
                   <div className="text-2xl font-black text-emerald-400 mt-1">98.5%</div>
                   <span className="text-[10px] text-slate-400">4-rule check (missing, stale, bounds, duplicate)</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Feature PSI Drift</span>
-                  <div className="text-2xl font-black text-sky-400 mt-1">0.038 (STABLE)</div>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Feature PSI Drift</span>
+                  <div className="text-2xl font-black text-[#0699C6] mt-1">0.038 (STABLE)</div>
                   <span className="text-[10px] text-slate-400">Population Stability Index &lt; 0.10</span>
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase">Production Champion</span>
+                <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase">Production Champion</span>
                   <div className="text-sm font-black text-white mt-1">LightGBM-Quantile-v2.4.1</div>
-                  <span className="text-[10px] text-cyan-400">Serving active 24H inference</span>
+                  <span className="text-[10px] text-[#0699C6]">Serving active 24H inference</span>
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200 flex items-center justify-between">
                 <div>
                   <h4 className="text-xs font-black text-white uppercase">Model Rollback Governance</h4>
                   <p className="text-[11px] text-slate-400">Instantaneously revert active inference to previous validated checkpoint.</p>
@@ -834,33 +834,33 @@ export default function CopilotModal({ isOpen, onClose }) {
             <div className="space-y-4 animate-fadeIn">
               {/* Quality Metrics Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Queries</span>
+                <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Queries</span>
                   <span className="text-xl font-black text-white">{metricsData?.total_queries || 0}</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Fallback Rate</span>
+                <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Fallback Rate</span>
                   <span className="text-xl font-black text-amber-400">{metricsData?.fallback_rate_pct || 0}%</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Avg Latency</span>
-                  <span className="text-xl font-black text-cyan-400">{metricsData?.average_latency_ms || 0} ms</span>
+                <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Avg Latency</span>
+                  <span className="text-xl font-black text-[#0699C6]">{metricsData?.average_latency_ms || 0} ms</span>
                 </div>
-                <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Grounding Pass</span>
+                <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Grounding Pass</span>
                   <span className="text-xl font-black text-emerald-400">{metricsData?.grounding_compliance_pct || 100}%</span>
                 </div>
               </div>
 
               {/* Audit Trail Table */}
-              <div className="rounded-2xl bg-slate-950/80 border border-slate-800 overflow-hidden">
-                <div className="px-4 py-2.5 border-b border-slate-800 flex items-center justify-between bg-slate-950">
-                  <span className="text-xs font-black text-slate-300 uppercase">Chronological Copilot Audit Trail</span>
+              <div className="rounded-2xl bg-[#f0faff] border border-slate-200 overflow-hidden">
+                <div className="px-4 py-2.5 border-b border-slate-200 flex items-center justify-between bg-slate-100">
+                  <span className="text-xs font-black text-slate-700 uppercase">Chronological Copilot Audit Trail</span>
                   <span className="text-[10px] font-mono text-slate-500">Immutable SCADA Log</span>
                 </div>
                 <div className="max-h-60 overflow-y-auto">
                   <table className="w-full text-left text-[11px]">
-                    <thead className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-bold uppercase text-[9px]">
+                    <thead className="bg-[#f8fcfe] text-slate-500 border-b border-slate-200 font-bold uppercase text-[9px]">
                       <tr>
                         <th className="py-2 px-3">Time</th>
                         <th className="py-2 px-3">Role</th>
@@ -869,18 +869,18 @@ export default function CopilotModal({ isOpen, onClose }) {
                         <th className="py-2 px-3">Latency</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60 text-slate-300 font-medium">
+                    <tbody className="divide-y divide-slate-100/60 text-slate-700 font-medium">
                       {auditData.length === 0 ? (
                         <tr>
                           <td colSpan={5} className="py-4 text-center text-slate-500">No interaction logs recorded yet.</td>
                         </tr>
                       ) : (
                         auditData.map((item, i) => (
-                          <tr key={i} className="hover:bg-slate-800/40">
+                          <tr key={i} className="hover:bg-slate-50">
                             <td className="py-2 px-3 font-mono text-slate-400">{item.timestamp?.split('T')[1]?.replace('Z', '') || '12:00'}</td>
-                            <td className="py-2 px-3"><span className="px-2 py-0.5 rounded bg-slate-800 text-[10px]">{item.user_role}</span></td>
+                            <td className="py-2 px-3"><span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px]">{item.user_role}</span></td>
                             <td className="py-2 px-3 text-white max-w-xs truncate">{item.query}</td>
-                            <td className="py-2 px-3"><span className={`text-[10px] font-bold ${item.copilot_mode === 'CLOUD' ? 'text-cyan-400' : 'text-amber-400'}`}>{item.copilot_mode}</span></td>
+                            <td className="py-2 px-3"><span className={`text-[10px] font-bold ${item.copilot_mode === 'CLOUD' ? 'text-[#0699C6]' : 'text-amber-400'}`}>{item.copilot_mode}</span></td>
                             <td className="py-2 px-3 font-mono text-slate-400">{item.latency_ms} ms</td>
                           </tr>
                         ))

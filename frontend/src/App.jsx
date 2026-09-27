@@ -13,6 +13,7 @@ import MonitoringModal from './modals/MonitoringModal';
 import BatteryModal from './modals/BatteryModal';
 import MicrogridModal from './modals/MicrogridModal';
 import WeatherModal from './modals/WeatherModal';
+import AlertsModal from './modals/AlertsModal';
 import { STATIONS } from './constants/stations';
 
 export default function App() {
@@ -404,6 +405,15 @@ export default function App() {
         activeOverrides={activeOverrides}
         onApplyOverrides={handleApplyOverrides}
         onResetOverrides={handleResetOverrides}
+        latestData={latestData}
+        stationId={stationId}
+      />
+
+      <AlertsModal
+        isOpen={activeModal === 'alerts'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
       />
     </div>
   );

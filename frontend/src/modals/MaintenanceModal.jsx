@@ -35,7 +35,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 shrink-0">
           <div>
             <h2 className="text-base font-extrabold text-[#127694] flex items-center gap-2">
-              <i className="fa-solid fa-shield-halved text-xs text-[#05c5ff]"></i>
+              <i className="fa-solid fa-shield-halved text-xs text-[#05C5FF]"></i>
               Station Asset Health, Diagnostics &amp; Digital Twin Benchmarks
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -47,7 +47,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
               href="/api/analytics/report"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0698c4] text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0699C6] text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
             >
               <i className="fa-solid fa-file-arrow-down text-xs"></i>
               <span>Download HTML Report</span>
@@ -63,7 +63,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
         </div>
 
         {/* Multi-Tab Selector */}
-        <div className="flex items-center gap-1.5 p-1 bg-[#f0faff] rounded-2xl border border-[#9ae5fe]/60 mb-3.5 shrink-0 overflow-x-auto">
+        <div className="flex items-center gap-1.5 p-1 bg-[#f0faff] rounded-2xl border border-[#bcecfc]/60 mb-3.5 shrink-0 overflow-x-auto">
           {[
             { id: 'subsystems', label: '1. Subsystem Diagnostics', icon: 'fa-microchip' },
             { id: 'failure', label: '2. Winter Failure Injection', icon: 'fa-triangle-exclamation' },
@@ -77,7 +77,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className={`fa-solid ${tab.icon} text-xs`}></i>
@@ -91,24 +91,24 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
           <div className="flex-1 overflow-y-auto space-y-3.5 pr-1">
             {/* KPI Badges */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#bcecfc]/70 text-center">
                 <span className="text-[9px] font-bold text-slate-400 uppercase block">Health Score</span>
                 <div className="text-xl font-black text-emerald-600 my-0.5">{healthScore}%</div>
                 <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block">
                   STABLE
                 </span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#bcecfc]/70 text-center">
                 <span className="text-[9px] font-bold text-slate-400 uppercase block">Degradation Rate</span>
                 <div className="text-xl font-black text-slate-800 my-0.5">{degradationRate}%/h</div>
                 <span className="text-[9px] text-slate-500">Normal thermal wear</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#bcecfc]/70 text-center">
                 <span className="text-[9px] font-bold text-slate-400 uppercase block">ETA to Warning</span>
-                <div className="text-xl font-black text-[#0698c4] my-0.5">{etaWarning} h</div>
+                <div className="text-xl font-black text-[#0699C6] my-0.5">{etaWarning} h</div>
                 <span className="text-[9px] text-slate-500">~30.1 Polar Days</span>
               </div>
-              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#9ae5fe]/70 text-center">
+              <div className="p-2.5 rounded-xl bg-[#f0faff] border border-[#bcecfc]/70 text-center">
                 <span className="text-[9px] font-bold text-slate-400 uppercase block">G2 Service Window</span>
                 <div className="text-xl font-black text-amber-600 my-0.5">36 Hours</div>
                 <span className="text-[9px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-full inline-block">
@@ -119,22 +119,22 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
 
             {/* Subsystems 4 Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-[#127694] flex items-center gap-1.5">
-                    <i className="fa-solid fa-wind text-xs text-[#05c5ff]"></i>
+                    <i className="fa-solid fa-wind text-xs text-[#05C5FF]"></i>
                     Wind Turbine Subsystem
                   </span>
                   <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">94% Health</span>
                 </div>
                 <div className="space-y-1.5 text-xs text-slate-600">
                   <div className="flex justify-between"><span>Vibration Amplitude:</span> <strong className="text-slate-800">0.24 mm/s (Nominal)</strong></div>
-                  <div className="flex justify-between"><span>Blade De-icing Coils:</span> <strong className="text-[#0698c4]">Active (Auto-PWM)</strong></div>
+                  <div className="flex justify-between"><span>Blade De-icing Coils:</span> <strong className="text-[#0699C6]">Active (Auto-PWM)</strong></div>
                   <div className="flex justify-between"><span>Cut-out Gale Braking:</span> <strong className="text-rose-600">&gt; 25.0 m/s Ready</strong></div>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-[#127694] flex items-center gap-1.5">
                     <i className="fa-solid fa-car-battery text-xs text-[#127694]"></i>
@@ -144,7 +144,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                 </div>
                 <div className="space-y-1.5 text-xs text-slate-600">
                   <div className="flex justify-between"><span>Cell Core Temp:</span> <strong className="text-slate-800">-8.6°C (Thermal Safe)</strong></div>
-                  <div className="flex justify-between"><span>Cell Delta Voltage:</span> <strong className="text-[#0698c4]">12 mV (Balanced)</strong></div>
+                  <div className="flex justify-between"><span>Cell Delta Voltage:</span> <strong className="text-[#0699C6]">12 mV (Balanced)</strong></div>
                   <div className="flex justify-between"><span>Protected Reserve:</span> <strong className="text-rose-600">20% Inviolable Floor</strong></div>
                 </div>
               </div>
@@ -152,7 +152,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
               <div className="p-3.5 rounded-2xl bg-white border border-amber-200 shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-[#127694] flex items-center gap-1.5">
-                    <i className="fa-solid fa-gas-pump text-xs text-[#0698c4]"></i>
+                    <i className="fa-solid fa-gas-pump text-xs text-[#0699C6]"></i>
                     Diesel Genset Units (G1 &amp; G2)
                   </span>
                   <span className="text-[9px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">G2 Notice: 82%</span>
@@ -164,17 +164,17 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold text-[#127694] flex items-center gap-1.5">
-                    <i className="fa-solid fa-wave-square text-xs text-[#05c5ff]"></i>
+                    <i className="fa-solid fa-wave-square text-xs text-[#05C5FF]"></i>
                     Inverter Bus &amp; STS Sync
                   </span>
                   <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">98% Health</span>
                 </div>
                 <div className="space-y-1.5 text-xs text-slate-600">
                   <div className="flex justify-between"><span>Harmonic Distortion:</span> <strong className="text-slate-800">1.8% (&lt; 5% Limit)</strong></div>
-                  <div className="flex justify-between"><span>Bus Frequency:</span> <strong className="text-[#0698c4]">50.02 Hz Stable</strong></div>
+                  <div className="flex justify-between"><span>Bus Frequency:</span> <strong className="text-[#0699C6]">50.02 Hz Stable</strong></div>
                   <div className="flex justify-between"><span>Static Transfer Switch:</span> <strong className="text-emerald-600">&lt; 4 ms Seamless</strong></div>
                 </div>
               </div>
@@ -195,9 +195,9 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
               </p>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-[#9ae5fe]">
+            <div className="overflow-x-auto rounded-2xl border border-[#bcecfc]">
               <table className="w-full text-xs text-left">
-                <thead className="bg-[#f0faff] text-[#127694] font-bold border-b border-[#9ae5fe]">
+                <thead className="bg-[#f0faff] text-[#127694] font-bold border-b border-[#bcecfc]">
                   <tr>
                     <th className="p-2.5">Failure Scenario</th>
                     <th className="p-2.5">Feasibility</th>
@@ -249,9 +249,9 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
         {/* Tab 3: Sizing Sweep & CapEx Payback */}
         {activeTab === 'sizing' && (
           <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-            <div className="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe] text-xs">
+            <div className="p-3 rounded-2xl bg-[#f0faff] border border-[#bcecfc] text-xs">
               <span className="font-extrabold text-[#127694] block mb-1">
-                <i className="fa-solid fa-chart-pie mr-1.5 text-[#0698c4]"></i>
+                <i className="fa-solid fa-chart-pie mr-1.5 text-[#0699C6]"></i>
                 Microgrid Asset Sizing Sweep &amp; CapEx Payback Matrix
               </span>
               <p className="text-slate-600 leading-relaxed">
@@ -259,9 +259,9 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
               </p>
             </div>
 
-            <div className="overflow-x-auto rounded-2xl border border-[#9ae5fe]">
+            <div className="overflow-x-auto rounded-2xl border border-[#bcecfc]">
               <table className="w-full text-xs text-left">
-                <thead className="bg-[#f0faff] text-[#127694] font-bold border-b border-[#9ae5fe]">
+                <thead className="bg-[#f0faff] text-[#127694] font-bold border-b border-[#bcecfc]">
                   <tr>
                     <th className="p-2.5">Architecture Scenario</th>
                     <th className="p-2.5">Wind / Solar / BESS</th>
@@ -298,7 +298,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                     <td className="p-2.5 font-bold text-[#127694]">$578,486</td>
                     <td className="p-2.5">516.8 T</td>
                     <td className="p-2.5 text-slate-800">$350,000</td>
-                    <td className="p-2.5 font-bold text-[#0698c4]">1.58 Years</td>
+                    <td className="p-2.5 font-bold text-[#0699C6]">1.58 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-emerald-50/50">
                     <td className="p-2.5 font-bold text-emerald-900">Double All Renewables</td>
@@ -344,7 +344,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                 </span>
                 <div className="text-xs space-y-1.5 mt-1 text-slate-700">
                   <div className="flex justify-between"><span>Peak Demand:</span> <strong className="font-mono">457.4 kW</strong></div>
-                  <div className="flex justify-between"><span>Min Temp:</span> <strong className="font-mono text-[#0698c4]">-39.6°C</strong></div>
+                  <div className="flex justify-between"><span>Min Temp:</span> <strong className="font-mono text-[#0699C6]">-39.6°C</strong></div>
                   <div className="flex justify-between"><span>Max Wind:</span> <strong className="font-mono">37.5 m/s</strong></div>
                   <div className="flex justify-between"><span>Fuel Saved:</span> <strong className="font-mono text-emerald-600">119,003 L (25.2%)</strong></div>
                   <div className="flex justify-between"><span>Feasibility:</span> <strong className="text-emerald-700">100% FEASIBLE</strong></div>
@@ -357,7 +357,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                 </span>
                 <div className="text-xs space-y-1.5 mt-1 text-slate-700">
                   <div className="flex justify-between"><span>Peak Demand:</span> <strong className="font-mono">548.9 kW</strong></div>
-                  <div className="flex justify-between"><span>Min Temp:</span> <strong className="font-mono text-[#0698c4]">-44.6°C</strong></div>
+                  <div className="flex justify-between"><span>Min Temp:</span> <strong className="font-mono text-[#0699C6]">-44.6°C</strong></div>
                   <div className="flex justify-between"><span>Max Wind:</span> <strong className="font-mono">45.0 m/s</strong></div>
                   <div className="flex justify-between"><span>Fuel Saved:</span> <strong className="font-mono text-emerald-600">146,900 L (26.5%)</strong></div>
                   <div className="flex justify-between"><span>Feasibility:</span> <strong className="text-emerald-700">FEASIBLE (High Burn)</strong></div>
@@ -387,7 +387,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
             type="button"
             onClick={handleAck}
             className={`px-3.5 py-1.5 rounded-xl text-white font-bold transition shadow-xs ${
-              isAcked ? 'bg-emerald-600' : 'bg-[#0698c4] hover:bg-[#05c5ff]'
+              isAcked ? 'bg-emerald-600' : 'bg-[#0699C6] hover:bg-[#05C5FF]'
             }`}
           >
             {ackText}

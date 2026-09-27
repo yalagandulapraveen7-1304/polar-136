@@ -30,7 +30,7 @@ export default function BottomCards({
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0699C6] flex items-center justify-center font-bold text-xs">
                   <i className="fa-solid fa-sliders"></i>
                 </div>
                 <span className="font-extrabold text-xs text-[#127694] uppercase tracking-tight">
@@ -48,11 +48,11 @@ export default function BottomCards({
 
           {/* Generator Outputs & Burn Rate */}
           <div className="space-y-2 my-1">
-            <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] shadow-xs flex items-center justify-between">
+            <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs flex items-center justify-between">
               <div>
                 <span className="text-[10px] font-bold text-slate-400 uppercase block">Genset Outputs</span>
                 <span className="text-xs font-black text-slate-800">
-                  G1: <strong className="text-[#0698c4]">{gen1Kw.toFixed(1)} kW</strong> · G2: <strong className="text-rose-600">{gen2Kw.toFixed(1)} kW</strong>
+                  G1: <strong className="text-[#0699C6]">{gen1Kw.toFixed(1)} kW</strong> · G2: <strong className="text-rose-600">{gen2Kw.toFixed(1)} kW</strong>
                 </span>
               </div>
               <div className="text-right">
@@ -63,7 +63,7 @@ export default function BottomCards({
 
             <div className="flex items-center justify-between text-xs px-1 text-slate-600">
               <span>Fuel Burn Rate:</span>
-              <strong className="font-mono text-[#0698c4]">{fuelBurnRate.toFixed(1)} L/h</strong>
+              <strong className="font-mono text-[#0699C6]">{fuelBurnRate.toFixed(1)} L/h</strong>
             </div>
           </div>
 
@@ -73,7 +73,7 @@ export default function BottomCards({
             <button
               type="button"
               onClick={() => onOpenModal('dispatch')}
-              className="px-3 py-1.5 rounded-xl bg-[#0698c4] hover:bg-[#05c5ff] text-white font-bold text-xs transition shadow-sm flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-[#0699C6] hover:bg-[#05C5FF] text-white font-bold text-xs transition shadow-sm flex items-center gap-1.5"
             >
               <i className="fa-solid fa-code-fork text-xs"></i>
               <span>OPTIMIZE DISPATCH</span>
@@ -86,7 +86,7 @@ export default function BottomCards({
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0699C6] flex items-center justify-center font-bold text-xs">
                   <i className="fa-solid fa-shield-halved"></i>
                 </div>
                 <span className="font-extrabold text-xs text-[#127694] uppercase tracking-tight">
@@ -131,9 +131,9 @@ export default function BottomCards({
             <button
               type="button"
               onClick={() => onOpenModal('maintenance')}
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#9ae5fe] transition shadow-xs flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#bcecfc] transition shadow-xs flex items-center gap-1.5"
             >
-              <i className="fa-solid fa-wrench text-xs text-[#0698c4]"></i>
+              <i className="fa-solid fa-wrench text-xs text-[#0699C6]"></i>
               <span>VIEW MAINTENANCE</span>
             </button>
           </div>
@@ -168,7 +168,7 @@ export default function BottomCards({
               className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
                 currentScenario === 'blizzard'
                   ? 'border-rose-400 bg-rose-50 font-bold text-rose-800'
-                  : 'border-[#9ae5fe]/60 bg-white hover:bg-[#f0faff] text-slate-700'
+                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
               }`}
             >
               <span className="text-[10px]">Cat-3 Blizzard</span>
@@ -181,7 +181,7 @@ export default function BottomCards({
               className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
                 currentScenario === 'trip'
                   ? 'border-amber-400 bg-amber-50 font-bold text-amber-800'
-                  : 'border-[#9ae5fe]/60 bg-white hover:bg-[#f0faff] text-slate-700'
+                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
               }`}
             >
               <span className="text-[10px]">Gen-Set Trip</span>
@@ -194,7 +194,7 @@ export default function BottomCards({
               className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
                 currentScenario === 'night'
                   ? 'border-slate-400 bg-slate-100 font-bold text-slate-800'
-                  : 'border-[#9ae5fe]/60 bg-white hover:bg-[#f0faff] text-slate-700'
+                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
               }`}
             >
               <span className="text-[10px]">Polar Night</span>
@@ -207,7 +207,7 @@ export default function BottomCards({
               className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
                 currentScenario === 'dawn'
                   ? 'border-emerald-400 bg-emerald-50 font-bold text-emerald-800'
-                  : 'border-[#9ae5fe]/60 bg-white hover:bg-[#f0faff] text-slate-700'
+                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
               }`}
             >
               <span className="text-[10px]">Spring Sunrise</span>
@@ -227,7 +227,7 @@ export default function BottomCards({
             <button
               type="button"
               onClick={() => onOpenModal('manual')}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-50 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
             >
               <i className="fa-solid fa-sliders text-xs"></i>
               <span>MANUAL OVERRIDE</span>
@@ -238,8 +238,8 @@ export default function BottomCards({
       </div>
 
       {/* ROW 2: ANNUAL STRATEGIC IMPACT KPIS (PROJECT A DIGITAL TWIN BENCHMARKS) */}
-      <div className="novara-card p-4 sm:p-5 bg-gradient-to-r from-white via-[#f0faff] to-white border-2 border-[#9ae5fe] shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#9ae5fe]/60">
+      <div className="novara-card p-4 sm:p-5 bg-gradient-to-r from-white via-[#f0faff] to-white border-2 border-[#bcecfc] shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#bcecfc]/60">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-black text-[#127694] tracking-tight uppercase">
@@ -258,16 +258,16 @@ export default function BottomCards({
             <button
               type="button"
               onClick={() => onOpenModal('monitoring')}
-              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#9ae5fe] transition shadow-xs flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#bcecfc] transition shadow-xs flex items-center gap-1.5"
             >
-              <i className="fa-solid fa-chart-pie text-xs text-[#0698c4]"></i>
+              <i className="fa-solid fa-chart-pie text-xs text-[#0699C6]"></i>
               <span>3-Layer Energy Analytics</span>
             </button>
             <a
               href="/api/analytics/report"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0698c4] text-white font-bold text-xs transition shadow-sm flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0699C6] text-white font-bold text-xs transition shadow-sm flex items-center gap-1.5"
             >
               <i className="fa-solid fa-file-lines text-xs"></i>
               <span>Consolidated HTML Report</span>
@@ -279,7 +279,7 @@ export default function BottomCards({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 text-center">
 
           {/* KPI 1: Fuel & Water Saved */}
-          <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
               Fuel &amp; Water Saved
             </span>
@@ -290,7 +290,7 @@ export default function BottomCards({
           </div>
 
           {/* KPI 2: Logistics Cost Saved */}
-          <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
               Delivered Cost Saved
             </span>
@@ -301,18 +301,18 @@ export default function BottomCards({
           </div>
 
           {/* KPI 3: Tank Reserve Margin */}
-          <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
               Tank Reserve Margin
             </span>
-            <div className="text-2xl font-black text-[#0698c4] my-0.5">+52,895 L</div>
+            <div className="text-2xl font-black text-[#0699C6] my-0.5">+52,895 L</div>
             <span className="text-[10px] font-bold text-rose-600">
               Baseline dry (-66,098 L)
             </span>
           </div>
 
           {/* KPI 4: Carbon Avoided & Renewable Fraction */}
-          <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
               Emissions Avoided
             </span>

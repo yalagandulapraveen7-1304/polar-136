@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Mini SVG Sparkline Component
-function MiniSparkline({ data = [40, 42, 41, 45, 44, 46], color = '#0698c4', height = 24, width = 64 }) {
+function MiniSparkline({ data = [40, 42, 41, 45, 44, 46], color = '#0699C6', height = 24, width = 64 }) {
   if (!data || data.length < 2) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -65,11 +65,11 @@ export default function PowerBalanceBanner({
   };
 
   return (
-    <div className="w-full novara-card p-3 sm:p-4 bg-gradient-to-r from-white via-[#f4fafc] to-white border border-[#9ae5fe] shadow-sm flex flex-col gap-3">
+    <div className="w-full novara-card p-3 sm:p-4 bg-gradient-to-r from-white via-[#f4fafc] to-white border border-[#bcecfc] shadow-sm flex flex-col gap-3">
       {/* 1. Tactical Title & Quick Status Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#9ae5fe]/40 pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#bcecfc]/40 pb-2.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center font-black text-xs shadow-sm">
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center font-black text-xs shadow-sm">
             <i className="fa-solid fa-gauge-high"></i>
           </div>
           <div>
@@ -90,10 +90,10 @@ export default function PowerBalanceBanner({
 
         {/* Live Power Balance Indicator Pill */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#9ae5fe] shadow-xs">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
             <span className="text-[10px] font-bold text-slate-400 uppercase">Power Balance:</span>
             <div className="flex items-center gap-1.5 font-mono text-xs font-black">
-              <span className="text-[#0698c4]">{totalGenKw} kW Gen</span>
+              <span className="text-[#0699C6]">{totalGenKw} kW Gen</span>
               <span className="text-slate-300">/</span>
               <span className="text-[#127694]">{totalDemandKw} kW Dem</span>
             </div>
@@ -110,7 +110,7 @@ export default function PowerBalanceBanner({
           <button
             type="button"
             onClick={onOpenMonitoring}
-            className="px-3 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0698c4] text-white font-extrabold text-xs transition shadow-sm flex items-center gap-1.5"
+            className="px-3 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0699C6] text-white font-extrabold text-xs transition shadow-sm flex items-center gap-1.5"
             title="Open comprehensive 3-layer monitoring and historical analytics"
           >
             <i className="fa-solid fa-chart-pie text-xs"></i>
@@ -123,7 +123,7 @@ export default function PowerBalanceBanner({
       {/* 2. Tactical Reading Strip: SOLAR | WIND | BATTERY | DIESEL | LOAD with Sparklines */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 w-full">
         {/* SOLAR */}
-        <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe]/60 shadow-xs flex flex-col justify-between hover:border-[#0698c4] transition">
+        <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc]/60 shadow-xs flex flex-col justify-between hover:border-[#0699C6] transition">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold text-amber-600 uppercase flex items-center gap-1">
               <i className="fa-solid fa-sun text-xs"></i>
@@ -145,9 +145,9 @@ export default function PowerBalanceBanner({
         </div>
 
         {/* WIND */}
-        <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe]/60 shadow-xs flex flex-col justify-between hover:border-[#0698c4] transition">
+        <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc]/60 shadow-xs flex flex-col justify-between hover:border-[#0699C6] transition">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-extrabold text-[#0698c4] uppercase flex items-center gap-1">
+            <span className="text-[10px] font-extrabold text-[#0699C6] uppercase flex items-center gap-1">
               <i className="fa-solid fa-wind text-xs"></i>
               WIND
             </span>
@@ -158,16 +158,16 @@ export default function PowerBalanceBanner({
               <span className="text-2xl font-black text-slate-800 tracking-tight">{windKw}</span>
               <span className="text-[10px] font-bold text-slate-400">kW</span>
             </div>
-            <MiniSparkline data={sp.wind} color="#0698c4" width={56} height={20} />
+            <MiniSparkline data={sp.wind} color="#0699C6" width={56} height={20} />
           </div>
           <div className="text-[9px] text-slate-500 font-semibold flex items-center justify-between pt-1 border-t border-slate-100">
             <span>Turbines: 2 Active</span>
-            <span className="text-[#0698c4] font-bold">&lt; 25 m/s Safe</span>
+            <span className="text-[#0699C6] font-bold">&lt; 25 m/s Safe</span>
           </div>
         </div>
 
         {/* BATTERY */}
-        <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe]/60 shadow-xs flex flex-col justify-between hover:border-[#0698c4] transition">
+        <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc]/60 shadow-xs flex flex-col justify-between hover:border-[#0699C6] transition">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold text-emerald-600 uppercase flex items-center gap-1">
               <i className="fa-solid fa-car-battery text-xs"></i>
@@ -193,7 +193,7 @@ export default function PowerBalanceBanner({
         </div>
 
         {/* DIESEL / CHP */}
-        <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe]/60 shadow-xs flex flex-col justify-between hover:border-[#0698c4] transition">
+        <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc]/60 shadow-xs flex flex-col justify-between hover:border-[#0699C6] transition">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold text-rose-600 uppercase flex items-center gap-1">
               <i className="fa-solid fa-gas-pump text-xs"></i>
@@ -215,7 +215,7 @@ export default function PowerBalanceBanner({
         </div>
 
         {/* TOTAL ELECTRICAL LOAD */}
-        <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe]/60 shadow-xs flex flex-col justify-between hover:border-[#0698c4] transition col-span-2 sm:col-span-1">
+        <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc]/60 shadow-xs flex flex-col justify-between hover:border-[#0699C6] transition col-span-2 sm:col-span-1">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold text-[#127694] uppercase flex items-center gap-1">
               <i className="fa-solid fa-bolt text-xs"></i>
@@ -232,13 +232,13 @@ export default function PowerBalanceBanner({
           </div>
           <div className="text-[9px] text-slate-500 font-semibold flex items-center justify-between pt-1 border-t border-slate-100">
             <span>20 kW Non-Shed Floor</span>
-            <span className="text-[#0698c4] font-bold">{renSharePct}% Green</span>
+            <span className="text-[#0699C6] font-bold">{renSharePct}% Green</span>
           </div>
         </div>
       </div>
 
       {/* 3. Sub-bar: Curtailment Accounting & Thermal Loop Integration */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-[#e5f6fd]/60 border border-[#9ae5fe]/50 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-[#e5f6fd]/60 border border-[#bcecfc]/50 text-xs">
         <div className="flex items-center gap-3">
           <span className="text-[11px] font-extrabold text-[#127694] flex items-center gap-1.5">
             <i className="fa-solid fa-leaf text-emerald-600 text-xs"></i>
@@ -252,7 +252,7 @@ export default function PowerBalanceBanner({
         </div>
 
         <div className="flex items-center gap-2 text-[10px] font-mono text-[#127694]">
-          <span className="px-2 py-0.5 rounded-md bg-white border border-[#9ae5fe]/60 font-bold">
+          <span className="px-2 py-0.5 rounded-md bg-white border border-[#bcecfc]/60 font-bold">
             Solar: {solarKw} kW + Wind: {windKw} kW = {solarKw + windKw} kW Green
           </span>
         </div>

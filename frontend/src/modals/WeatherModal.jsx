@@ -85,28 +85,28 @@ export default function WeatherModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900/95 border border-cyan-500/40 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col text-slate-100 overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-50/40 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white border border-[#bcecfc] rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92vh] flex flex-col text-slate-800 overflow-hidden font-sans">
         
         {/* Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-cyan-500/20 bg-slate-900/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#05C5FF] flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
               <i className="fa-solid fa-cloud-bolt"></i>
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-black tracking-wide text-cyan-300">POLAR WEATHER & ENVIRONMENTAL INTELLIGENCE</h2>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-500/30">
+                <h2 className="text-lg font-black tracking-wide text-[#127694]">POLAR WEATHER & ENVIRONMENTAL INTELLIGENCE</h2>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e5f6fd] text-[#0699C6] border border-cyan-500/30">
                   {currentStation.name}
                 </span>
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                  prov.source === 'LIVE' ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-amber-950 text-amber-400 border-amber-500/30'
+                  prov.source === 'LIVE' ? 'bg-emerald-50 text-emerald-400 border-emerald-500/30' : 'bg-amber-50 text-amber-400 border-amber-500/30'
                 }`}>
                   ● {prov.source || 'SYNTHETIC'}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono">
+              <p className="text-xs text-slate-500 font-mono">
                 Coupling Antarctic Meteorology directly into Renewable Potential, Building Heat Loss ($UA \times \Delta T$), and Microgrid Dispatch
               </p>
             </div>
@@ -114,7 +114,7 @@ export default function WeatherModal({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-700"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition border border-slate-200"
           >
             <i className="fa-solid fa-xmark text-sm"></i>
           </button>
@@ -122,19 +122,19 @@ export default function WeatherModal({
 
         {/* Global Toast */}
         {simToast && (
-          <div className="px-6 py-2.5 bg-cyan-500/20 border-b border-cyan-500/40 text-cyan-300 text-xs font-bold flex items-center justify-between animate-fadeIn">
+          <div className="px-6 py-2.5 bg-cyan-500/20 border-b border-cyan-500/40 text-[#127694] text-xs font-bold flex items-center justify-between animate-fadeIn">
             <div className="flex items-center gap-2">
-              <i className="fa-solid fa-circle-check text-cyan-400"></i>
+              <i className="fa-solid fa-circle-check text-[#0699C6]"></i>
               <span>{simToast}</span>
             </div>
-            <button onClick={() => setSimToast(null)} className="text-cyan-400 hover:text-white">
+            <button onClick={() => setSimToast(null)} className="text-[#0699C6] hover:text-white">
               <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
         )}
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-1 px-6 pt-3 border-b border-slate-800 bg-slate-900/40 overflow-x-auto">
+        <div className="flex items-center gap-1 px-6 pt-3 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] overflow-x-auto">
           {[
             { id: 'current', label: '1. Live Environmental Status', icon: 'fa-temperature-low' },
             { id: 'forecast', label: '2. Multi-Horizon Quantiles', icon: 'fa-chart-area' },
@@ -147,8 +147,8 @@ export default function WeatherModal({
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-bold transition whitespace-nowrap border-b-2 ${
                 activeTab === tab.id
-                  ? 'border-cyan-400 text-cyan-300 bg-slate-800/80 shadow-sm'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                  ? 'border-[#0699C6] text-[#127694] bg-white shadow-xs'
+                  : 'border-transparent text-slate-500 hover:text-[#0699C6] hover:bg-slate-100/60'
               }`}
             >
               <i className={`fa-solid ${tab.icon} text-xs`}></i>
@@ -158,7 +158,7 @@ export default function WeatherModal({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+        <div className="p-6 overflow-y-auto flex-1 space-y-6 bg-white text-slate-800">
 
           {/* ============================================================== */}
           {/* TAB 1: LIVE ENVIRONMENTAL STATUS & OPERATIONAL IMPACT          */}
@@ -168,18 +168,18 @@ export default function WeatherModal({
               
               {/* Tactical Weather HUD Cards */}
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ambient Temp</div>
-                  <div className="text-2xl font-mono font-black text-cyan-300 mt-1">
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ambient Temp</div>
+                  <div className="text-2xl font-mono font-black text-[#127694] mt-1">
                     {m.temperature_c !== undefined ? m.temperature_c : -22.4}°C
                   </div>
-                  <div className="text-[10px] text-cyan-400 font-semibold mt-0.5">
+                  <div className="text-[10px] text-[#0699C6] font-semibold mt-0.5">
                     Target: 21.0°C (ΔT = {Math.abs(21.0 - (m.temperature_c || -22.4)).toFixed(1)}°C)
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Wind Speed</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Wind Speed</div>
                   <div className="text-2xl font-mono font-black text-blue-300 mt-1">
                     {m.wind_speed_ms !== undefined ? m.wind_speed_ms : 12.0} <span className="text-xs font-sans text-slate-400">m/s</span>
                   </div>
@@ -188,8 +188,8 @@ export default function WeatherModal({
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Wind Direction</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Wind Direction</div>
                   <div className="text-2xl font-mono font-black text-purple-300 mt-1">
                     {m.wind_direction_deg !== undefined ? m.wind_direction_deg : 135}°
                   </div>
@@ -198,8 +198,8 @@ export default function WeatherModal({
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Solar Radiation</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Solar Radiation</div>
                   <div className="text-2xl font-mono font-black text-amber-300 mt-1">
                     {m.solar_irradiance_wm2 !== undefined ? m.solar_irradiance_wm2 : 120} <span className="text-xs font-sans text-slate-400">W/m²</span>
                   </div>
@@ -208,8 +208,8 @@ export default function WeatherModal({
                   </div>
                 </div>
 
-                <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Surface Pressure</div>
+                <div className="bg-[#f0faff] p-3.5 rounded-xl border border-[#bcecfc]/70">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Surface Pressure</div>
                   <div className="text-2xl font-mono font-black text-emerald-300 mt-1">
                     {m.surface_pressure_hpa !== undefined ? m.surface_pressure_hpa : 985} <span className="text-xs font-sans text-slate-400">hPa</span>
                   </div>
@@ -220,11 +220,11 @@ export default function WeatherModal({
               </div>
 
               {/* Data Provenance & Quality Bar */}
-              <div className="bg-slate-950/80 p-4 rounded-xl border border-slate-800 flex items-center justify-between flex-wrap gap-3">
+              <div className="bg-[#f0faff] p-4 rounded-xl border border-[#bcecfc]/70 flex items-center justify-between flex-wrap gap-3">
                 <div className="flex items-center gap-4 text-xs font-mono">
                   <div>
                     <span className="text-slate-500 uppercase">Data Source: </span>
-                    <strong className="text-cyan-300">{prov.source || 'SYNTHETIC'}</strong>
+                    <strong className="text-[#127694]">{prov.source || 'SYNTHETIC'}</strong>
                   </div>
                   <div>
                     <span className="text-slate-500 uppercase">Last Updated: </span>
@@ -237,21 +237,21 @@ export default function WeatherModal({
                 </div>
 
                 <div className="flex items-center gap-2 text-[10px] font-mono">
-                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-emerald-500/30 text-emerald-400">Temp: ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-emerald-500/30 text-emerald-400">Wind: ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-emerald-500/30 text-emerald-400">Solar: ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-900 border border-emerald-500/30 text-emerald-400">Pressure: ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Temp: ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Wind: ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Solar: ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Pressure: ✓</span>
                 </div>
               </div>
 
               {/* Direct Operational Energy Impacts */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Heating Demand</div>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Heating Demand</div>
                   <div className="text-lg font-mono font-bold text-amber-300">
                     {op.heating_demand_kwth || 120.0} kWth
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-500/30 mt-1 inline-block">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-400 border border-amber-500/30 mt-1 inline-block">
                     LEVEL: {op.heating_demand_level || 'HIGH'}
                   </span>
                   <p className="text-[10px] text-slate-400 mt-2 font-mono">
@@ -259,13 +259,13 @@ export default function WeatherModal({
                   </p>
                 </div>
 
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Wind Turbine Status</div>
-                  <div className="text-lg font-mono font-bold text-cyan-300">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Wind Turbine Status</div>
+                  <div className="text-lg font-mono font-bold text-[#127694]">
                     {op.wind_turbine_output_kw || 0} kW
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded mt-1 inline-block border ${
-                    op.wind_turbine_status === 'STORM_CUT_OUT' ? 'bg-rose-950 text-rose-400 border-rose-500/30' : 'bg-emerald-950 text-emerald-400 border-emerald-500/30'
+                    op.wind_turbine_status === 'STORM_CUT_OUT' ? 'bg-rose-50 text-rose-400 border-rose-500/30' : 'bg-emerald-50 text-emerald-400 border-emerald-500/30'
                   }`}>
                     {op.wind_turbine_status || 'ONLINE'}
                   </span>
@@ -274,12 +274,12 @@ export default function WeatherModal({
                   </p>
                 </div>
 
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Solar PV Potential</div>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Solar PV Potential</div>
                   <div className="text-lg font-mono font-bold text-amber-300">
                     {m.solar_irradiance_wm2 || 0} W/m²
                   </div>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-900 text-amber-400 border border-amber-500/30 mt-1 inline-block">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-500/30 mt-1 inline-block">
                     {op.solar_potential_level || 'MODERATE'}
                   </span>
                   <p className="text-[10px] text-slate-400 mt-2 font-mono">
@@ -287,8 +287,8 @@ export default function WeatherModal({
                   </p>
                 </div>
 
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Battery Condition</div>
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Battery Condition</div>
                   <div className="text-lg font-mono font-bold text-purple-300">
                     {m.temperature_c || -22.0}°C Cell
                   </div>
@@ -309,10 +309,10 @@ export default function WeatherModal({
           {activeTab === 'forecast' && (
             <div className="space-y-6 animate-fadeIn">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <h3 className="text-sm font-bold text-cyan-300 uppercase tracking-wider font-mono">
+                <h3 className="text-sm font-bold text-[#127694] uppercase tracking-wider font-mono">
                   Probabilistic Weather Quantiles (P10 Stress / P50 Median / P90 High)
                 </h3>
-                <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                   {[6, 24, 72].map((h) => (
                     <button
                       key={h}
@@ -331,16 +331,16 @@ export default function WeatherModal({
               {forecastData && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Temperature Curve */}
-                  <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-bold text-cyan-300">Temperature Forecast (°C)</span>
+                      <span className="text-xs font-bold text-[#127694]">Temperature Forecast (°C)</span>
                       <span className="text-[10px] font-mono text-slate-400">P10 (Cold Stress) vs P50 vs P90</span>
                     </div>
                     <div className="space-y-2 font-mono text-xs">
                       {forecastData.timestamps.slice(0, 6).map((ts, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-slate-900/60 p-2 rounded border border-slate-800">
+                        <div key={idx} className="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200">
                           <span className="text-slate-400">{ts}</span>
-                          <span className="text-cyan-400 font-bold">P10: {forecastData.temperature_c.p10[idx]}°C</span>
+                          <span className="text-[#0699C6] font-bold">P10: {forecastData.temperature_c.p10[idx]}°C</span>
                           <span className="text-white font-bold">P50: {forecastData.temperature_c.p50[idx]}°C</span>
                           <span className="text-amber-400 font-bold">P90: {forecastData.temperature_c.p90[idx]}°C</span>
                         </div>
@@ -349,14 +349,14 @@ export default function WeatherModal({
                   </div>
 
                   {/* Wind Speed Curve */}
-                  <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
+                  <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-bold text-blue-300">Wind Speed Forecast (m/s)</span>
+                      <span className="text-xs font-bold text-[#127694]">Wind Speed Forecast (m/s)</span>
                       <span className="text-[10px] font-mono text-slate-400">P10 (Drop Risk) vs P50 vs P90</span>
                     </div>
                     <div className="space-y-2 font-mono text-xs">
                       {forecastData.timestamps.slice(0, 6).map((ts, idx) => (
-                        <div key={idx} className="flex justify-between items-center bg-slate-900/60 p-2 rounded border border-slate-800">
+                        <div key={idx} className="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200">
                           <span className="text-slate-400">{ts}</span>
                           <span className="text-blue-400 font-bold">P10: {forecastData.wind_speed_ms.p10[idx]} m/s</span>
                           <span className="text-white font-bold">P50: {forecastData.wind_speed_ms.p50[idx]} m/s</span>
@@ -378,18 +378,18 @@ export default function WeatherModal({
               
               {/* Chronological Timeline */}
               <div>
-                <h3 className="text-xs font-bold text-cyan-300 uppercase tracking-wider mb-3 font-mono">
+                <h3 className="text-xs font-bold text-[#127694] uppercase tracking-wider mb-3 font-mono">
                   Chronological Weather-to-Energy Operational Timeline
                 </h3>
                 <div className="space-y-2.5 font-mono text-xs">
                   {timelineData.map((item, idx) => (
-                    <div key={idx} className="bg-slate-800/50 p-3.5 rounded-xl border border-slate-700/60 flex items-start gap-4">
-                      <span className="px-2.5 py-1 rounded bg-cyan-950 text-cyan-400 font-bold text-xs shrink-0 border border-cyan-500/30">
+                    <div key={idx} className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-start gap-4">
+                      <span className="px-2.5 py-1 rounded bg-[#e5f6fd] text-[#0699C6] font-bold text-xs shrink-0 border border-cyan-500/30">
                         {item.time_offset}
                       </span>
                       <div className="space-y-1 flex-1">
                         <div className="text-white font-bold">{item.condition}</div>
-                        <div className="text-slate-300 text-[11px]"><span className="text-cyan-400 font-bold">Impact: </span>{item.impact}</div>
+                        <div className="text-slate-700 text-[11px]"><span className="text-[#0699C6] font-bold">Impact: </span>{item.impact}</div>
                         <div className="text-emerald-300 text-[11px]"><span className="text-emerald-400 font-bold">Action: </span>{item.action}</div>
                       </div>
                     </div>
@@ -405,18 +405,18 @@ export default function WeatherModal({
                   </h3>
                   <div className="space-y-3">
                     {alertsData.map((alt) => (
-                      <div key={alt.id} className="bg-slate-900/80 p-4 rounded-xl border border-rose-500/40 text-xs font-mono space-y-1.5">
+                      <div key={alt.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs font-mono space-y-1.5">
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-rose-400 flex items-center gap-2">
                             <i className="fa-solid fa-triangle-exclamation"></i>
                             {alt.title}
                           </span>
-                          <span className="px-2 py-0.5 rounded bg-rose-950 text-rose-300 text-[10px] font-bold border border-rose-500/40">
+                          <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-300 text-[10px] font-bold border border-rose-500/40">
                             {alt.severity}
                           </span>
                         </div>
-                        <div className="text-slate-300"><span className="text-slate-500 font-bold">Trigger: </span>{alt.condition}</div>
-                        <div className="text-slate-300"><span className="text-slate-500 font-bold">Impact: </span>{alt.impact}</div>
+                        <div className="text-slate-700"><span className="text-slate-500 font-bold">Trigger: </span>{alt.condition}</div>
+                        <div className="text-slate-700"><span className="text-slate-500 font-bold">Impact: </span>{alt.impact}</div>
                         <div className="text-emerald-300 font-bold"><span className="text-emerald-400">Action: </span>{alt.recommended_action}</div>
                       </div>
                     ))}
@@ -432,14 +432,14 @@ export default function WeatherModal({
           {activeTab === 'simulator' && (
             <div className="space-y-6 animate-fadeIn">
               {/* Presets */}
-              <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60">
-                <span className="text-xs font-mono font-bold text-cyan-300 uppercase block mb-3">
+              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                <span className="text-xs font-mono font-bold text-[#127694] uppercase block mb-3">
                   Antarctic Stress Test Presets:
                 </span>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
                   <button
                     onClick={() => handleStressPreset('NORMAL_WINTER')}
-                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition"
+                    className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-left transition"
                   >
                     <div className="font-bold text-xs text-white">Normal Winter</div>
                     <div className="text-[10px] text-slate-400 mt-1">-22°C · 12 m/s Wind</div>
@@ -447,15 +447,15 @@ export default function WeatherModal({
 
                   <button
                     onClick={() => handleStressPreset('EXTREME_COLD')}
-                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-left transition"
+                    className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-cyan-500/40 text-left transition"
                   >
-                    <div className="font-bold text-xs text-cyan-300">Extreme Cold Snap</div>
+                    <div className="font-bold text-xs text-[#127694]">Extreme Cold Snap</div>
                     <div className="text-[10px] text-slate-400 mt-1">-41.5°C · Heat Surging</div>
                   </button>
 
                   <button
                     onClick={() => handleStressPreset('HIGH_WIND_CUTOUT')}
-                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-left transition"
+                    className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-amber-500/40 text-left transition"
                   >
                     <div className="font-bold text-xs text-amber-300">Gale Storm Cut-Out</div>
                     <div className="text-[10px] text-slate-400 mt-1">28.4 m/s · Turbine Trip</div>
@@ -463,7 +463,7 @@ export default function WeatherModal({
 
                   <button
                     onClick={() => handleStressPreset('POLAR_VORTEX')}
-                    className="p-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-rose-500/40 text-left transition"
+                    className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-rose-500/40 text-left transition"
                   >
                     <div className="font-bold text-xs text-rose-400">Polar Vortex Stress</div>
                     <div className="text-[10px] text-slate-400 mt-1">-44°C · Compound Shock</div>
@@ -472,7 +472,7 @@ export default function WeatherModal({
               </div>
 
               {/* Custom Sliders */}
-              <div className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/60 space-y-4">
+              <div className="bg-[#f0faff] p-5 rounded-2xl border border-slate-200 space-y-4">
                 <span className="text-xs font-mono font-bold text-white uppercase block">
                   Interactive Environmental Parameter Sliders:
                 </span>
@@ -481,7 +481,7 @@ export default function WeatherModal({
                   <div>
                     <div className="flex justify-between text-xs font-mono mb-1">
                       <span className="text-slate-400">Ambient Temperature:</span>
-                      <span className="font-bold text-cyan-300">{simTemp}°C</span>
+                      <span className="font-bold text-[#127694]">{simTemp}°C</span>
                     </div>
                     <input
                       type="range"
@@ -531,7 +531,7 @@ export default function WeatherModal({
 
                 <button
                   onClick={handleCustomSimulate}
-                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs transition active:scale-95 shadow-lg shadow-cyan-500/20"
+                  className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#0699C6] to-[#05C5FF] hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black text-xs transition active:scale-95 shadow-lg shadow-cyan-500/20"
                 >
                   APPLY CUSTOM WEATHER & RECALCULATE ENERGY IMPACTS
                 </button>
@@ -547,23 +547,23 @@ export default function WeatherModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 {/* Correlation 1: Temperature vs Heating Load */}
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-3">
-                  <h4 className="text-xs font-bold text-cyan-300 uppercase tracking-wider font-mono">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+                  <h4 className="text-xs font-bold text-[#127694] uppercase tracking-wider font-mono">
                     Correlation 1: Outdoor Temperature vs Building Heating Demand
                   </h4>
-                  <p className="text-[11px] text-slate-300 font-mono leading-relaxed">
+                  <p className="text-[11px] text-slate-700 font-mono leading-relaxed">
                     Physical relationship: $Q_\text{heat} = UA \cdot (21^\circ\text{C} - T_\text{outdoor}) + C_\text{wind} \cdot v_\text{wind} \cdot \Delta T - Q_\text{internal}$
                   </p>
                   <div className="space-y-1.5 font-mono text-xs">
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
                       <span>Ambient -10°C (Mild Summer)</span>
-                      <span className="text-cyan-300 font-bold">52.4 kWth</span>
+                      <span className="text-[#127694] font-bold">52.4 kWth</span>
                     </div>
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
                       <span>Ambient -25°C (Average Winter)</span>
                       <span className="text-amber-300 font-bold">88.5 kWth</span>
                     </div>
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
                       <span>Ambient -38°C (Extreme Cold Snap)</span>
                       <span className="text-rose-400 font-bold">118.2 kWth (+125% Surge)</span>
                     </div>
@@ -571,27 +571,27 @@ export default function WeatherModal({
                 </div>
 
                 {/* Correlation 2: Wind Speed vs Turbine Power */}
-                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/60 space-y-3">
+                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
                   <h4 className="text-xs font-bold text-blue-300 uppercase tracking-wider font-mono">
                     Correlation 2: Wind Speed vs Turbine Power Output
                   </h4>
-                  <p className="text-[11px] text-slate-300 font-mono leading-relaxed">
+                  <p className="text-[11px] text-slate-700 font-mono leading-relaxed">
                     Cubic power curve $P \propto v^3$ with cut-in ($3.0\text{ m/s}$), rated ($12.0\text{ m/s}$), and storm cut-out ($&gt; 25.0\text{ m/s}$).
                   </p>
                   <div className="space-y-1.5 font-mono text-xs">
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
                       <span>Wind 2.5 m/s (Below Cut-In)</span>
                       <span className="text-slate-400 font-bold">0.0 kW (Idle)</span>
                     </div>
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
                       <span>Wind 8.0 m/s (Cubic Ramp)</span>
-                      <span className="text-cyan-300 font-bold">34.2 kW</span>
+                      <span className="text-[#127694] font-bold">34.2 kW</span>
                     </div>
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-slate-800">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-slate-200">
                       <span>Wind 12.0 - 24.9 m/s (Rated Plateau)</span>
                       <span className="text-emerald-400 font-bold">{currentStation.windCapacity} kW (100% Green)</span>
                     </div>
-                    <div className="flex justify-between p-2 rounded bg-slate-900/60 border border-rose-500/40">
+                    <div className="flex justify-between p-2 rounded bg-slate-50 border border-rose-500/40">
                       <span className="text-rose-400 font-bold">Wind &gt; 25.0 m/s (Storm Cut-Out)</span>
                       <span className="text-rose-400 font-black">0.0 kW (FEATHERED & BRAKED)</span>
                     </div>
@@ -605,14 +605,14 @@ export default function WeatherModal({
         </div>
 
         {/* Modal Bottom Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-800 bg-slate-900/60 text-xs font-mono text-slate-400">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200 bg-slate-50 text-xs font-mono text-slate-400">
           <div className="flex items-center gap-3">
             <span>STATION: <strong className="text-white">{currentStation.name}</strong></span>
-            <span>SOURCE: <strong className="text-cyan-400">{prov.source || 'SYNTHETIC'}</strong></span>
+            <span>SOURCE: <strong className="text-[#0699C6]">{prov.source || 'SYNTHETIC'}</strong></span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold transition border border-slate-700"
+            className="px-4 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition border border-slate-200"
           >
             Close
           </button>

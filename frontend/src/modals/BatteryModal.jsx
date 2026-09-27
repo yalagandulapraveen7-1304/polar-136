@@ -196,13 +196,13 @@ export default function BatteryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
-      <div className="bg-white rounded-3xl shadow-2xl border border-[#9ae5fe] w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-50/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
+      <div className="bg-white rounded-3xl shadow-2xl border border-[#bcecfc] w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden">
 
         {/* 1. HEADER */}
-        <div className="px-6 py-4 border-b border-[#9ae5fe]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex flex-wrap items-center justify-between gap-3">
+        <div className="px-6 py-4 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#0698c4] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#10b981] to-[#0699C6] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">
               <i className="fa-solid fa-car-battery"></i>
             </div>
             <div>
@@ -236,15 +236,15 @@ export default function BatteryModal({
         </div>
 
         {/* 2. NAVIGATION TABS */}
-        <div className="px-6 py-2 bg-[#f8fcfe] border-b border-[#9ae5fe]/40 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#9ae5fe] shadow-xs">
+        <div className="px-6 py-2 bg-[#f8fcfe] border-b border-[#bcecfc]/40 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#bcecfc] shadow-xs">
             <button
               type="button"
               onClick={() => setActiveTab('electrothermal')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'electrothermal'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-temperature-half text-xs"></i>
@@ -256,7 +256,7 @@ export default function BatteryModal({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'sizing'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-scale-balanced text-xs"></i>
@@ -268,7 +268,7 @@ export default function BatteryModal({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'curtailment'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-leaf text-xs"></i>
@@ -280,7 +280,7 @@ export default function BatteryModal({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'historical'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-clock-rotate-left text-xs"></i>
@@ -291,8 +291,8 @@ export default function BatteryModal({
               onClick={() => setActiveTab('advisor')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'advisor'
-                  ? 'bg-[#0698c4] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  ? 'bg-[#0699C6] text-white shadow-xs'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-brain text-xs"></i>
@@ -301,7 +301,7 @@ export default function BatteryModal({
           </div>
 
           {activeTab === 'historical' && (
-            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#9ae5fe] shadow-xs">
+            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#bcecfc] shadow-xs">
               {['24H', '7D', '30D', '12M'].map((rng) => (
                 <button
                   key={rng}
@@ -309,8 +309,8 @@ export default function BatteryModal({
                   onClick={() => setTimeRange(rng)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition ${
                     timeRange === rng
-                      ? 'bg-[#0698c4] text-white shadow-xs'
-                      : 'text-slate-500 hover:text-[#0698c4]'
+                      ? 'bg-[#0699C6] text-white shadow-xs'
+                      : 'text-slate-500 hover:text-[#0699C6]'
                   }`}
                 >
                   {rng}
@@ -377,12 +377,12 @@ export default function BatteryModal({
               {/* Main Battery Visualizer (Section 4.L) */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 {/* Visual Battery Cylinder */}
-                <div className="lg:col-span-5 p-5 rounded-2xl bg-gradient-to-br from-white via-[#f0faff] to-[#e6f7fc] border border-[#9ae5fe] shadow-xs flex flex-col justify-between">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#9ae5fe]/40">
+                <div className="lg:col-span-5 p-5 rounded-2xl bg-gradient-to-br from-white via-[#f0faff] to-[#e6f7fc] border border-[#bcecfc] shadow-xs flex flex-col justify-between">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#bcecfc]/40">
                     <span className="text-xs font-extrabold text-[#127694] uppercase tracking-tight">
                       BESS LiFePO4 Pack Monitor
                     </span>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white text-[#0698c4] border border-[#9ae5fe]">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white text-[#0699C6] border border-[#bcecfc]">
                       480V DC Bus
                     </span>
                   </div>
@@ -406,7 +406,7 @@ export default function BatteryModal({
                               ? 'bg-rose-500'
                               : soc <= 25
                               ? 'bg-amber-500'
-                              : 'bg-gradient-to-r from-emerald-500 to-[#0698c4]'
+                              : 'bg-gradient-to-r from-emerald-500 to-[#0699C6]'
                           }`}
                           style={{ width: `${Math.min(100, Math.max(5, soc))}%` }}
                         />
@@ -426,10 +426,10 @@ export default function BatteryModal({
                   </div>
 
                   {/* Flow Direction Indicator */}
-                  <div className="grid grid-cols-2 gap-2 text-center pt-3 border-t border-[#9ae5fe]/40">
+                  <div className="grid grid-cols-2 gap-2 text-center pt-3 border-t border-[#bcecfc]/40">
                     <div className={`p-2 rounded-xl border ${
                       pLimits.current_discharge_kw > 0.5
-                        ? 'bg-[#c2f0fe] border-[#0698c4] text-[#127694]'
+                        ? 'bg-[#c2f0fe] border-[#0699C6] text-[#127694]'
                         : 'bg-white border-slate-100 text-slate-400'
                     }`}>
                       <span className="text-[9px] font-bold uppercase block">◄ DISCHARGE</span>
@@ -449,12 +449,12 @@ export default function BatteryModal({
                 {/* Electro-Thermal Physics Matrix (Section 4.A & 4.C) */}
                 <div className="lg:col-span-7 flex flex-col gap-3">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                    <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+                    <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block">State of Health (SoH)</span>
                       <span className="text-xl font-black text-emerald-600">{soh}%</span>
                       <span className="text-[9px] text-slate-500 block mt-0.5">LiFePO4 Core Stable</span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+                    <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block">Cell Temperature</span>
                       <span className={`text-xl font-black ${
                         tempC <= -35 ? 'text-rose-600' : tempC <= -20 ? 'text-amber-600' : 'text-slate-800'
@@ -465,24 +465,24 @@ export default function BatteryModal({
                         {tempC < -20 ? 'Sub-Zero Derated' : 'Heated Envelope'}
                       </span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+                    <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block">Derated Usable Energy</span>
                       <span className="text-xl font-black text-[#127694]">{Math.round(cap.usable_energy_above_reserve_kwh)} kWh</span>
                       <span className="text-[9px] text-emerald-600 font-bold block mt-0.5">Above 20% Floor</span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+                    <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block">Max Discharge Rate</span>
                       <span className="text-xl font-black text-slate-800">{pLimits.max_discharge_kw} kW</span>
                       <span className="text-[9px] text-slate-500 block mt-0.5">
                         {isLockedOut ? 'Prohibited by Lockout' : 'Derated Peak Limit'}
                       </span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+                    <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block">Max Charge Rate</span>
                       <span className="text-xl font-black text-slate-800">{pLimits.max_charge_kw} kW</span>
                       <span className="text-[9px] text-slate-500 block mt-0.5">80 kW Inverter Inviolable</span>
                     </div>
-                    <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+                    <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                       <span className="text-[10px] font-bold text-slate-400 uppercase block">Roundtrip Efficiency</span>
                       <span className="text-xl font-black text-emerald-600">92.0%</span>
                       <span className="text-[9px] text-slate-500 block mt-0.5">Chg 95% / Disch 98%</span>
@@ -490,7 +490,7 @@ export default function BatteryModal({
                   </div>
 
                   {/* Safety State Machine Diagram (Section 4.K) */}
-                  <div className="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs flex flex-col justify-between">
+                  <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs flex flex-col justify-between">
                     <span className="text-xs font-black text-[#127694] uppercase tracking-tight block mb-2">
                       Polar Safety State Machine (Temperature Boundary Transitions)
                     </span>
@@ -535,23 +535,23 @@ export default function BatteryModal({
                   </div>
 
                   {/* Interactive Temperature Test Buttons (Section 4.B) */}
-                  <div className="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe]/60 flex flex-wrap items-center justify-between gap-2">
+                  <div className="p-3 rounded-2xl bg-[#f0faff] border border-[#bcecfc]/60 flex flex-wrap items-center justify-between gap-2">
                     <span className="text-[11px] font-extrabold text-[#127694]">
-                      <i className="fa-solid fa-vial text-xs text-[#0698c4] mr-1.5"></i>
+                      <i className="fa-solid fa-vial text-xs text-[#0699C6] mr-1.5"></i>
                       Simulate Sub-Zero Battery Thermal Shock:
                     </span>
                     <div className="flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => handleSimulateTemperature(-10.0)}
-                        className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-emerald-50 text-emerald-700 border border-[#9ae5fe] transition"
+                        className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-emerald-50 text-emerald-700 border border-[#bcecfc] transition"
                       >
                         Nominal (-10°C)
                       </button>
                       <button
                         type="button"
                         onClick={() => handleSimulateTemperature(-25.0)}
-                        className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-amber-50 text-amber-700 border border-[#9ae5fe] transition"
+                        className="px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-amber-50 text-amber-700 border border-[#bcecfc] transition"
                       >
                         Derate (-25°C)
                       </button>
@@ -580,9 +580,9 @@ export default function BatteryModal({
           {activeTab === 'sizing' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
               {/* Engineering Insight Banner */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#e5f6fd] via-white to-[#e5f6fd] border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#e5f6fd] via-white to-[#e5f6fd] border border-[#bcecfc] shadow-xs">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#0698c4] text-white flex items-center justify-center font-black text-sm shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-[#0699C6] text-white flex items-center justify-center font-black text-sm shrink-0">
                     <i className="fa-solid fa-lightbulb"></i>
                   </div>
                   <div>
@@ -599,7 +599,7 @@ export default function BatteryModal({
               </div>
 
               {/* Comparative Table of Configurations A, B, C, D */}
-              <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs overflow-x-auto">
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b border-slate-200 text-[10px] font-bold text-slate-400 uppercase">
@@ -621,7 +621,7 @@ export default function BatteryModal({
                           {cfg.name}
                         </td>
                         <td className="py-3 font-mono text-[#127694] font-bold">{cfg.battery_kwh} kWh</td>
-                        <td className="py-3 font-mono text-[#0698c4] font-bold">{cfg.inverter_kw} kW</td>
+                        <td className="py-3 font-mono text-[#0699C6] font-bold">{cfg.inverter_kw} kW</td>
                         <td className="py-3 font-mono font-black text-emerald-600">
                           ${cfg.annual_savings_usd.toLocaleString()}
                         </td>
@@ -662,7 +662,7 @@ export default function BatteryModal({
           {/* TAB 3: RENEWABLE ENERGY STORAGE & CURTAILMENT ACCOUNTING (Section 4.F) */}
           {activeTab === 'curtailment' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <h3 className="text-xs font-black text-[#127694] uppercase tracking-tight mb-1">
                   Renewable Energy Curtailment vs Storage Inverter Clamping
                 </h3>
@@ -673,9 +673,9 @@ export default function BatteryModal({
                 {/* Example Walkthrough Card (Section 4.F) */}
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-center my-3">
                   <div className="p-3 rounded-2xl bg-cyan-50 border border-cyan-200">
-                    <span className="text-[10px] font-bold text-[#0698c4] uppercase block">Renewable Generation</span>
+                    <span className="text-[10px] font-bold text-[#0699C6] uppercase block">Renewable Generation</span>
                     <span className="text-2xl font-black text-slate-800 mt-1 block">420 kW</span>
-                    <span className="text-[10px] text-[#0698c4] block">Wind (320k) + Solar (100k)</span>
+                    <span className="text-[10px] text-[#0699C6] block">Wind (320k) + Solar (100k)</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200">
                     <span className="text-[10px] font-bold text-slate-500 uppercase block">Station Demand</span>
@@ -694,7 +694,7 @@ export default function BatteryModal({
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#f0faff] border border-[#9ae5fe]/60 text-xs text-[#127694] leading-relaxed">
+                <div className="p-3 rounded-xl bg-[#f0faff] border border-[#bcecfc]/60 text-xs text-[#127694] leading-relaxed">
                   <strong>Physics Proof:</strong> Out of 120 kW excess renewable power (420 kW - 300 kW), the microgrid can only store <strong>80 kW</strong> into the BESS because the bidirectional inverter is clamped at 80 kW rating. The remaining <strong>40 kW is forcibly feathered/curtailed</strong>. An upgraded 120 kW inverter would capture 100% of this clean energy!
                 </div>
               </div>
@@ -705,28 +705,28 @@ export default function BatteryModal({
           {activeTab === 'historical' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Full Cycles (EFC)</span>
                   <span className="text-xl font-black text-emerald-600">
                     {historicalData?.equivalent_full_cycles || 5.2}
                   </span>
                   <span className="text-[10px] text-slate-500 block">Nominal Life: 4,000</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Energy Throughput</span>
                   <span className="text-xl font-black text-[#127694]">
                     {historicalData?.energy_throughput_kwh?.toLocaleString() || '2,140'} kWh
                   </span>
                   <span className="text-[10px] text-slate-500 block">{timeRange} Cumulative</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Cold Derating Time</span>
                   <span className="text-xl font-black text-amber-600">
                     {historicalData?.thermal_exposure?.hours_in_cold_derating || 14.5} hrs
                   </span>
                   <span className="text-[10px] text-slate-500 block">Jacket Maintained Safe</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Peak Shaved</span>
                   <span className="text-xl font-black text-emerald-600">
                     {historicalData?.renewable_integration?.peak_shaving_contribution_kw || 55} kW
@@ -736,7 +736,7 @@ export default function BatteryModal({
               </div>
 
               {/* Chart: SoC Trajectory with 20% Reserve Floor */}
-              <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-black text-[#127694] uppercase tracking-tight">
                     Historical Battery State of Charge Trajectory ({timeRange})
@@ -755,7 +755,7 @@ export default function BatteryModal({
           {/* TAB 5: AI BATTERY ADVISORY (Section 4.I) */}
           {activeTab === 'advisor' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#e5f6fd] via-white to-[#e5f6fd] border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#e5f6fd] via-white to-[#e5f6fd] border border-[#bcecfc] shadow-xs">
                 <span className="text-xs font-black text-[#127694] uppercase tracking-tight block mb-2">
                   Autonomous AI Storage Reasoning Engine
                 </span>
@@ -765,8 +765,8 @@ export default function BatteryModal({
               </div>
 
               <div className="space-y-3">
-                <div className="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#0698c4] text-white flex items-center justify-center text-sm font-bold shrink-0">
+                <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-[#0699C6] text-white flex items-center justify-center text-sm font-bold shrink-0">
                     <i className="fa-solid fa-microchip"></i>
                   </div>
                   <div>
@@ -807,7 +807,7 @@ export default function BatteryModal({
         </div>
 
         {/* 4. MODAL FOOTER */}
-        <div className="px-6 py-3 border-t border-[#9ae5fe]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex items-center justify-between text-xs">
+        <div className="px-6 py-3 border-t border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex items-center justify-between text-xs">
           <span className="text-slate-500 font-medium">
             Polar Storage System &middot; 400 kWh LiFePO4 &middot; 80 kW Bidirectional Inverter &middot; 20% Floor Safe
           </span>

@@ -38,13 +38,18 @@ class DataIngestionDriver:
         self.genset_1_status = "RUNNING"
         self.genset_2_status = "STANDBY"
         
-        # Override parameters (injectable by Commander)
+        # Override parameters (injectable by Commander / Scenario Engine)
         self.override_temp_c: Optional[float] = None
         self.override_wind_ms: Optional[float] = None
         self.override_solar_wm2: Optional[float] = None
         self.override_load_mult: float = 1.0
         self.fault_genset_1: bool = False
+        self.fault_genset_2: bool = False
         self.fault_battery_heater: bool = False
+        self.wind_trip: bool = False
+        self.solar_trip: bool = False
+        self.fuel_reserve_pct: Optional[float] = None
+        self.renewables_available_pct: float = 100.0
         self.override_battery_soc: Optional[float] = None
         self.battery_reserve_pct: float = 20.0
 
@@ -64,7 +69,12 @@ class DataIngestionDriver:
                 "solar_irradiance_wm2": self.override_solar_wm2,
                 "load_multiplier": self.override_load_mult,
                 "fault_genset_1": self.fault_genset_1,
+                "fault_genset_2": self.fault_genset_2,
                 "fault_battery_heater": self.fault_battery_heater,
+                "wind_trip": self.wind_trip,
+                "solar_trip": self.solar_trip,
+                "fuel_reserve_pct": self.fuel_reserve_pct,
+                "renewables_available_pct": self.renewables_available_pct,
                 "battery_soc_pct": self.override_battery_soc,
                 "battery_reserve_pct": self.battery_reserve_pct,
             }
@@ -115,6 +125,16 @@ class DataIngestionDriver:
             self.current_battery_soc = self.override_battery_soc
         if "battery_reserve_pct" in overrides and overrides["battery_reserve_pct"] is not None:
             self.battery_reserve_pct = float(overrides["battery_reserve_pct"])
+        if "fault_genset_2" in overrides and overrides["fault_genset_2"] is not None:
+            self.fault_genset_2 = bool(overrides["fault_genset_2"])
+        if "wind_trip" in overrides and overrides["wind_trip"] is not None:
+            self.wind_trip = bool(overrides["wind_trip"])
+        if "solar_trip" in overrides and overrides["solar_trip"] is not None:
+            self.solar_trip = bool(overrides["solar_trip"])
+        if "fuel_reserve_pct" in overrides and overrides["fuel_reserve_pct"] is not None:
+            self.fuel_reserve_pct = float(overrides["fuel_reserve_pct"])
+        if "renewables_available_pct" in overrides and overrides["renewables_available_pct"] is not None:
+            self.renewables_available_pct = float(overrides["renewables_available_pct"])
 
         if persist:
             self._persist_overrides()
@@ -125,7 +145,12 @@ class DataIngestionDriver:
         self.override_solar_wm2 = None
         self.override_load_mult = 1.0
         self.fault_genset_1 = False
+        self.fault_genset_2 = False
         self.fault_battery_heater = False
+        self.wind_trip = False
+        self.solar_trip = False
+        self.fuel_reserve_pct = None
+        self.renewables_available_pct = 100.0
         self.override_battery_soc = None
         self.current_battery_soc = 76.5
         self.battery_reserve_pct = 20.0
@@ -353,9 +378,14 @@ class DataIngestionDriver:
             "battery_soc_pct": round(self.override_battery_soc if self.override_battery_soc is not None else self.current_battery_soc, 1),
             "battery_reserve_pct": round(self.battery_reserve_pct, 1),
             "battery_temp_c": round(self.current_battery_temp, 1),
-            "diesel_reserve_liters": round(self.current_diesel_reserve, 1),
+            "diesel_reserve_liters": round(self.current_diesel_reserve if self.fuel_reserve_pct is None else (station["diesel_fuel_reserve_liters"] * (self.fuel_reserve_pct / 100.0)), 1),
+            "fuel_reserve_pct": round(self.fuel_reserve_pct if self.fuel_reserve_pct is not None else (self.current_diesel_reserve / station["diesel_fuel_reserve_liters"] * 100.0), 1),
             "genset_1_fault": self.fault_genset_1,
+            "genset_2_fault": self.fault_genset_2,
             "battery_heater_fault": self.fault_battery_heater,
+            "wind_trip": self.wind_trip,
+            "solar_trip": self.solar_trip,
+            "renewables_available_pct": self.renewables_available_pct,
             "scada_diagnostics": scada_diag
         }
         return standard_payload

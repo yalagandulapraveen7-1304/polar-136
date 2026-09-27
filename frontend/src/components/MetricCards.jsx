@@ -36,7 +36,7 @@ export default function MetricCards({
     battFlowRate = `+${battChargeKw.toFixed(1)} kW`;
   } else if (battDischargeKw > 0.5) {
     battFlowStatus = 'Discharging';
-    battFlowClass = 'text-[#0698c4] bg-[#c2f0fe] border border-[#9ae5fe]';
+    battFlowClass = 'text-[#0699C6] bg-[#c2f0fe] border border-[#bcecfc]';
     battFlowRate = `-${battDischargeKw.toFixed(1)} kW`;
   }
 
@@ -80,12 +80,12 @@ export default function MetricCards({
       {/* 1. BATTERY RESERVE GAUGE CARD (Section 4 Battery Management) */}
       <div
         onClick={() => onOpenModal('battery')}
-        className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0faff] cursor-pointer hover:border-[#0698c4] hover:shadow-md transition group"
+        className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0faff] cursor-pointer hover:border-[#0699C6] hover:shadow-md transition group"
         title="Click to open Battery Management & Storage Sizing Center"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center font-bold text-xs group-hover:scale-105 transition-transform">
+            <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0699C6] flex items-center justify-center font-bold text-xs group-hover:scale-105 transition-transform">
               <i className="fa-solid fa-car-battery"></i>
             </div>
             <span className="font-extrabold text-xs text-[#127694] tracking-tight uppercase">Battery Storage</span>
@@ -114,7 +114,7 @@ export default function MetricCards({
               <span className="text-[10px] font-bold text-slate-400 uppercase">SoC</span>
             </div>
             <div className="text-right">
-              <span className="font-mono text-xs font-bold text-[#0698c4]">{battFlowRate}</span>
+              <span className="font-mono text-xs font-bold text-[#0699C6]">{battFlowRate}</span>
               <div className="text-[9px] text-slate-400 font-semibold">
                 {latestData?.battery_management?.capacities?.usable_energy_above_reserve_kwh || 185} kWh usable
               </div>
@@ -156,7 +156,7 @@ export default function MetricCards({
           <span className="text-slate-500 font-medium">
             Health: <strong className="text-emerald-600">{battHealth}%</strong>
           </span>
-          <span className="text-slate-500 font-medium flex items-center gap-1 text-[#0698c4] font-bold">
+          <span className="text-slate-500 font-medium flex items-center gap-1 text-[#0699C6] font-bold">
             <span>Sizing &amp; Derating</span>
             <i className="fa-solid fa-arrow-up-right-from-square text-[8px]"></i>
           </span>
@@ -235,8 +235,8 @@ export default function MetricCards({
           </div>
 
           <div className="grid grid-cols-2 gap-2 mt-2">
-            <div className="p-1 rounded-lg bg-[#e5f6fd] text-center border border-[#9ae5fe]/60">
-              <span className="text-[9px] font-bold text-[#0698c4]">Wind: {Math.round(windKw)} kW</span>
+            <div className="p-1 rounded-lg bg-[#e5f6fd] text-center border border-[#bcecfc]/60">
+              <span className="text-[9px] font-bold text-[#0699C6]">Wind: {Math.round(windKw)} kW</span>
             </div>
             <div className="p-1 rounded-lg bg-amber-50 text-center border border-amber-200">
               <span className="text-[9px] font-bold text-amber-700">Solar: {Math.round(solarKw)} kW</span>

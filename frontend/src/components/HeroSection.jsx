@@ -174,28 +174,28 @@ export default function HeroSection({
           </span>
         </div>
       ) : (
-        <div className="w-full p-2.5 rounded-2xl bg-[#e5f6fd] border border-[#9ae5fe] flex items-center justify-between text-xs text-[#127694] font-bold shadow-sm">
+        <div className="w-full p-2.5 rounded-2xl bg-[#e5f6fd] border border-[#bcecfc] flex items-center justify-between text-xs text-[#127694] font-bold shadow-sm">
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>ENERGY BALANCE STABLE · 0.00 kW residual · AI LP Optimizer active · 68.2% Green Share</span>
           </span>
-          <span className="text-[10px] font-mono bg-white text-[#0698c4] px-2.5 py-0.5 rounded-full border border-[#9ae5fe]">
+          <span className="text-[10px] font-mono bg-white text-[#0699C6] px-2.5 py-0.5 rounded-full border border-[#bcecfc]">
             Grid Frequency: 50.02 Hz Synced
           </span>
         </div>
       )}
 
       {/* 2. SUB-HEADER: TABS (COPILOT & SCHEMATIC vs PREDICTIVE HORIZON) */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#9ae5fe]/40 pb-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#bcecfc]/40 pb-2">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#9ae5fe] shadow-sm">
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#bcecfc] shadow-sm">
             <button
               type="button"
               onClick={() => setCenterTab('copilot')}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 centerTab === 'copilot'
                   ? 'bg-[#127694] text-white shadow-sm'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-robot text-xs"></i>
@@ -207,7 +207,7 @@ export default function HeroSection({
               className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 centerTab === 'flow'
                   ? 'bg-[#127694] text-white shadow-sm'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-diagram-project text-xs"></i>
@@ -220,7 +220,7 @@ export default function HeroSection({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-[#c2f0fe] text-[#0698c4] border border-[#9ae5fe] flex items-center gap-1.5">
+          <span className="text-[10px] font-extrabold px-2.5 py-1 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc] flex items-center gap-1.5">
             <i className="fa-solid fa-microchip text-xs"></i>
             <span>98.4% AI Confidence</span>
           </span>
@@ -234,10 +234,10 @@ export default function HeroSection({
           {/* Left / Center Column (7 Cols on lg): The AI Copilot Brain */}
           <div className="lg:col-span-7 flex flex-col gap-3">
             {/* Primary Natural Language AI Insight Card */}
-            <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm relative overflow-hidden">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-sm relative overflow-hidden">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-[#0698c4] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+                  <div className="w-7 h-7 rounded-lg bg-[#0699C6] text-white flex items-center justify-center text-xs font-bold shadow-sm">
                     <i className="fa-solid fa-brain"></i>
                   </div>
                   <span className="text-xs font-black text-[#127694] tracking-tight uppercase">
@@ -256,7 +256,7 @@ export default function HeroSection({
 
               {/* 3-Part Mission Control Assessment */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-100">
-                <div className="p-2 rounded-xl bg-[#f0faff] border border-[#9ae5fe]/60">
+                <div className="p-2 rounded-xl bg-[#f0faff] border border-[#bcecfc]/60">
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">1. DETECTED</span>
                   <p className="text-[11px] font-bold text-slate-800 mt-0.5">
                     Renewable deficit expected (Blizzard gale &gt; 25 m/s)
@@ -281,7 +281,7 @@ export default function HeroSection({
                 <button
                   type="button"
                   onClick={() => onOpenModal('copilot')}
-                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-extrabold text-xs border border-[#9ae5fe] transition shadow-sm flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-extrabold text-xs border border-[#bcecfc] transition shadow-sm flex items-center gap-1.5"
                 >
                   <i className="fa-solid fa-lightbulb text-amber-500"></i>
                   <span>VIEW EXPLANATION</span>
@@ -293,7 +293,7 @@ export default function HeroSection({
                   className={`px-4 py-1.5 rounded-xl font-extrabold text-xs transition shadow flex items-center gap-1.5 ${
                     isG2Dispatched
                       ? 'bg-emerald-600 text-white cursor-default'
-                      : 'bg-[#0698c4] hover:bg-[#05c5ff] text-white'
+                      : 'bg-[#0699C6] hover:bg-[#05C5FF] text-white'
                   }`}
                 >
                   <i className={`fa-solid ${isG2Dispatched ? 'fa-check' : 'fa-play'} text-xs`}></i>
@@ -305,7 +305,7 @@ export default function HeroSection({
             {/* Copilot Natural Language Command Bar */}
             <div className="w-full">
               <form onSubmit={handleFormSubmit} className="copilot-command-pill px-3 sm:px-4 py-2 flex items-center gap-2">
-                <i className="fa-solid fa-magnifying-glass text-xs text-[#05c5ff] shrink-0"></i>
+                <i className="fa-solid fa-magnifying-glass text-xs text-[#05C5FF] shrink-0"></i>
                 <input
                   type="text"
                   value={query}
@@ -315,7 +315,7 @@ export default function HeroSection({
                 />
                 <button
                   type="submit"
-                  className="px-3.5 py-1.5 rounded-full bg-[#0698c4] hover:bg-[#05c5ff] text-white font-bold text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm"
+                  className="px-3.5 py-1.5 rounded-full bg-[#0699C6] hover:bg-[#05C5FF] text-white font-bold text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm"
                 >
                   <i className="fa-solid fa-wand-magic-sparkles text-xs"></i>
                   <span className="hidden sm:inline">Ask Copilot</span>
@@ -324,7 +324,7 @@ export default function HeroSection({
                   type="button"
                   title="Expand Full Chatbot Dialog"
                   onClick={() => onOpenModal('copilot')}
-                  className="p-1.5 rounded-full text-slate-400 hover:text-[#0698c4] hover:bg-slate-100 transition shrink-0"
+                  className="p-1.5 rounded-full text-slate-400 hover:text-[#0699C6] hover:bg-slate-100 transition shrink-0"
                 >
                   <i className="fa-solid fa-up-right-and-down-left-from-center text-xs"></i>
                 </button>
@@ -335,7 +335,7 @@ export default function HeroSection({
                 <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Quick Prompts:</span>
                 <button
                   type="button"
-                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#9ae5fe] text-[#127694] hover:bg-[#c2f0fe] transition"
+                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
                   onClick={() => {
                     setQuery('Why did you choose this microgrid dispatch mix?');
                     handleAskCopilot('Why did you choose this microgrid dispatch mix?');
@@ -345,7 +345,7 @@ export default function HeroSection({
                 </button>
                 <button
                   type="button"
-                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#9ae5fe] text-[#127694] hover:bg-[#c2f0fe] transition"
+                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
                   onClick={() => {
                     setQuery('How long will our fuel reserves last if a storm hits?');
                     handleAskCopilot('How long will our fuel reserves last if a storm hits?');
@@ -355,7 +355,7 @@ export default function HeroSection({
                 </button>
                 <button
                   type="button"
-                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#9ae5fe] text-[#127694] hover:bg-[#c2f0fe] transition"
+                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
                   onClick={() => {
                     setQuery('Explain verified fuel and cost savings vs baseline.');
                     handleAskCopilot('Explain verified fuel and cost savings vs baseline.');
@@ -367,10 +367,10 @@ export default function HeroSection({
 
               {/* Inline Copilot Response Box */}
               {isResponseVisible && (
-                <div className="mt-2.5 p-3 rounded-2xl bg-white border border-[#05c5ff]/50 shadow-md">
-                  <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#9ae5fe]/40 text-xs font-bold text-[#127694]">
+                <div className="mt-2.5 p-3 rounded-2xl bg-white border border-[#05C5FF]/50 shadow-md">
+                  <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#bcecfc]/40 text-xs font-bold text-[#127694]">
                     <span className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-robot text-xs text-[#05c5ff]"></i>
+                      <i className="fa-solid fa-robot text-xs text-[#05C5FF]"></i>
                       Polar AI Response
                     </span>
                     <button
@@ -384,7 +384,7 @@ export default function HeroSection({
                   <p className="text-xs text-slate-700 leading-relaxed">
                     {isCopilotLoading ? (
                       <span className="inline-flex items-center gap-1.5 text-slate-500 italic">
-                        <i className="fa-solid fa-spinner fa-spin text-[#0698c4]"></i> AI reasoning over station telemetry &amp; constraints...
+                        <i className="fa-solid fa-spinner fa-spin text-[#0699C6]"></i> AI reasoning over station telemetry &amp; constraints...
                       </span>
                     ) : (
                       copilotResponse
@@ -397,14 +397,14 @@ export default function HeroSection({
 
           {/* Right Column (5 Cols on lg): 6H | 12H | 24H Forecast Panel */}
           <div className="lg:col-span-5 flex flex-col gap-3">
-            <div className="p-3.5 rounded-2xl bg-white border border-[#9ae5fe] shadow-sm flex flex-col justify-between">
+            <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-xs font-black text-[#127694] uppercase tracking-tight flex items-center gap-1.5">
-                  <i className="fa-solid fa-chart-line text-[#0698c4]"></i>
+                  <i className="fa-solid fa-chart-line text-[#0699C6]"></i>
                   Predictive Horizon
                 </span>
                 {/* 6H | 12H | 24H Horizon Toggle */}
-                <div className="flex items-center gap-1 bg-[#f0faff] p-0.5 rounded-xl border border-[#9ae5fe]">
+                <div className="flex items-center gap-1 bg-[#f0faff] p-0.5 rounded-xl border border-[#bcecfc]">
                   {['6h', '12h', '24h'].map((h) => (
                     <button
                       key={h}
@@ -413,7 +413,7 @@ export default function HeroSection({
                       className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase transition ${
                         forecastHorizon === h
                           ? 'bg-[#127694] text-white shadow-xs'
-                          : 'text-slate-500 hover:text-[#0698c4]'
+                          : 'text-slate-500 hover:text-[#0699C6]'
                       }`}
                     >
                       {h}
@@ -450,7 +450,7 @@ export default function HeroSection({
                       <span>{item.load}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-mono text-[#0698c4]">{item.ren}</span>
+                      <span className="text-[10px] font-mono text-[#0699C6]">{item.ren}</span>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${item.isWarning ? 'bg-rose-200 text-rose-800' : 'bg-slate-100 text-slate-600'}`}>
                         {item.status}
                       </span>
@@ -465,7 +465,7 @@ export default function HeroSection({
                 <button
                   type="button"
                   onClick={() => onOpenModal('forecast')}
-                  className="font-bold text-[#0698c4] hover:text-[#05c5ff] flex items-center gap-1"
+                  className="font-bold text-[#0699C6] hover:text-[#05C5FF] flex items-center gap-1"
                 >
                   <span>Full Climate Horizon</span>
                   <i className="fa-solid fa-arrow-right text-[9px]"></i>

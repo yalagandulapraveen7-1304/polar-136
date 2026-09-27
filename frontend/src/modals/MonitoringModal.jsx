@@ -123,7 +123,7 @@ export default function MonitoringModal({
               {
                 label: 'Wind Power (kW)',
                 data: wSeries,
-                borderColor: '#0698c4',
+                borderColor: '#0699C6',
                 backgroundColor: 'rgba(6, 152, 196, 0.25)',
                 borderWidth: 2,
                 fill: true,
@@ -201,7 +201,7 @@ export default function MonitoringModal({
               {
                 label: 'Predicted Median (P50)',
                 data: p50,
-                borderColor: '#0698c4',
+                borderColor: '#0699C6',
                 borderWidth: 2,
                 pointRadius: 2,
                 fill: false,
@@ -265,13 +265,13 @@ export default function MonitoringModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
-      <div className="bg-white rounded-3xl shadow-2xl border border-[#9ae5fe] w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-slate-50/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 animate-fadeIn">
+      <div className="bg-white rounded-3xl shadow-2xl border border-[#bcecfc] w-full max-w-6xl max-h-[92vh] flex flex-col overflow-hidden">
         
         {/* 1. MODAL HEADER */}
-        <div className="px-6 py-4 border-b border-[#9ae5fe]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex flex-wrap items-center justify-between gap-3">
+        <div className="px-6 py-4 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center font-black text-lg shadow-md shrink-0">
               <i className="fa-solid fa-chart-pie"></i>
             </div>
             <div>
@@ -279,7 +279,7 @@ export default function MonitoringModal({
                 <h2 className="text-base sm:text-lg font-black text-[#127694] tracking-tight">
                   POLAR ENERGY MONITORING &amp; ANALYTICS COMMAND
                 </h2>
-                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4] border border-[#9ae5fe]">
+                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc]">
                   {stationId} BASE
                 </span>
               </div>
@@ -299,15 +299,15 @@ export default function MonitoringModal({
         </div>
 
         {/* 2. TAB NAVIGATION BAR */}
-        <div className="px-6 py-2 bg-[#f8fcfe] border-b border-[#9ae5fe]/40 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#9ae5fe] shadow-xs">
+        <div className="px-6 py-2 bg-[#f8fcfe] border-b border-[#bcecfc]/40 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#bcecfc] shadow-xs">
             <button
               type="button"
               onClick={() => setActiveTab('realtime')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'realtime'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-gauge text-xs"></i>
@@ -319,7 +319,7 @@ export default function MonitoringModal({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'historical'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-clock-rotate-left text-xs"></i>
@@ -331,7 +331,7 @@ export default function MonitoringModal({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 activeTab === 'forecast'
                   ? 'bg-[#127694] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-[#0698c4]'
+                  : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
               <i className="fa-solid fa-chart-line text-xs"></i>
@@ -353,7 +353,7 @@ export default function MonitoringModal({
 
           {/* Time range selector for Historical view */}
           {activeTab === 'historical' && (
-            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#9ae5fe] shadow-xs">
+            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#bcecfc] shadow-xs">
               {['24H', '7D', '30D', '12M'].map((rng) => (
                 <button
                   key={rng}
@@ -361,8 +361,8 @@ export default function MonitoringModal({
                   onClick={() => setTimeRange(rng)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-extrabold transition ${
                     timeRange === rng
-                      ? 'bg-[#0698c4] text-white shadow-xs'
-                      : 'text-slate-500 hover:text-[#0698c4]'
+                      ? 'bg-[#0699C6] text-white shadow-xs'
+                      : 'text-slate-500 hover:text-[#0699C6]'
                   }`}
                 >
                   {rng}
@@ -389,12 +389,12 @@ export default function MonitoringModal({
                   <span className="text-[10px] text-amber-600 font-semibold block mt-1">Bifacial Albedo +24%</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-cyan-50/70 border border-cyan-200">
-                  <span className="text-[10px] font-bold text-[#0698c4] uppercase block">Wind Generation</span>
+                  <span className="text-[10px] font-bold text-[#0699C6] uppercase block">Wind Generation</span>
                   <div className="flex items-baseline gap-1 mt-1">
                     <span className="text-2xl font-black text-slate-800">104</span>
                     <span className="text-xs font-bold text-slate-500">kW</span>
                   </div>
-                  <span className="text-[10px] text-[#0698c4] font-semibold block mt-1">2 Turbines Online</span>
+                  <span className="text-[10px] text-[#0699C6] font-semibold block mt-1">2 Turbines Online</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200">
                   <span className="text-[10px] font-bold text-emerald-700 uppercase block">Battery Flow</span>
@@ -424,7 +424,7 @@ export default function MonitoringModal({
 
               {/* Power Balance & Grid Frequency */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs flex flex-col justify-between">
+                <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs flex flex-col justify-between">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                     <span className="text-xs font-black text-[#127694] uppercase tracking-tight">
                       Microgrid Power Balance Equations
@@ -454,12 +454,12 @@ export default function MonitoringModal({
                 </div>
 
                 {/* Curtailment Monitoring Card */}
-                <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs flex flex-col justify-between">
+                <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs flex flex-col justify-between">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                     <span className="text-xs font-black text-[#127694] uppercase tracking-tight">
                       Renewable Curtailment Tracking
                     </span>
-                    <span className="text-[10px] font-mono font-bold bg-cyan-50 text-[#0698c4] px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-mono font-bold bg-cyan-50 text-[#0699C6] px-2 py-0.5 rounded-full">
                       100% Green Harvest
                     </span>
                   </div>
@@ -476,7 +476,7 @@ export default function MonitoringModal({
                       <span className="text-slate-600">Curtailed Wind / Solar Energy:</span>
                       <strong className="font-mono text-slate-800">0.0 kW (0.0%)</strong>
                     </div>
-                    <div className="p-2 rounded-xl bg-[#f0faff] text-[11px] text-[#127694] font-medium border border-[#9ae5fe]/40">
+                    <div className="p-2 rounded-xl bg-[#f0faff] text-[11px] text-[#127694] font-medium border border-[#bcecfc]/40">
                       Active Constraint: <strong>None</strong>. LiFePO4 battery is safely operating at 77% SoC and absorbing surplus katabatic wind gust energy without inverter clipping.
                     </div>
                   </div>
@@ -490,16 +490,16 @@ export default function MonitoringModal({
             <div className="flex flex-col gap-4 animate-fadeIn">
               {/* Summary KPIs */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Generation</span>
                   <span className="text-xl font-black text-slate-800">
                     {historicalData?.generation_stack?.total_generation_kwh?.toLocaleString() || '17,395'} kWh
                   </span>
-                  <span className="text-[10px] text-[#0698c4] font-semibold block mt-0.5">
+                  <span className="text-[10px] text-[#0699C6] font-semibold block mt-0.5">
                     {historicalData?.efficiency_metrics?.renewable_utilization_pct || 68.2}% Green Share
                   </span>
                 </div>
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Diesel Consumed</span>
                   <span className="text-xl font-black text-rose-700">
                     {historicalData?.efficiency_metrics?.diesel_consumed_litres?.toLocaleString() || '2,410'} L
@@ -508,7 +508,7 @@ export default function MonitoringModal({
                     {historicalData?.efficiency_metrics?.fuel_efficiency_l_per_kwh || 0.280} L/kWh Burn Rate
                   </span>
                 </div>
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Battery Cycling</span>
                   <span className="text-xl font-black text-emerald-700">
                     {historicalData?.battery_cycling?.equivalent_full_cycles || 4.2} EFC
@@ -517,7 +517,7 @@ export default function MonitoringModal({
                     Avg DoD: {historicalData?.battery_cycling?.avg_depth_of_discharge_pct || 42}%
                   </span>
                 </div>
-                <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe]/60 shadow-xs">
+                <div className="p-3 rounded-2xl bg-white border border-[#bcecfc]/60 shadow-xs">
                   <span className="text-[10px] font-bold text-slate-400 uppercase block">Critical Base Load</span>
                   <span className="text-xl font-black text-[#127694]">
                     {historicalData?.consumption_breakdown?.critical_load_kwh?.toLocaleString() || '3,360'} kWh
@@ -529,7 +529,7 @@ export default function MonitoringModal({
               </div>
 
               {/* Chart: Generation Stack & Load Timeline */}
-              <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="text-xs font-black text-[#127694] uppercase tracking-tight">
@@ -572,7 +572,7 @@ export default function MonitoringModal({
                     <span className="text-xs font-black text-[#127694] uppercase">
                       Polar Night Winter Cycle (May - Aug)
                     </span>
-                    <span className="text-[9px] font-bold bg-[#c2f0fe] text-[#0698c4] px-2 py-0.5 rounded-full">
+                    <span className="text-[9px] font-bold bg-[#c2f0fe] text-[#0699C6] px-2 py-0.5 rounded-full">
                       0 W/m&sup2; Darkness
                     </span>
                   </div>
@@ -590,7 +590,7 @@ export default function MonitoringModal({
           {/* TAB 3: ACTUAL VS FORECAST QUANTILE TRACKING ("What is likely to happen next?") */}
           {activeTab === 'forecast' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
-              <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
                     <h3 className="text-xs font-black text-[#127694] uppercase tracking-tight">
@@ -618,7 +618,7 @@ export default function MonitoringModal({
                     10% probability that load will fall below this boundary. Minimum diesel dispatch needed.
                   </p>
                 </div>
-                <div className="p-3 rounded-2xl bg-[#f0faff] border border-[#9ae5fe]">
+                <div className="p-3 rounded-2xl bg-[#f0faff] border border-[#bcecfc]">
                   <span className="text-[10px] font-black text-[#127694] uppercase block">P50 Expected Median</span>
                   <span className="text-xs font-bold text-slate-800 mt-1 block">Nominal Dispatch Target</span>
                   <p className="text-[10px] text-slate-600 mt-1">
@@ -688,7 +688,7 @@ export default function MonitoringModal({
               )}
 
               {/* 5-Step Closed-Loop Flow Visualization */}
-              <div className="p-4 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <span className="text-xs font-black text-[#127694] uppercase tracking-tight block mb-3">
                   Autonomous Closed-Loop Control Architecture: MONITOR &rarr; UNDERSTAND &rarr; PREDICT &rarr; OPTIMIZE &rarr; ACT
                 </span>
@@ -700,9 +700,9 @@ export default function MonitoringModal({
                     <span className="text-[10px] text-slate-500 block mt-0.5">Turbines: 104 kW actual</span>
                   </div>
                   <div className="p-2.5 rounded-xl bg-cyan-50 border border-cyan-200 text-center">
-                    <span className="text-[9px] font-black text-[#0698c4] uppercase block">2. UNDERSTAND</span>
+                    <span className="text-[9px] font-black text-[#0699C6] uppercase block">2. UNDERSTAND</span>
                     <span className="text-xs font-extrabold text-[#127694] block mt-1">Bus Residual</span>
-                    <span className="text-[10px] text-[#0698c4] block mt-0.5">Battery picking up slack</span>
+                    <span className="text-[10px] text-[#0699C6] block mt-0.5">Battery picking up slack</span>
                   </div>
                   <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-center">
                     <span className="text-[9px] font-black text-amber-700 uppercase block">3. PREDICT</span>
@@ -726,7 +726,7 @@ export default function MonitoringModal({
         </div>
 
         {/* 4. MODAL FOOTER */}
-        <div className="px-6 py-3 border-t border-[#9ae5fe]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex items-center justify-between text-xs">
+        <div className="px-6 py-3 border-t border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] flex items-center justify-between text-xs">
           <span className="text-slate-500 font-medium">
             Polar Energy System · Antarctic Digital Twin Engine · High-Precision Microgrid Telemetry
           </span>

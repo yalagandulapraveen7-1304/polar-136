@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light" style="color-scheme: light;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
   <title>NOVARA // AI Polar Energy Management System (PolarOPS)</title>
 
   <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
@@ -12,12 +13,30 @@
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            polar: {
+              primary: '#05C5FF',
+              secondary: '#0699C6',
+              bg: '#EDF9FD',
+              deep: '#127694'
+            }
+          }
+        }
+      }
+    };
+  </script>
 
   <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-[#f4fafc] text-slate-800 antialiased selection:bg-[#05c5ff] selection:text-white min-h-screen overflow-x-hidden w-full">
+<body class="bg-[#EDF9FD] text-slate-800 antialiased selection:bg-[#05c5ff] selection:text-white min-h-screen overflow-x-hidden w-full" style="color-scheme: light;">
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
+

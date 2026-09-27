@@ -86,9 +86,9 @@ export default function EnergyFlowCanvas({ latestData }) {
 
       // Topology coordinates
       const nodes = {
-        renewables: { x: w * 0.16, y: h * 0.24, title: 'Wind & Solar Hybrid', val: `${totalRenewableKw.toFixed(0)} kW`, sub: `W: ${windKw.toFixed(0)}k | S: ${solarKw.toFixed(0)}k`, color: '#05c5ff' },
+        renewables: { x: w * 0.16, y: h * 0.24, title: 'Wind & Solar Hybrid', val: `${totalRenewableKw.toFixed(0)} kW`, sub: `W: ${windKw.toFixed(0)}k | S: ${solarKw.toFixed(0)}k`, color: '#05C5FF' },
         generator: { x: w * 0.16, y: h * 0.76, title: 'Diesel Gen-Set G1/G2', val: `${genKw.toFixed(0)} kW`, sub: 'Optimal LP Modulated', color: '#f43f5e' },
-        bus: { x: w * 0.50, y: h * 0.50, title: 'Inverter Grid Bus', val: '400V 50Hz', sub: 'Balanced · 0 kW Residual', color: '#0698c4' },
+        bus: { x: w * 0.50, y: h * 0.50, title: 'Inverter Grid Bus', val: '400V 50Hz', sub: 'Balanced · 0 kW Residual', color: '#0699C6' },
         battery: { x: w * 0.50, y: h * 0.88, title: 'BESS LiFePO4 Reserve', val: isCharging ? `+${battAbsKw.toFixed(0)} kW Chg` : `-${battAbsKw.toFixed(0)} kW Disch`, sub: '77% SoC · 20% Floor Safe', color: '#10b981' },
         load: { x: w * 0.84, y: h * 0.50, title: 'Total Station Demand', val: '412 kW', sub: '20 kW Life Support Non-Shed', color: '#127694' }
       };
@@ -108,7 +108,7 @@ export default function EnergyFlowCanvas({ latestData }) {
         // 1. Renewables -> Bus
         const renCfg = getParticleConfig(totalRenewableKw);
         for (let i = 0; i < renCfg.count; i++) {
-          particles.push(new FlowParticle(nodes.renewables.x, nodes.renewables.y, nodes.bus.x, nodes.bus.y, '#05c5ff', renCfg.speed));
+          particles.push(new FlowParticle(nodes.renewables.x, nodes.renewables.y, nodes.bus.x, nodes.bus.y, '#05C5FF', renCfg.speed));
         }
 
         // 2. Renewables -> Battery (if charging)
@@ -138,7 +138,7 @@ export default function EnergyFlowCanvas({ latestData }) {
         // 5. Bus -> Load (combined 412 kW total load)
         const loadCfg = getParticleConfig(412);
         for (let i = 0; i < loadCfg.count; i++) {
-          particles.push(new FlowParticle(nodes.bus.x, nodes.bus.y, nodes.load.x, nodes.load.y, '#0698c4', loadCfg.speed));
+          particles.push(new FlowParticle(nodes.bus.x, nodes.bus.y, nodes.load.x, nodes.load.y, '#0699C6', loadCfg.speed));
         }
 
         lastParticleSetup = time;
@@ -182,7 +182,7 @@ export default function EnergyFlowCanvas({ latestData }) {
       ctx.setLineDash([]);
 
       // 2. Draw Transfer Label Pills on Connections
-      function drawPill(text, x, y, bg = '#ffffff', fg = '#127694', border = '#9ae5fe') {
+      function drawPill(text, x, y, bg = '#ffffff', fg = '#127694', border = '#bcecfc') {
         ctx.font = '700 9px "JetBrains Mono", monospace';
         const metrics = ctx.measureText(text);
         const pw = metrics.width + 12;
@@ -203,15 +203,15 @@ export default function EnergyFlowCanvas({ latestData }) {
       }
 
       // Explicit dynamic flow values
-      drawPill(`Renewable → Bus: ${totalRenewableKw.toFixed(0)} kW`, (nodes.renewables.x + nodes.bus.x) / 2, (nodes.renewables.y + nodes.bus.y) / 2 - 10, '#f0faff', '#0698c4', '#9ae5fe');
+      drawPill(`Renewable → Bus: ${totalRenewableKw.toFixed(0)} kW`, (nodes.renewables.x + nodes.bus.x) / 2, (nodes.renewables.y + nodes.bus.y) / 2 - 10, '#f0faff', '#0699C6', '#bcecfc');
       if (isCharging) {
         drawPill(`Bus → BESS: +${battAbsKw.toFixed(0)} kW (Charging)`, nodes.bus.x - 70, (nodes.bus.y + nodes.battery.y) / 2, '#f0fdf4', '#10b981', '#a7f3d0');
       } else {
-        drawPill(`BESS → Bus: -${battAbsKw.toFixed(0)} kW (Discharge)`, nodes.bus.x + 70, (nodes.bus.y + nodes.battery.y) / 2, '#f0faff', '#127694', '#9ae5fe');
+        drawPill(`BESS → Bus: -${battAbsKw.toFixed(0)} kW (Discharge)`, nodes.bus.x + 70, (nodes.bus.y + nodes.battery.y) / 2, '#f0faff', '#127694', '#bcecfc');
       }
       drawPill(`Gen → Bus: ${genKw.toFixed(0)} kW`, (nodes.generator.x + nodes.bus.x) / 2, (nodes.generator.y + nodes.bus.y) / 2 + 10, '#fef2f2', '#f43f5e', '#fecaca');
       drawPill(`Gen → BESS: 0 kW (Direct Lockout)`, (nodes.generator.x + nodes.battery.x) / 2, (nodes.generator.y + nodes.battery.y) / 2 + 10, '#f8fafc', '#94a3b8', '#e2e8f0');
-      drawPill(`Bus → Load: 412 kW Demand`, (nodes.bus.x + nodes.load.x) / 2, (nodes.bus.y + nodes.load.y) / 2 - 10, '#f0faff', '#127694', '#9ae5fe');
+      drawPill(`Bus → Load: 412 kW Demand`, (nodes.bus.x + nodes.load.x) / 2, (nodes.bus.y + nodes.load.y) / 2 - 10, '#f0faff', '#127694', '#bcecfc');
 
       // 3. Update & Draw Particles
       particles.forEach(p => {
@@ -232,7 +232,7 @@ export default function EnergyFlowCanvas({ latestData }) {
         ctx.fill();
 
         ctx.fillStyle = '#ffffff';
-        ctx.strokeStyle = isBus ? '#0698c4' : (node.color || '#9ae5fe');
+        ctx.strokeStyle = isBus ? '#0699C6' : (node.color || '#bcecfc');
         ctx.lineWidth = isBus ? 2 : 1.2;
 
         ctx.beginPath();
@@ -270,13 +270,13 @@ export default function EnergyFlowCanvas({ latestData }) {
   }, [latestData]);
 
   return (
-    <div className="relative w-full flex flex-col items-center justify-center bg-gradient-to-b from-white to-[#f7fcfe] rounded-2xl border border-[#9ae5fe]/80 overflow-hidden shadow-inner p-2">
-      <div className="w-full flex items-center justify-between px-3 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-[#9ae5fe]/40 mb-1">
+    <div className="relative w-full flex flex-col items-center justify-center bg-gradient-to-b from-white to-[#f7fcfe] rounded-2xl border border-[#bcecfc]/80 overflow-hidden shadow-inner p-2">
+      <div className="w-full flex items-center justify-between px-3 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-[#bcecfc]/40 mb-1">
         <span className="flex items-center gap-1.5 text-[#127694]">
-          <i className="fa-solid fa-diagram-project text-xs text-[#0698c4]"></i>
+          <i className="fa-solid fa-diagram-project text-xs text-[#0699C6]"></i>
           Real-Time Bus Circuit Routing &amp; Flow Dynamics
         </span>
-        <span className="text-[#0698c4] font-mono lowercase">Particle Speed &amp; Density Proportional to kW Power</span>
+        <span className="text-[#0699C6] font-mono lowercase">Particle Speed &amp; Density Proportional to kW Power</span>
       </div>
       <canvas ref={canvasRef} id="energy-flow-canvas" className="w-full" style={{ height: '320px' }} />
     </div>

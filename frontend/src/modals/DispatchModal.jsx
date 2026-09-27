@@ -79,7 +79,7 @@ export default function DispatchModal({
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#05c5ff] to-[#127694] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#05C5FF] to-[#127694] text-white flex items-center justify-center font-bold text-xs shadow-sm">
               <i className="fa-solid fa-layer-group text-sm"></i>
             </div>
             <div>
@@ -101,17 +101,17 @@ export default function DispatchModal({
         </div>
 
         {/* 3-Level Optimization Architecture Selector Tabs */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-[#f0faff] rounded-2xl border border-[#9ae5fe]/70 mb-4 shrink-0">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-1.5 bg-[#f0faff] rounded-2xl border border-[#bcecfc]/70 mb-4 shrink-0">
           <button
             type="button"
             onClick={() => setActiveTier('level3')}
             className={`p-2 rounded-xl text-xs font-bold text-left transition flex items-center gap-2 ${
               activeTier === 'level3'
                 ? 'bg-[#127694] text-white shadow-sm'
-                : 'bg-white text-slate-700 hover:text-[#0698c4] border border-[#9ae5fe]/60'
+                : 'bg-white text-slate-700 hover:text-[#0699C6] border border-[#bcecfc]/60'
             }`}
           >
-            <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ${activeTier === 'level3' ? 'bg-white/20 text-white' : 'bg-[#e5f6fd] text-[#0698c4]'}`}>
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ${activeTier === 'level3' ? 'bg-white/20 text-white' : 'bg-[#e5f6fd] text-[#0699C6]'}`}>
               <i className="fa-solid fa-bolt"></i>
             </div>
             <div>
@@ -126,7 +126,7 @@ export default function DispatchModal({
             className={`p-2 rounded-xl text-xs font-bold text-left transition flex items-center gap-2 ${
               activeTier === 'level2'
                 ? 'bg-[#127694] text-white shadow-sm'
-                : 'bg-white text-slate-700 hover:text-[#0698c4] border border-[#9ae5fe]/60'
+                : 'bg-white text-slate-700 hover:text-[#0699C6] border border-[#bcecfc]/60'
             }`}
           >
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ${activeTier === 'level2' ? 'bg-white/20 text-white' : 'bg-amber-50 text-amber-600'}`}>
@@ -144,7 +144,7 @@ export default function DispatchModal({
             className={`p-2 rounded-xl text-xs font-bold text-left transition flex items-center gap-2 ${
               activeTier === 'level1'
                 ? 'bg-[#127694] text-white shadow-sm'
-                : 'bg-white text-slate-700 hover:text-[#0698c4] border border-[#9ae5fe]/60'
+                : 'bg-white text-slate-700 hover:text-[#0699C6] border border-[#bcecfc]/60'
             }`}
           >
             <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs shrink-0 ${activeTier === 'level1' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
@@ -163,10 +163,10 @@ export default function DispatchModal({
         {activeTier === 'level3' && (
           <div className="space-y-4">
             {/* Active LP Reasoning Banner */}
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#e5f6fd] to-[#f0faff] border border-[#9ae5fe]">
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#e5f6fd] to-[#f0faff] border border-[#bcecfc]">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs font-bold text-[#127694] flex items-center gap-1.5">
-                  <i className="fa-solid fa-microchip text-xs text-[#0698c4]"></i>
+                  <i className="fa-solid fa-microchip text-xs text-[#0699C6]"></i>
                   Level 3: Instantaneous 1-Second Receding-Horizon Control
                 </span>
                 <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-mono">
@@ -176,22 +176,22 @@ export default function DispatchModal({
               <p className="text-xs text-slate-700 leading-relaxed font-medium">
                 {explanationText}
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-2.5 border-t border-[#9ae5fe]/60 text-center font-mono">
-                <div className="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3 pt-2.5 border-t border-[#bcecfc]/60 text-center font-mono">
+                <div className="p-2 bg-white rounded-xl border border-[#bcecfc]/60">
                   <div className="text-[9px] font-bold text-slate-400 uppercase font-sans">Renewables Dispatched</div>
-                  <div className="text-sm font-black text-[#0698c4]">{totalRenewables.toFixed(1)} kW</div>
+                  <div className="text-sm font-black text-[#0699C6]">{totalRenewables.toFixed(1)} kW</div>
                 </div>
-                <div className="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+                <div className="p-2 bg-white rounded-xl border border-[#bcecfc]/60">
                   <div className="text-[9px] font-bold text-slate-400 uppercase font-sans">Battery Flow</div>
                   <div className={`text-sm font-black ${battChargeKw > 0.1 ? 'text-emerald-600' : 'text-[#127694]'}`}>
                     {battChargeKw > 0.1 ? `+${battChargeKw.toFixed(1)} kW` : (battDischargeKw > 0.1 ? `-${battDischargeKw.toFixed(1)} kW` : '0.0 kW')}
                   </div>
                 </div>
-                <div className="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+                <div className="p-2 bg-white rounded-xl border border-[#bcecfc]/60">
                   <div className="text-[9px] font-bold text-slate-400 uppercase font-sans">Generator Output</div>
                   <div className="text-sm font-black text-slate-800">{genOutputKw.toFixed(1)} kW</div>
                 </div>
-                <div className="p-2 bg-white rounded-xl border border-[#9ae5fe]/60">
+                <div className="p-2 bg-white rounded-xl border border-[#bcecfc]/60">
                   <div className="text-[9px] font-bold text-slate-400 uppercase font-sans">Spinning Reserve</div>
                   <div className="text-sm font-black text-emerald-600">+15.0 kW Margin</div>
                 </div>
@@ -200,22 +200,22 @@ export default function DispatchModal({
 
             {/* Source Mix Distribution Badges */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
-              <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="text-[9px] font-bold text-slate-400 uppercase">Solar PV</div>
                 <div className="text-lg font-black text-[#4499b3] my-0.5">{solarPct}%</div>
                 <div className="text-[10px] text-slate-500">{solarKw.toFixed(1)} kW active</div>
               </div>
-              <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="text-[9px] font-bold text-slate-400 uppercase">Wind Turbines</div>
-                <div className="text-lg font-black text-[#05c5ff] my-0.5">{windPct}%</div>
+                <div className="text-lg font-black text-[#05C5FF] my-0.5">{windPct}%</div>
                 <div className="text-[10px] text-slate-500">{windKw.toFixed(1)} kW active</div>
               </div>
-              <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="text-[9px] font-bold text-slate-400 uppercase">Battery Buffer</div>
                 <div className="text-lg font-black text-[#127694] my-0.5">{battPct}%</div>
                 <div className="text-[10px] text-slate-500">{battDischargeKw > 0.1 ? battDischargeKw.toFixed(1) : (battChargeKw > 0.1 ? `+${battChargeKw.toFixed(1)}` : '0.0')} kW</div>
               </div>
-              <div className="p-3 rounded-2xl bg-white border border-[#9ae5fe] shadow-xs">
+              <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
                 <div className="text-[9px] font-bold text-slate-400 uppercase">Diesel Gensets</div>
                 <div className="text-lg font-black text-slate-800 my-0.5">{genPct}%</div>
                 <div className="text-[10px] text-slate-500">{genOutputKw.toFixed(1)} kW active</div>
@@ -223,7 +223,7 @@ export default function DispatchModal({
             </div>
 
             {/* Live Flow Canvas */}
-            <div className="bg-[#f8fcfe] p-3 rounded-2xl border border-[#9ae5fe]">
+            <div className="bg-[#f8fcfe] p-3 rounded-2xl border border-[#bcecfc]">
               <EnergyFlowCanvas latestData={latestData} />
             </div>
 
@@ -256,9 +256,9 @@ export default function DispatchModal({
               </div>
 
               <div className="p-3 rounded-2xl bg-white border border-cyan-200 shadow-xs">
-                <div className="flex items-center justify-between text-xs font-bold text-[#0698c4] mb-1">
+                <div className="flex items-center justify-between text-xs font-bold text-[#0699C6] mb-1">
                   <span>Priority 3: Lighting</span>
-                  <span className="text-[9px] bg-[#c2f0fe] text-[#0698c4] px-2 py-0.5 rounded-full font-bold">
+                  <span className="text-[9px] bg-[#c2f0fe] text-[#0699C6] px-2 py-0.5 rounded-full font-bold">
                     Essential
                   </span>
                 </div>
@@ -297,7 +297,7 @@ export default function DispatchModal({
                   <button
                     type="button"
                     onClick={() => setRiskMode24h('P50')}
-                    className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold transition ${riskMode24h === 'P50' ? 'bg-[#127694] text-white' : 'text-slate-600 hover:text-[#0698c4]'}`}
+                    className={`px-2 py-0.5 rounded-lg text-[10px] font-extrabold transition ${riskMode24h === 'P50' ? 'bg-[#127694] text-white' : 'text-slate-600 hover:text-[#0699C6]'}`}
                   >
                     P50 Expected
                   </button>
@@ -333,7 +333,7 @@ export default function DispatchModal({
                 </div>
                 <div className="p-2 bg-white rounded-xl border border-amber-200/80 shadow-xs">
                   <div className="text-[9px] font-bold text-slate-400 uppercase font-sans">Ending BESS SoC</div>
-                  <div className="text-xs font-black text-[#0698c4]">
+                  <div className="text-xs font-black text-[#0699C6]">
                     {schedule24h?.soc_trajectory ? schedule24h.soc_trajectory[schedule24h.soc_trajectory.length - 1] : 68.5}%
                   </div>
                 </div>
@@ -341,15 +341,15 @@ export default function DispatchModal({
             </div>
 
             {/* 24-Hour Hourly MILP Schedule Table */}
-            <div className="overflow-x-auto rounded-2xl border border-[#9ae5fe] max-h-[380px]">
+            <div className="overflow-x-auto rounded-2xl border border-[#bcecfc] max-h-[380px]">
               {isLoading24h ? (
                 <div className="p-8 text-center text-xs text-slate-500">
-                  <i className="fa-solid fa-spinner fa-spin text-lg text-[#0698c4] mb-2 block"></i>
+                  <i className="fa-solid fa-spinner fa-spin text-lg text-[#0699C6] mb-2 block"></i>
                   <span>Solving 288-variable mixed-integer linear program in HiGHS...</span>
                 </div>
               ) : (
                 <table className="w-full text-xs text-left font-mono">
-                  <thead className="bg-[#f0faff] text-[#127694] font-bold border-b border-[#9ae5fe] sticky top-0 z-10 font-sans">
+                  <thead className="bg-[#f0faff] text-[#127694] font-bold border-b border-[#bcecfc] sticky top-0 z-10 font-sans">
                     <tr>
                       <th className="p-2">Hour</th>
                       <th className="p-2">Load</th>
@@ -378,14 +378,14 @@ export default function DispatchModal({
                             {row.u_gen2 ? `ON (${row.p_gen2_kw})` : 'OFF'}
                           </span>
                         </td>
-                        <td className="p-2 text-[#05c5ff] font-bold">{row.p_wind_kw}</td>
+                        <td className="p-2 text-[#05C5FF] font-bold">{row.p_wind_kw}</td>
                         <td className="p-2 text-[#4499b3]">{row.p_solar_kw}</td>
                         <td className="p-2">
                           <span className={row.p_bess_net_kw > 0 ? 'text-[#127694]' : (row.p_bess_net_kw < 0 ? 'text-emerald-600' : 'text-slate-400')}>
                             {row.p_bess_net_kw > 0 ? `-${row.p_bess_net_kw.toFixed(1)} dis` : (row.p_bess_net_kw < 0 ? `+${Math.abs(row.p_bess_net_kw).toFixed(1)} chg` : '0.0')}
                           </span>
                         </td>
-                        <td className="p-2 font-bold text-[#0698c4]">{row.battery_soc_pct}%</td>
+                        <td className="p-2 font-bold text-[#0699C6]">{row.battery_soc_pct}%</td>
                         <td className="p-2 text-slate-600">{row.q_chp_kwth}</td>
                         <td className="p-2 font-bold text-slate-800">{row.fuel_liters}</td>
                       </tr>
@@ -418,22 +418,22 @@ export default function DispatchModal({
 
               {/* 4 Macro Benchmarks */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 pt-2.5 border-t border-emerald-200/60 text-center">
-                <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] shadow-xs">
+                <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
                   <span className="text-[9px] font-bold text-slate-400 uppercase block">Annual Fuel Saved</span>
                   <div className="text-lg font-black text-emerald-600">118,994 L</div>
                   <span className="text-[9px] text-slate-500 font-bold">-25.2% vs Baseline</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] shadow-xs">
+                <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
                   <span className="text-[9px] font-bold text-slate-400 uppercase block">Delivered Cost Saved</span>
                   <div className="text-lg font-black text-[#127694]">$356,982 USD</div>
                   <span className="text-[9px] text-slate-500">$3.00/L logistics cost</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] shadow-xs">
+                <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
                   <span className="text-[9px] font-bold text-slate-400 uppercase block">Tank Margin</span>
-                  <div className="text-lg font-black text-[#0698c4]">+52,895 L</div>
+                  <div className="text-lg font-black text-[#0699C6]">+52,895 L</div>
                   <span className="text-[9px] text-rose-600 font-bold">Baseline dry (-66,098 L)</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] shadow-xs">
+                <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
                   <span className="text-[9px] font-bold text-slate-400 uppercase block">Emissions Avoided</span>
                   <div className="text-lg font-black text-emerald-600">318.9 Tonnes</div>
                   <span className="text-[9px] text-slate-500 font-bold">68.2% Green Share</span>
@@ -442,8 +442,8 @@ export default function DispatchModal({
             </div>
 
             {/* Sizing Sweep Payback Table */}
-            <div className="rounded-2xl border border-[#9ae5fe] overflow-hidden">
-              <div className="p-2.5 bg-[#f0faff] border-b border-[#9ae5fe] flex items-center justify-between text-xs">
+            <div className="rounded-2xl border border-[#bcecfc] overflow-hidden">
+              <div className="p-2.5 bg-[#f0faff] border-b border-[#bcecfc] flex items-center justify-between text-xs">
                 <span className="font-extrabold text-[#127694]">Infrastructure Sizing Sweeps &amp; CapEx Payback</span>
                 <span className="text-[10px] text-slate-500">Delivered Fuel Cost: $3.00/L</span>
               </div>
@@ -477,7 +477,7 @@ export default function DispatchModal({
                     <td className="p-2">200 kW / 60 kW / 400 kWh</td>
                     <td className="p-2 font-bold text-emerald-600">192,829 L ($578K)</td>
                     <td className="p-2 font-mono text-slate-800">$350,000</td>
-                    <td className="p-2 font-bold text-[#0698c4]">1.58 Years</td>
+                    <td className="p-2 font-bold text-[#0699C6]">1.58 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-emerald-50/50">
                     <td className="p-2 font-bold text-emerald-900">Double All Renewables</td>
@@ -493,14 +493,14 @@ export default function DispatchModal({
             {/* Strategic Target Guidelines */}
             <div className="p-3 bg-white rounded-2xl border border-slate-200 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
               <span className="flex items-center gap-1.5">
-                <i className="fa-solid fa-bullseye text-[#0698c4]"></i>
+                <i className="fa-solid fa-bullseye text-[#0699C6]"></i>
                 Level 1 Targets Passed to Level 2: <strong>966.1 L/day Fuel Cap · 20% Min SoC · 15 kW Spinning Reserve</strong>
               </span>
               <a
                 href="/api/analytics/report"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[10px] font-bold text-[#0698c4] hover:text-[#05c5ff] flex items-center gap-1"
+                className="text-[10px] font-bold text-[#0699C6] hover:text-[#05C5FF] flex items-center gap-1"
               >
                 <span>View Full Report</span>
                 <i className="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>

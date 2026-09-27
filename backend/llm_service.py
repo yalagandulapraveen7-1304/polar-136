@@ -25,7 +25,7 @@ class GroqAIService:
         if self.api_key and not self.api_key.startswith("YOUR_"):
             try:
                 from groq import Groq
-                self.client = Groq(api_key=self.api_key)
+                self.client = Groq(api_key=self.api_key, timeout=3.0)
                 # Auto-detect available model
                 try:
                     available = [m.id for m in self.client.models.list().data]
@@ -85,7 +85,8 @@ Provide EXACTLY ONE authoritative, technical sentence explaining why this specif
                     ],
                     model=self.active_model,
                     temperature=0.2,
-                    max_tokens=350
+                    max_tokens=350,
+                    timeout=3.0
                 )
                 raw_content = chat_completion.choices[0].message.content
                 content = self._clean_response(raw_content)

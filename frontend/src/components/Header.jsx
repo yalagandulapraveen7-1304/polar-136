@@ -29,12 +29,12 @@ export default function Header({
       <div className="flex items-center justify-between w-full flex-wrap gap-2">
         {/* Brand Identity & System Tag */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
             <i className="fa-solid fa-snowflake text-sm text-white"></i>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-extrabold tracking-tight text-lg text-[#127694] leading-none">POLAR EMS</span>
-            <span className="text-[10px] tracking-wider uppercase font-bold px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4] border border-[#9ae5fe]">
+            <span className="text-[10px] tracking-wider uppercase font-bold px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc]">
               MISSION CONTROL
             </span>
           </div>
@@ -45,16 +45,16 @@ export default function Header({
           <button
             type="button"
             onClick={() => setIsStationMenuOpen(!isStationMenuOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#9ae5fe] transition text-[#127694] font-bold text-xs shadow-sm"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#bcecfc] transition text-[#127694] font-bold text-xs shadow-sm"
           >
-            <i className="fa-solid fa-location-dot text-[#0698c4]"></i>
+            <i className="fa-solid fa-location-dot text-[#0699C6]"></i>
             <span>Station:</span>
             <span className="text-slate-900 font-extrabold uppercase">{currentStation.name.split(' ')[0]}</span>
             <i className={`fa-solid fa-chevron-down text-[10px] transition-transform duration-200 ${isStationMenuOpen ? 'rotate-180' : ''}`}></i>
           </button>
 
           {isStationMenuOpen && (
-            <div className="absolute left-0 mt-1.5 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-[#9ae5fe] p-1.5 z-50 animate-fadeIn">
+            <div className="absolute left-0 mt-1.5 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-[#bcecfc] p-1.5 z-50 animate-fadeIn">
               <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1">
                 Antarctic Research Bases
               </div>
@@ -69,7 +69,7 @@ export default function Header({
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition ${
                     stationId === st.id
                       ? 'bg-[#127694] text-white font-bold'
-                      : 'text-slate-700 hover:bg-[#e5f6fd] hover:text-[#0698c4]'
+                      : 'text-slate-700 hover:bg-[#e5f6fd] hover:text-[#0699C6]'
                   }`}
                 >
                   <div className="flex flex-col">
@@ -86,7 +86,7 @@ export default function Header({
         </div>
 
         {/* Operational Mode Toggle: DEMO vs SCADA */}
-        <div className="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+        <div className="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#bcecfc]">
           <button
             type="button"
             className={`mode-pill ${mode === 'DEMO_MODE' ? 'active' : ''}`}
@@ -115,7 +115,7 @@ export default function Header({
         </div>
 
         {/* Center / Action Pills for Modals */}
-        <nav className="hidden lg:flex items-center gap-1 bg-white/80 p-1 rounded-full border border-[#9ae5fe]/60 shadow-inner">
+        <nav className="hidden lg:flex items-center gap-1 bg-white/80 p-1 rounded-full border border-[#bcecfc]/60 shadow-inner">
           <button
             className="nav-pill active"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -123,7 +123,7 @@ export default function Header({
             <i className="fa-solid fa-table-cells-large text-xs"></i> Overview
           </button>
           <button
-            className="nav-pill text-[#127694] hover:text-[#0698c4]"
+            className="nav-pill text-[#127694] hover:text-[#0699C6]"
             onClick={() => onOpenModal('monitoring')}
           >
             <i className="fa-solid fa-chart-pie text-xs"></i> Monitor
@@ -165,6 +165,13 @@ export default function Header({
             <i className="fa-solid fa-robot text-xs"></i> AI Copilot
           </button>
           <button
+            className="nav-pill text-rose-700 hover:text-rose-800"
+            onClick={() => onOpenModal('alerts')}
+            title="Real-Time SCADA Alerts & Compound Risk Intelligence"
+          >
+            <i className="fa-solid fa-triangle-exclamation text-xs text-rose-600"></i> Alerts
+          </button>
+          <button
             className="nav-pill"
             onClick={() => onOpenModal('maintenance')}
           >
@@ -191,7 +198,7 @@ export default function Header({
           </div>
 
           <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-            <div className="w-7 h-7 rounded-full bg-slate-800 text-cyan-300 flex items-center justify-center font-bold text-[10px] ring-2 ring-[#0698c4]/40 shadow-sm" title="Cmdr. E. Vance · SIH Lead">
+            <div className="w-7 h-7 rounded-full bg-slate-800 text-cyan-300 flex items-center justify-center font-bold text-[10px] ring-2 ring-[#0699C6]/40 shadow-sm" title="Cmdr. E. Vance · SIH Lead">
               EV
             </div>
             <div className="hidden xl:flex flex-col text-left">
