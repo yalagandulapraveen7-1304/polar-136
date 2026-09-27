@@ -158,12 +158,12 @@ class SystemEventLogger:
                             ) VALUES (?, ?, ?, ?, ?, ?, ?)
                         """, (
                             ts,
-                            inv.get("rule_id"),
-                            inv.get("severity"),
-                            inv.get("title"),
-                            inv.get("original_val"),
-                            inv.get("clamped_val"),
-                            inv.get("reason")
+                            inv.get("rule_id", "RULE-OVERRIDE"),
+                            inv.get("severity") or inv.get("tier") or "WARNING",
+                            inv.get("title", "Guardrail Intervention"),
+                            inv.get("original_val", ""),
+                            inv.get("clamped_val", ""),
+                            inv.get("reason", "")
                         ))
 
                     # Log AI explanation

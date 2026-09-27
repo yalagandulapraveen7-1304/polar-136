@@ -11,222 +11,297 @@ export default function MetricCards({
   const d = latestData?.dispatch || {};
   const h = latestData?.hardware_health || {};
 
-  const stationInfo = STATIONS[stationId] || STATIONS.BHARATI;
+  const stationInfo = STATIONS[stationId] || STATIONS.MAITRI;
 
-  // Battery calculations
+  // 1. Battery Reserve Calculations
   const soc = activeOverrides?.battery_soc_pct !== undefined && activeOverrides?.battery_soc_pct !== null
     ? parseFloat(activeOverrides.battery_soc_pct)
-    : (t.battery_soc_pct !== undefined && t.battery_soc_pct !== null ? t.battery_soc_pct : 76.5);
+    : (t.battery_soc_pct !== undefined && t.battery_soc_pct !== null ? t.battery_soc_pct : 77.0);
 
-  const battReserve = activeOverrides?.battery_reserve_pct !== undefined && activeOverrides?.battery_reserve_pct !== null
+  const reserveFloor = activeOverrides?.battery_reserve_pct !== undefined && activeOverrides?.battery_reserve_pct !== null
     ? parseFloat(activeOverrides.battery_reserve_pct)
-    : (t.battery_reserve_pct !== undefined && t.battery_reserve_pct !== null ? t.battery_reserve_pct : 20.0);
+    : 20.0;
 
-  const battTemp = t.battery_temp_c !== undefined ? t.battery_temp_c : -6.1;
-  const battDischargeKw = d.p_battery_discharge_kw || 0.0;
-  const battChargeKw = d.p_battery_charge_kw || 0.0;
-  const battRateKw = d.p_battery_kw !== undefined
-    ? d.p_battery_kw
-    : (battDischargeKw > 0 ? battDischargeKw : (battChargeKw > 0 ? -battChargeKw : 0.0));
+  const battTemp = t.battery_temp_c !== undefined ? t.battery_temp_c : 6.5;
+  const battDischargeKw = d.p_battery_discharge_kw || (d.p_battery_kw > 0 ? d.p_battery_kw : 0.0);
+  const battChargeKw = d.p_battery_charge_kw || (d.p_battery_kw < 0 ? -d.p_battery_kw : 0.0);
 
-  let battStatusText = 'Buffer Standby';
-  let battStatusClass = 'text-[9px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full';
+  let battFlowStatus = 'Buffer Standby';
+  let battFlowClass = 'text-slate-600 bg-slate-100';
+  let battFlowRate = '0.0 kW';
 
-  if (battChargeKw > 0.5 || battRateKw < -0.5) {
-    battStatusText = 'Charging';
-    battStatusClass = 'text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200';
-  } else if (battDischargeKw > 0.5 || battRateKw > 0.5) {
-    battStatusText = 'Discharging';
-    battStatusClass = 'text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full';
+  if (battChargeKw > 0.5) {
+    battFlowStatus = 'Charging';
+    battFlowClass = 'text-emerald-700 bg-emerald-50 border border-emerald-200';
+    battFlowRate = `+${battChargeKw.toFixed(1)} kW`;
+  } else if (battDischargeKw > 0.5) {
+    battFlowStatus = 'Discharging';
+    battFlowClass = 'text-[#0698c4] bg-[#c2f0fe] border border-[#9ae5fe]';
+    battFlowRate = `-${battDischargeKw.toFixed(1)} kW`;
   }
 
-  let rateStr = '0.00 kW';
-  if (battChargeKw > 0.1) {
-    rateStr = `+${battChargeKw.toFixed(2)} kW`;
-  } else if (battDischargeKw > 0.1) {
-    rateStr = `-${battDischargeKw.toFixed(2)} kW`;
-  }
+  const battHealth = h.bess_thermal_health_pct !== undefined ? h.bess_thermal_health_pct : 96;
 
-  // Diesel fuel calculations
-  const fuelLiters = t.diesel_fuel_liters !== undefined ? t.diesel_fuel_liters : 4477;
-  const maxFuel = stationInfo.fuelCapacity || 60000.0;
-  const fuelPct = Math.min(100, Math.max(0, (fuelLiters / maxFuel) * 100));
-  const genOutputKw = (d.p_diesel_1_kw || 0) + (d.p_diesel_2_kw || 0);
-  const burnRate = t.fuel_burn_rate_lh !== undefined ? t.fuel_burn_rate_lh : (genOutputKw * 0.26);
-  const autonomyDays = burnRate > 0.05 ? Math.min(60, fuelLiters / (burnRate * 24)) : 26.6;
+  // 2. Current Station Load Calculations
+  const rawLoad = t.station_load_kwe !== undefined ? t.station_load_kwe : (t.load_elec_kw !== undefined ? t.load_elec_kw : stationInfo.baseLoad);
+  const loadMult = activeOverrides?.load_multiplier || 1.0;
+  const currentLoadKw = Math.round(rawLoad * loadMult);
+  const peakLoadKw = stationInfo.peakLoad || 457.0;
+  const loadPctOfPeak = Math.min(100, Math.round((currentLoadKw / peakLoadKw) * 100));
 
-  const isGenRunning = genOutputKw > 0.1;
+  // 3. Renewable Generation Calculations
+  const windKw = d.p_wind_kw !== undefined ? d.p_wind_kw : 218.0;
+  const solarKw = d.p_solar_kw !== undefined ? d.p_solar_kw : 68.0;
+  const totalRenewablesKw = Math.round(windKw + solarKw);
+  const totalGenKw = totalRenewablesKw + (d.p_diesel_1_kw || 0) + (d.p_diesel_2_kw || 0) + battDischargeKw;
+  const renewablePct = totalGenKw > 0 ? Math.min(100, Math.round((totalRenewablesKw / totalGenKw) * 100)) : 69;
 
-  // Health
-  const deviceHealth = h.overall_score_pct !== undefined ? h.overall_score_pct : 84;
+  // 4. Environmental Conditions Calculations
+  const tempC = activeOverrides?.ambient_temp_c !== undefined
+    ? activeOverrides.ambient_temp_c
+    : (t.ambient_temp_c !== undefined ? t.ambient_temp_c : -42.0);
+
+  const windMs = activeOverrides?.wind_speed_ms !== undefined
+    ? activeOverrides.wind_speed_ms
+    : (t.wind_speed_ms !== undefined ? t.wind_speed_ms : 25.9);
+
+  const solarIrr = activeOverrides?.solar_irradiance_wm2 !== undefined
+    ? activeOverrides.solar_irradiance_wm2
+    : (t.solar_irradiance_wm2 !== undefined ? t.solar_irradiance_wm2 : 131.0);
+
+  const isCutoutActive = windMs >= 25.0;
+  const isPolarNight = solarIrr <= 0.0;
+  const weatherLabel = isCutoutActive ? 'Cat-3 Blizzard Gale' : (tempC < -35 ? 'Extreme Polar Cold' : 'Nominal Polar Winds');
 
   return (
-    <div className="lg:col-span-4 xl:col-span-3 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-3.5 sm:gap-4 lg:gap-5">
-      {/* CARD R1: Station Battery & Reserve */}
-      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
-                <i className="fa-solid fa-car-battery text-xs"></i>
-              </div>
-              <span className="font-bold text-xs text-[#127694]">Station Battery & Reserve</span>
-            </div>
-            <span id="batteryStatusSub" className={battStatusClass}>
-              {battStatusText}
-            </span>
-          </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 w-full">
 
-          <div className="flex items-baseline justify-between my-2">
-            <div className="flex items-baseline gap-2">
-              <span id="batterySocBig" className="text-2xl font-black text-slate-800">{Math.round(soc)}%</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Current SoC</span>
+      {/* 1. BATTERY RESERVE GAUGE CARD */}
+      {/* 1. BATTERY RESERVE GAUGE CARD (Section 4 Battery Management) */}
+      <div
+        onClick={() => onOpenModal('battery')}
+        className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0faff] cursor-pointer hover:border-[#0698c4] hover:shadow-md transition group"
+        title="Click to open Battery Management & Storage Sizing Center"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center font-bold text-xs group-hover:scale-105 transition-transform">
+              <i className="fa-solid fa-car-battery"></i>
             </div>
-            <span className="text-xs font-semibold text-slate-400">
-              Capacity: <strong id="batteryCapacityKwh" className="text-slate-700">{stationInfo.batteryCapacity} kWh</strong>
+            <span className="font-extrabold text-xs text-[#127694] tracking-tight uppercase">Battery Storage</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+              latestData?.battery_management?.safety_state_machine?.state === 'LOCKOUT'
+                ? 'bg-rose-100 text-rose-800 border border-rose-300 animate-pulse'
+                : latestData?.battery_management?.safety_state_machine?.state === 'COLD_DERATING'
+                ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+            }`}>
+              {latestData?.battery_management?.safety_state_machine?.label || 'SAFE'}
+            </span>
+            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${battFlowClass}`}>
+              {battFlowStatus}
             </span>
           </div>
         </div>
 
-        {/* Cylinder Battery Bar */}
-        <div className="space-y-1.5 my-2">
-          <div className="cylinder-battery-container">
-            <div
-              id="batteryFillBar"
-              className="cylinder-battery-fill"
-              style={{ width: `${Math.min(100, Math.max(5, soc))}%` }}
-            >
-              <span id="batteryPctText" className="battery-pct-label">{Math.round(soc)}%</span>
+        {/* Big Number & Telemetry */}
+        <div className="my-2.5">
+          <div className="flex items-baseline justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl font-black text-slate-800 tracking-tight">{Math.round(soc)}%</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase">SoC</span>
+            </div>
+            <div className="text-right">
+              <span className="font-mono text-xs font-bold text-[#0698c4]">{battFlowRate}</span>
+              <div className="text-[9px] text-slate-400 font-semibold">
+                {latestData?.battery_management?.capacities?.usable_energy_above_reserve_kwh || 185} kWh usable
+              </div>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-slate-500">
-            <span>Cell Temp: <strong id="batteryCellTemp">{battTemp.toFixed(1)}°C</strong></span>
-            <span className="flex items-center gap-1">
-              Protected Floor: <strong id="batteryReservePctText" className="text-[#127694] font-black">{Math.round(battReserve)}% Reserve</strong>
-              <button
-                type="button"
-                id="btnQuickAdjustReserve"
-                title="Adjust protected battery reserve floor"
-                onClick={() => onOpenModal('manual')}
-                className="text-[9px] font-bold text-[#0698c4] hover:text-[#05c5ff] bg-[#e0f7fe] hover:bg-[#c2f0fe] px-1.5 py-0.5 rounded transition"
+
+          {/* Visual Cylinder Battery Gauge with Protected Floor */}
+          <div className="relative mt-2">
+            <div className="cylinder-battery-container">
+              <div
+                className={`cylinder-battery-fill ${
+                  latestData?.battery_management?.safety_state_machine?.state === 'LOCKOUT'
+                    ? 'bg-rose-500'
+                    : soc <= 25
+                    ? 'bg-amber-500'
+                    : ''
+                }`}
+                style={{ width: `${Math.min(100, Math.max(5, soc))}%` }}
               >
-                Manual
-              </button>
-            </span>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-          <span>Rate: <strong id="batteryRateKw" className="text-[#0698c4]">{rateStr}</strong></span>
-          <span>LiFePO4 Thermal Pack</span>
-        </div>
-      </div>
-
-      {/* CARD R2: Diesel Fuel Reserves & Generator */}
-      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
-                <i className="fa-solid fa-gas-pump text-xs"></i>
+                <span className="battery-pct-label">{Math.round(soc)}%</span>
               </div>
-              <span className="font-bold text-xs text-[#127694]">Diesel Fuel & Gen-Set</span>
             </div>
-            <span
-              id="genStatusBadge"
-              className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                isGenRunning
-                  ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                  : 'text-slate-600 bg-slate-100 border-slate-200'
-              }`}
-            >
-              {isGenRunning ? 'GEN RUNNING' : 'GEN STANDBY'}
-            </span>
-          </div>
-
-          <div className="flex items-baseline justify-between my-2">
-            <span id="valFuelLitersBig" className="text-2xl font-black text-slate-800">
-              {Math.round(fuelLiters).toLocaleString()} L
-            </span>
-            <span id="valFuelPctText" className="text-xs font-bold text-[#0698c4]">
-              {Math.round(fuelPct)}% Capacity
-            </span>
-          </div>
-        </div>
-
-        {/* Fuel Progress Bar */}
-        <div className="space-y-1.5 my-2">
-          <div className="w-full h-2 rounded-full bg-[#e5f6fd] overflow-hidden border border-[#9ae5fe]/60">
+            {/* 20% Reserve Floor Marker */}
             <div
-              id="fuelProgressFill"
-              className="h-full bg-gradient-to-r from-[#0698c4] to-[#05c5ff] rounded-full transition-all duration-500"
-              style={{ width: `${fuelPct}%` }}
+              className="absolute top-0 bottom-0 border-r-2 border-dashed border-rose-500 z-10 pointer-events-none"
+              style={{ left: `${reserveFloor}%` }}
+              title="20% Protected Reserve Floor"
             ></div>
           </div>
-          <div className="flex items-center justify-between text-[10px] text-slate-500">
-            <span>Burn Rate: <strong id="valFuelBurnRate">{burnRate.toFixed(2)} L/h</strong></span>
-            <span>Efficiency: <strong id="valGenEfficiency" className="text-[#0698c4]">85%</strong></span>
+        </div>
+
+        {/* Footer Meta: Health & Limits */}
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+          <span className="text-slate-500 font-medium">
+            Core: <strong className={battTemp <= -35 ? 'text-rose-600 font-black' : battTemp <= -20 ? 'text-amber-600 font-bold' : 'text-slate-700'}>
+              {battTemp > 0 ? `+${battTemp.toFixed(1)}` : battTemp.toFixed(1)}°C
+            </strong>
+          </span>
+          <span className="text-slate-500 font-medium">
+            Health: <strong className="text-emerald-600">{battHealth}%</strong>
+          </span>
+          <span className="text-slate-500 font-medium flex items-center gap-1 text-[#0698c4] font-bold">
+            <span>Sizing &amp; Derating</span>
+            <i className="fa-solid fa-arrow-up-right-from-square text-[8px]"></i>
+          </span>
+        </div>
+      </div>
+
+      {/* 2. CURRENT LOAD CARD */}
+      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f7fcfe]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+              <i className="fa-solid fa-bolt"></i>
+            </div>
+            <span className="font-extrabold text-xs text-[#127694] tracking-tight uppercase">Current Load</span>
+          </div>
+          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+            {loadPctOfPeak}% Peak
+          </span>
+        </div>
+
+        <div className="my-2.5">
+          <div className="flex items-baseline justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl font-black text-slate-800 tracking-tight">{currentLoadKw}</span>
+              <span className="text-xs font-bold text-slate-400">kW</span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-bold text-emerald-600">+3.2%</span>
+              <div className="text-[9px] text-slate-400 font-semibold">Load Trend</div>
+            </div>
+          </div>
+
+          {/* Progress bar towards peak */}
+          <div className="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-indigo-600 transition-all duration-500"
+              style={{ width: `${Math.min(100, (currentLoadKw / peakLoadKw) * 100)}%` }}
+            ></div>
           </div>
         </div>
 
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-          <span>Gen Output: <strong id="valGenKw" className="text-slate-700">{genOutputKw.toFixed(1)} kW</strong></span>
-          <span>Autonomy: <strong id="valFuelDaysRight" className="text-[#127694]">{autonomyDays.toFixed(1)} Days</strong></span>
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+          <span className="text-slate-500 font-medium">
+            Peak: <strong className="text-slate-800">{peakLoadKw} kW</strong>
+          </span>
+          <span className="text-slate-500 font-medium">
+            Life Support: <strong className="text-rose-600">20 kW Inviolable</strong>
+          </span>
         </div>
       </div>
 
-      {/* CARD R3: Station Health & Contingency Manual Override */}
-      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <div className="w-6 h-6 rounded-lg bg-[#c2f0fe] text-[#0698c4] flex items-center justify-center">
-                <i className="fa-solid fa-shield-halved text-xs"></i>
-              </div>
-              <span className="font-bold text-xs text-[#127694]">Station Health & Controls</span>
+      {/* 3. RENEWABLE GENERATION CARD */}
+      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0fdf4]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
+              <i className="fa-solid fa-leaf"></i>
             </div>
-            <button
-              id="btnOpenMaintenanceDirect"
-              type="button"
-              onClick={() => onOpenModal('maintenance')}
-              className="text-[9px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full hover:bg-[#9ae5fe] transition"
-            >
-              Diagnostics ➔
-            </button>
+            <span className="font-extrabold text-xs text-[#127694] tracking-tight uppercase">Renewables</span>
+          </div>
+          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            {renewablePct}% Share
+          </span>
+        </div>
+
+        <div className="my-2.5">
+          <div className="flex items-baseline justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl font-black text-slate-800 tracking-tight">{totalRenewablesKw}</span>
+              <span className="text-xs font-bold text-slate-400">kW</span>
+            </div>
+            <div className="text-right">
+              <span className="font-mono text-xs font-bold text-slate-600">Wind + Solar</span>
+              <div className="text-[9px] text-slate-400 font-semibold">Active Supply</div>
+            </div>
           </div>
 
-          {/* Health Score & Comms */}
-          <div className="space-y-2 my-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500">Device Health Score:</span>
-              <span id="valDeviceHealth" className="font-black text-emerald-600">{deviceHealth}% (Optimal)</span>
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="p-1 rounded-lg bg-[#e5f6fd] text-center border border-[#9ae5fe]/60">
+              <span className="text-[9px] font-bold text-[#0698c4]">Wind: {Math.round(windKw)} kW</span>
             </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500">Satellite Telemetry:</span>
-              <span id="valCommStatus" className="font-bold text-[#0698c4] flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-500">Active Polar Crew:</span>
-              <span id="valCrewCount" className="font-bold text-slate-700">{stationInfo.crew} Personnel</span>
+            <div className="p-1 rounded-lg bg-amber-50 text-center border border-amber-200">
+              <span className="text-[9px] font-bold text-amber-700">Solar: {Math.round(solarKw)} kW</span>
             </div>
           </div>
         </div>
 
-        {/* Open Manual Override Modal Button */}
-        <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
-          <button
-            id="btnTriggerModalSecondary"
-            type="button"
-            onClick={() => onOpenModal('manual')}
-            className="w-full py-2 px-3 rounded-xl text-xs font-bold border border-[#9ae5fe] bg-white hover:bg-[#f0faff] text-[#127694] transition flex items-center justify-center gap-2 shadow-sm"
-          >
-            <i className="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
-            <span>Inject Contingency / Override</span>
-          </button>
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+          <span className="text-slate-500 font-medium">
+            Albedo Gain: <strong className="text-amber-600">+20% Snow</strong>
+          </span>
+          <span className="text-slate-500 font-medium">
+            Curtailment: <strong className="text-slate-700">0.0 kW</strong>
+          </span>
         </div>
       </div>
+
+      {/* 4. ENVIRONMENTAL CONDITIONS CARD */}
+      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#eff6ff]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-xs">
+              <i className="fa-solid fa-temperature-arrow-down"></i>
+            </div>
+            <span className="font-extrabold text-xs text-[#127694] tracking-tight uppercase">Environment</span>
+          </div>
+          {isCutoutActive ? (
+            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 animate-pulse">
+              Gale Cut-out
+            </span>
+          ) : (
+            <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
+              {weatherLabel}
+            </span>
+          )}
+        </div>
+
+        <div className="my-2.5">
+          <div className="flex items-baseline justify-between">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-3xl font-black text-slate-800 tracking-tight">{tempC.toFixed(1)}°</span>
+              <span className="text-xs font-bold text-slate-400">C</span>
+            </div>
+            <div className="text-right">
+              <span className="font-mono text-xs font-bold text-slate-800">{windMs.toFixed(1)} m/s</span>
+              <div className="text-[9px] text-slate-400 font-semibold">Wind Velocity</div>
+            </div>
+          </div>
+
+          <div className="w-full mt-2 flex items-center justify-between text-[11px] font-mono bg-slate-50 p-1.5 rounded-lg border border-slate-100">
+            <span className="text-slate-500">Solar Irradiance:</span>
+            <span className="font-bold text-slate-800">{solarIrr.toFixed(0)} W/m²</span>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+          <span className="text-slate-500 font-medium">
+            Cut-out Limit: <strong className="text-slate-700">25.0 m/s</strong>
+          </span>
+          <span className="text-slate-500 font-medium">
+            Polar Night: <strong className={isPolarNight ? 'text-amber-600' : 'text-emerald-600'}>{isPolarNight ? 'Active' : 'Sunlit'}</strong>
+          </span>
+        </div>
+      </div>
+
     </div>
   );
 }

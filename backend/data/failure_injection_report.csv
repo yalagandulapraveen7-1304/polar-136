@@ -1,0 +1,4 @@
+scenario_name,feasible,diesel_capacity_kw,wind_capacity_kw,solar_capacity_kw,battery_capacity_kwh,failed_units,annual_fuel_optimized_l,annual_fuel_baseline_l,litres_saved,savings_pct,cost_saved_usd,co2_avoided_tonnes,recommended_tank_l,ran_out_before_resupply,pct_year_with_alert,reason
+no_failure_baseline,True,500.0,100.0,60.0,400.0,[],352628.0,471631.0,119003.0,25.2,357009.0,318.9,405522.0,False,37.5,
+genset_1_offline_full_year,False,200.0,100.0,60.0,400.0,,,,,,,,,,,Total capacity 280kW < peak load 457kW
+genset_2_offline_full_year,False,300.0,100.0,60.0,400.0,,,,,,,,,,,Total capacity 380kW < peak load 457kW

@@ -13,6 +13,12 @@ from pathlib import Path
 import httpx
 from typing import Dict, Any, Optional
 from backend.config import STATIONS
+from backend.schema.canonical import (
+    OperatingMode,
+    QualityFlag,
+    CanonicalTelemetrySnapshot,
+)
+from backend.simulation.polar_synth import PolarPhysicsSimulator
 
 OVERRIDE_STORE_PATH = Path(tempfile.gettempdir()) / "polarops_overrides.json"
 
@@ -41,6 +47,10 @@ class DataIngestionDriver:
         self.fault_battery_heater: bool = False
         self.override_battery_soc: Optional[float] = None
         self.battery_reserve_pct: float = 20.0
+
+        # Initialize Polar Physics Simulator for Mode A canonical telemetry
+        sim_mode = OperatingMode.SIMULATION if mode != "SCADA_MODE" else OperatingMode.LIVE
+        self.simulator = PolarPhysicsSimulator(station_id=station_id, mode=sim_mode)
 
         # Auto-restore active overrides across cold starts or serverless instances
         self._load_persisted_overrides()
@@ -78,10 +88,13 @@ class DataIngestionDriver:
         if station_id in STATIONS:
             self.station_id = station_id
             self.current_diesel_reserve = STATIONS[station_id]["diesel_fuel_reserve_liters"]
+            self.simulator.set_station(station_id)
 
     def set_mode(self, mode: str):
         if mode in ["DEMO_MODE", "SCADA_MODE"]:
             self.mode = mode
+            sim_mode = OperatingMode.SIMULATION if mode != "SCADA_MODE" else OperatingMode.LIVE
+            self.simulator.mode = sim_mode
 
     def apply_overrides(self, overrides: Dict[str, Any], persist: bool = True):
         """Commander manual injection sliders and fault toggles"""
@@ -116,6 +129,7 @@ class DataIngestionDriver:
         self.override_battery_soc = None
         self.current_battery_soc = 76.5
         self.battery_reserve_pct = 20.0
+        self.simulator.reset_overrides()
         try:
             if OVERRIDE_STORE_PATH.exists():
                 OVERRIDE_STORE_PATH.unlink(missing_ok=True)
@@ -345,4 +359,23 @@ class DataIngestionDriver:
             "scada_diagnostics": scada_diag
         }
         return standard_payload
+
+    def ingest_canonical(self) -> CanonicalTelemetrySnapshot:
+        """
+        Produces a strictly validated CanonicalTelemetrySnapshot according to the
+        Locked V1 Canonical Schema contract.
+        """
+        self._load_persisted_overrides()
+        self.simulator.set_overrides({
+            "ambient_temp_c": self.override_temp_c,
+            "wind_speed_ms": self.override_wind_ms,
+            "solar_irradiance_wm2": self.override_solar_wm2,
+            "load_multiplier": self.override_load_mult,
+            "battery_soc_pct": self.override_battery_soc,
+            "battery_reserve_pct": self.battery_reserve_pct,
+            "fault_genset_1": self.fault_genset_1,
+            "fault_battery_heater": self.fault_battery_heater,
+        })
+        return self.simulator.generate_snapshot()
+
 

@@ -2,16 +2,21 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Header from './components/Header';
 import HeroSection from './components/HeroSection';
 import MetricCards from './components/MetricCards';
+import PowerBalanceBanner from './components/PowerBalanceBanner';
 import BottomCards from './components/BottomCards';
 import ForecastFullModal from './modals/ForecastFullModal';
 import DispatchModal from './modals/DispatchModal';
 import CopilotModal from './modals/CopilotModal';
 import MaintenanceModal from './modals/MaintenanceModal';
 import ManualEntryModal from './modals/ManualEntryModal';
+import MonitoringModal from './modals/MonitoringModal';
+import BatteryModal from './modals/BatteryModal';
+import MicrogridModal from './modals/MicrogridModal';
+import WeatherModal from './modals/WeatherModal';
 import { STATIONS } from './constants/stations';
 
 export default function App() {
-  const [stationId, setStationId] = useState('BHARATI');
+  const [stationId, setStationId] = useState('MAITRI');
   const [mode, setMode] = useState('DEMO_MODE');
   const [currentScenario, setCurrentScenario] = useState('normal');
   const [clockTime, setClockTime] = useState('');
@@ -29,23 +34,23 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState([
     {
       time: '12:00:15',
-      station: 'Bharati',
+      station: 'Maitri',
       action: 'LP Dispatch Active',
-      reason: 'Optimal LP solution: 6.6kW renewable, 5.9kW battery buffer, 21.8kW generator',
+      reason: 'Optimal LP solution: 286 kW renewable, 76 kW battery buffer, 77 kW generator',
       tier: 'NORMAL'
     },
     {
       time: '11:58:30',
-      station: 'Bharati',
+      station: 'Maitri',
       action: 'Battery Reserve Check',
-      reason: 'LiFePO4 core at -8.6°C within heated thermal envelope. State of charge: 28%',
+      reason: 'LiFePO4 core at -8.6°C within heated thermal envelope. State of charge: 77%',
       tier: 'NORMAL'
     },
     {
       time: '11:55:00',
-      station: 'Bharati',
+      station: 'Maitri',
       action: 'Telemetry Handshake',
-      reason: 'FastAPI Render backend telemetry connection synchronized with satellite link',
+      reason: 'FastAPI SEMS telemetry stream synchronized via satellite link',
       tier: 'NORMAL'
     }
   ]);
@@ -110,7 +115,7 @@ export default function App() {
             // Handle Guardrail Interventions
             const g = payload.guardrail || {};
             if (g.interventions && g.interventions.length > 0) {
-              const stationName = STATIONS[stationId]?.name || 'Bharati';
+              const stationName = STATIONS[stationId]?.name || 'Maitri';
               const nowTime = new Date().toTimeString().substring(0, 8);
               setAuditLogs((prev) => {
                 let changed = false;
@@ -297,7 +302,7 @@ export default function App() {
 
   return (
     <div className="w-full max-w-[1600px] mx-auto p-3 sm:p-4 lg:p-5 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
-      {/* Floating Top Navigation Pill */}
+      {/* 1. Floating Top Navigation Pill */}
       <Header
         stationId={stationId}
         onStationChange={handleStationChange}
@@ -307,35 +312,68 @@ export default function App() {
         clockTime={clockTime}
       />
 
-      {/* Core Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 lg:gap-5">
-        {/* Left Column (Col Span 8 on lg, 9 on xl): Hero Section + 3 Bottom Cards */}
-        <div className="lg:col-span-8 xl:col-span-9 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
-          <HeroSection
-            stationId={stationId}
-            latestData={latestData}
-            onOpenModal={(modalName) => setActiveModal(modalName)}
-            activeOverrides={activeOverrides}
-          />
-          <BottomCards
-            latestData={latestData}
-            currentScenario={currentScenario}
-            onScenarioChange={handleScenarioChange}
-            onResetScenario={handleResetScenario}
-            onOpenModal={(modalName) => setActiveModal(modalName)}
-          />
-        </div>
+      {/* 2. Real-Time Operations Gauges (4 Live HUD Cards: Battery, Load, Renewables, Environment) */}
+      <MetricCards
+        stationId={stationId}
+        latestData={latestData}
+        activeOverrides={activeOverrides}
+        onOpenModal={(modalName) => setActiveModal(modalName)}
+      />
 
-        {/* Right Column (Col Span 4 on lg, 3 on xl): 3 Stacked Status Cards */}
-        <MetricCards
-          stationId={stationId}
-          latestData={latestData}
-          activeOverrides={activeOverrides}
-          onOpenModal={(modalName) => setActiveModal(modalName)}
-        />
-      </div>
+      {/* 2.5 Live Power Balance & Generation/Consumption Monitoring Banner (Section 3) */}
+      <PowerBalanceBanner
+        latestData={latestData}
+        onOpenMonitoring={() => setActiveModal('monitoring')}
+      />
+
+      {/* 3. Hero Section (Alert Banner + Central POLAR AI COPILOT + 6H/12H/24H Forecast + Energy Flow Matrix) */}
+      <HeroSection
+        stationId={stationId}
+        latestData={latestData}
+        onOpenModal={(modalName) => setActiveModal(modalName)}
+        activeOverrides={activeOverrides}
+        currentScenario={currentScenario}
+        onScenarioChange={handleScenarioChange}
+      />
+
+      {/* 4. Tactical Operations & Annual Strategic Impact KPIs */}
+      <BottomCards
+        latestData={latestData}
+        currentScenario={currentScenario}
+        onScenarioChange={handleScenarioChange}
+        onResetScenario={handleResetScenario}
+        onOpenModal={(modalName) => setActiveModal(modalName)}
+      />
 
       {/* Modals */}
+      <MonitoringModal
+        isOpen={activeModal === 'monitoring'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+      />
+
+      <BatteryModal
+        isOpen={activeModal === 'battery'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+      />
+
+      <MicrogridModal
+        isOpen={activeModal === 'microgrid'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+      />
+
+      <WeatherModal
+        isOpen={activeModal === 'weather'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+      />
+
       <ForecastFullModal
         isOpen={activeModal === 'forecast'}
         onClose={() => setActiveModal(null)}

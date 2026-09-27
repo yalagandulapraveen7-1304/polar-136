@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { STATIONS } from '../constants/stations';
 
 export default function Header({
   stationId,
@@ -6,318 +7,200 @@ export default function Header({
   mode,
   onModeChange,
   onOpenModal,
-  clockTime
+  clockTime,
+  connectionStatus = 'SATELLITE LINK ACTIVE'
 }) {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
+  const currentStation = STATIONS[stationId] || STATIONS.MAITRI;
 
-  // Close drawer on escape key
+  // Close dropdown on click outside
   useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape' && isDrawerOpen) {
-        setIsDrawerOpen(false);
+    function handleClickOutside(e) {
+      if (!e.target.closest('#stationDropdownContainer')) {
+        setIsStationMenuOpen(false);
       }
     }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isDrawerOpen]);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   return (
-    <header id="mainNavHeader" className="w-full floating-nav px-3.5 sm:px-5 py-2.5 z-30 relative transition-all duration-300">
-      <div className="flex items-center justify-between w-full">
-        {/* Brand Identity */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center shadow-sm shrink-0">
-            <i className="fa-solid fa-snowflake text-xs sm:text-sm text-white"></i>
+    <header id="mainNavHeader" className="w-full floating-nav px-4 py-2.5 z-40 relative transition-all duration-300">
+      <div className="flex items-center justify-between w-full flex-wrap gap-2">
+        {/* Brand Identity & System Tag */}
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0698c4] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
+            <i className="fa-solid fa-snowflake text-sm text-white"></i>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-extrabold tracking-tight text-base sm:text-lg text-[#127694] leading-none">NOVARA</span>
-            <span className="text-[9px] sm:text-[10px] tracking-wider uppercase font-bold px-1.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4]">POLAR EMS</span>
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold tracking-tight text-lg text-[#127694] leading-none">POLAR EMS</span>
+            <span className="text-[10px] tracking-wider uppercase font-bold px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0698c4] border border-[#9ae5fe]">
+              MISSION CONTROL
+            </span>
           </div>
         </div>
 
-        {/* Station Selector Pills (Visible on md+ tablets and desktop) */}
-        <div className="hidden md:flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+        {/* Station Selector Dropdown: "MAITRI ▼" */}
+        <div className="relative" id="stationDropdownContainer">
           <button
-            id="btn-bharati"
-            className={`station-pill ${stationId === 'BHARATI' ? 'active' : ''}`}
-            data-station="BHARATI"
-            onClick={() => onStationChange('BHARATI')}
+            type="button"
+            onClick={() => setIsStationMenuOpen(!isStationMenuOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#9ae5fe] transition text-[#127694] font-bold text-xs shadow-sm"
           >
-            Bharati
+            <i className="fa-solid fa-location-dot text-[#0698c4]"></i>
+            <span>Station:</span>
+            <span className="text-slate-900 font-extrabold uppercase">{currentStation.name.split(' ')[0]}</span>
+            <i className={`fa-solid fa-chevron-down text-[10px] transition-transform duration-200 ${isStationMenuOpen ? 'rotate-180' : ''}`}></i>
+          </button>
+
+          {isStationMenuOpen && (
+            <div className="absolute left-0 mt-1.5 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-[#9ae5fe] p-1.5 z-50 animate-fadeIn">
+              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1">
+                Antarctic Research Bases
+              </div>
+              {Object.values(STATIONS).map((st) => (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => {
+                    onStationChange(st.id);
+                    setIsStationMenuOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between transition ${
+                    stationId === st.id
+                      ? 'bg-[#127694] text-white font-bold'
+                      : 'text-slate-700 hover:bg-[#e5f6fd] hover:text-[#0698c4]'
+                  }`}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-bold">{st.name}</span>
+                    <span className={`text-[10px] ${stationId === st.id ? 'text-cyan-100' : 'text-slate-400'}`}>
+                      {st.locationText.split('•')[1] || st.locationText}
+                    </span>
+                  </div>
+                  {stationId === st.id && <i className="fa-solid fa-check text-xs text-white"></i>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Operational Mode Toggle: DEMO vs SCADA */}
+        <div className="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
+          <button
+            type="button"
+            className={`mode-pill ${mode === 'DEMO_MODE' ? 'active' : ''}`}
+            onClick={() => onModeChange('DEMO_MODE')}
+            title="Simulated high-resolution test harness"
+          >
+            DEMO
           </button>
           <button
-            id="btn-maitri"
-            className={`station-pill ${stationId === 'MAITRI' ? 'active' : ''}`}
-            data-station="MAITRI"
-            onClick={() => onStationChange('MAITRI')}
+            type="button"
+            className={`mode-pill ${mode === 'SCADA_MODE' ? 'active' : ''}`}
+            onClick={() => onModeChange('SCADA_MODE')}
+            title="Industrial PLC Modbus TCP registers (40001-40020)"
           >
-            Maitri
+            SCADA
           </button>
         </div>
 
-        {/* Center Navigation Links (Visible on lg+) */}
+        {/* System Status Pill: "● OPERATIONAL" */}
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+          <span>OPERATIONAL</span>
+          <span className="hidden xl:inline text-[10px] text-emerald-600 font-semibold border-l border-emerald-300 pl-2">
+            Balance: 0.00 kW residual
+          </span>
+        </div>
+
+        {/* Center / Action Pills for Modals */}
         <nav className="hidden lg:flex items-center gap-1 bg-white/80 p-1 rounded-full border border-[#9ae5fe]/60 shadow-inner">
           <button
             className="nav-pill active"
-            data-nav="overview"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <i className="fa-solid fa-table-cells-large text-xs"></i> Overview
           </button>
           <button
-            className="nav-pill"
-            id="navBtnForecast"
-            data-nav="forecast"
-            onClick={() => onOpenModal('forecast')}
+            className="nav-pill text-[#127694] hover:text-[#0698c4]"
+            onClick={() => onOpenModal('monitoring')}
           >
-            <i className="fa-solid fa-chart-line text-xs"></i> Forecast (Full)
+            <i className="fa-solid fa-chart-pie text-xs"></i> Monitor
+          </button>
+          <button
+            className="nav-pill text-emerald-700 hover:text-emerald-800"
+            onClick={() => onOpenModal('battery')}
+          >
+            <i className="fa-solid fa-car-battery text-xs text-emerald-600"></i> Storage
+          </button>
+          <button
+            className="nav-pill text-cyan-700 hover:text-cyan-800"
+            onClick={() => onOpenModal('microgrid')}
+          >
+            <i className="fa-solid fa-network-wired text-xs text-cyan-600"></i> Microgrid
+          </button>
+          <button
+            className="nav-pill text-sky-700 hover:text-sky-800"
+            onClick={() => onOpenModal('weather')}
+          >
+            <i className="fa-solid fa-cloud-bolt text-xs text-sky-600"></i> Weather
           </button>
           <button
             className="nav-pill"
-            id="navBtnDispatch"
-            data-nav="dispatch"
+            onClick={() => onOpenModal('forecast')}
+          >
+            <i className="fa-solid fa-chart-line text-xs"></i> Forecast
+          </button>
+          <button
+            className="nav-pill"
             onClick={() => onOpenModal('dispatch')}
           >
             <i className="fa-solid fa-code-fork text-xs"></i> Dispatch
           </button>
           <button
             className="nav-pill"
-            id="navBtnAssistant"
-            data-nav="assistant"
             onClick={() => onOpenModal('copilot')}
           >
-            <i className="fa-solid fa-robot text-xs"></i> Assistant
+            <i className="fa-solid fa-robot text-xs"></i> AI Copilot
           </button>
           <button
             className="nav-pill"
-            id="navBtnMaintenance"
-            data-nav="maintenance"
             onClick={() => onOpenModal('maintenance')}
           >
             <i className="fa-solid fa-shield-halved text-xs"></i> Maintenance
           </button>
-        </nav>
-
-        {/* Right Header Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Dual Mode Pill Toggle (Desktop & Tablet) */}
-          <div className="hidden sm:flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
-            <button
-              id="btn-mode-demo"
-              className={`mode-pill ${mode === 'DEMO_MODE' ? 'active' : ''}`}
-              title="Live NASA/Open-Meteo Antarctic Weather API"
-              onClick={() => onModeChange('DEMO_MODE')}
-            >
-              API
-            </button>
-            <button
-              id="btn-mode-scada"
-              className={`mode-pill ${mode === 'SCADA_MODE' ? 'active' : ''}`}
-              title="Modbus TCP / MQTT Registers"
-              onClick={() => onModeChange('SCADA_MODE')}
-            >
-              SCADA
-            </button>
-          </div>
-
-          {/* Manual Override Entry Button (Desktop & Tablet) */}
           <button
-            id="btnOpenManualModal"
-            className="hidden sm:flex text-[11px] font-bold text-[#127694] hover:text-[#0698c4] transition items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-[#9ae5fe] shadow-sm"
+            className="nav-pill text-amber-700 hover:text-amber-800"
             onClick={() => onOpenModal('manual')}
           >
-            <i className="fa-solid fa-sliders text-xs text-[#05c5ff]"></i>
-            <span>Manual Entry</span>
+            <i className="fa-solid fa-sliders text-xs text-amber-600"></i> Override
           </button>
+        </nav>
 
-          {/* Live UTC Station Clock (Desktop only) */}
-          <div className="hidden xl:flex items-center gap-1.5 text-slate-500 font-mono text-[10px] bg-white/90 px-3 py-1.5 rounded-full border border-[#9ae5fe]">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
-            <span id="stationClock">{clockTime || '2026-09-07 16:11:29 UTC'}</span>
+        {/* Live Antarctic Time & Operator Profile */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex flex-col text-right">
+            <span className="font-mono text-xs font-bold text-slate-800 tracking-tight">
+              {clockTime || 'ANTARCTIC UTC'}
+            </span>
+            <span className="text-[9px] font-semibold text-cyan-700 flex items-center gap-1 justify-end">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+              {connectionStatus}
+            </span>
           </div>
 
-          {/* Mobile Station Badge Pill (< md) */}
-          <div className="flex md:hidden items-center gap-0.5 bg-[#e5f6fd] p-0.5 rounded-full border border-[#9ae5fe] text-[10px]">
-            <button
-              id="btn-bharati-mobile-pill"
-              className={`station-pill-mini ${stationId === 'BHARATI' ? 'active' : ''}`}
-              data-station="BHARATI"
-              onClick={() => onStationChange('BHARATI')}
-            >
-              Bharati
-            </button>
-            <button
-              id="btn-maitri-mobile-pill"
-              className={`station-pill-mini ${stationId === 'MAITRI' ? 'active' : ''}`}
-              data-station="MAITRI"
-              onClick={() => onStationChange('MAITRI')}
-            >
-              Maitri
-            </button>
-          </div>
-
-          {/* BURGER BUTTON (Visible on mobile & tablet: < lg) */}
-          <button
-            id="btnBurgerMenu"
-            className="lg:hidden p-2 rounded-xl bg-white/95 hover:bg-[#e5f6fd] active:scale-95 border border-[#9ae5fe] text-[#127694] transition-all flex items-center justify-center shadow-sm"
-            aria-label="Toggle navigation menu"
-            aria-expanded={isDrawerOpen}
-            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-          >
-            <i
-              id="burgerIcon"
-              className={`fa-solid ${isDrawerOpen ? 'fa-xmark rotate-90' : 'fa-bars'} text-sm transition-transform duration-200`}
-            ></i>
-          </button>
-        </div>
-      </div>
-
-      {/* COLLAPSIBLE MOBILE & TABLET DRAWER */}
-      <div
-        id="mobileNavDrawer"
-        className={`mobile-drawer-overlay lg:hidden flex flex-col gap-3 p-3.5 sm:p-4 ${isDrawerOpen ? 'is-open' : ''}`}
-      >
-        {/* Navigation Grid: 2 columns on mobile, 3 columns on tablet */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          <button
-            type="button"
-            className="mobile-nav-btn active"
-            id="mobileNavOverview"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setIsDrawerOpen(false);
-            }}
-          >
-            <i className="fa-solid fa-table-cells-large text-base text-[#0698c4]"></i>
-            <span>Overview</span>
-          </button>
-          <button
-            type="button"
-            className="mobile-nav-btn"
-            id="mobileNavForecast"
-            onClick={() => {
-              onOpenModal('forecast');
-              setIsDrawerOpen(false);
-            }}
-          >
-            <i className="fa-solid fa-chart-line text-base text-[#0698c4]"></i>
-            <span>Full Forecast</span>
-          </button>
-          <button
-            type="button"
-            className="mobile-nav-btn"
-            id="mobileNavDispatch"
-            onClick={() => {
-              onOpenModal('dispatch');
-              setIsDrawerOpen(false);
-            }}
-          >
-            <i className="fa-solid fa-code-fork text-base text-[#0698c4]"></i>
-            <span>Dispatch Matrix</span>
-          </button>
-          <button
-            type="button"
-            className="mobile-nav-btn"
-            id="mobileNavAssistant"
-            onClick={() => {
-              onOpenModal('copilot');
-              setIsDrawerOpen(false);
-            }}
-          >
-            <i className="fa-solid fa-robot text-base text-[#0698c4]"></i>
-            <span>AI Assistant</span>
-          </button>
-          <button
-            type="button"
-            className="mobile-nav-btn"
-            id="mobileNavMaintenance"
-            onClick={() => {
-              onOpenModal('maintenance');
-              setIsDrawerOpen(false);
-            }}
-          >
-            <i className="fa-solid fa-shield-halved text-base text-[#0698c4]"></i>
-            <span>Maintenance</span>
-          </button>
-          <button
-            type="button"
-            className="mobile-nav-btn"
-            id="mobileNavManual"
-            onClick={() => {
-              onOpenModal('manual');
-              setIsDrawerOpen(false);
-            }}
-          >
-            <i className="fa-solid fa-sliders text-base text-[#05c5ff]"></i>
-            <span>Manual Entry</span>
-          </button>
-        </div>
-
-        {/* Quick Switch Bar for Station & Mode (Mobile & Tablet) */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-[#9ae5fe]/40">
-          <div className="flex items-center justify-between sm:justify-start gap-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Station:</span>
-            <div className="flex items-center gap-1 bg-[#e5f6fd] p-1 rounded-full border border-[#9ae5fe]">
-              <button
-                id="btn-bharati-mobile"
-                className={`station-pill ${stationId === 'BHARATI' ? 'active' : ''}`}
-                data-station="BHARATI"
-                onClick={() => {
-                  onStationChange('BHARATI');
-                  setIsDrawerOpen(false);
-                }}
-              >
-                Bharati
-              </button>
-              <button
-                id="btn-maitri-mobile"
-                className={`station-pill ${stationId === 'MAITRI' ? 'active' : ''}`}
-                data-station="MAITRI"
-                onClick={() => {
-                  onStationChange('MAITRI');
-                  setIsDrawerOpen(false);
-                }}
-              >
-                Maitri
-              </button>
+          <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+            <div className="w-7 h-7 rounded-full bg-slate-800 text-cyan-300 flex items-center justify-center font-bold text-[10px] ring-2 ring-[#0698c4]/40 shadow-sm" title="Cmdr. E. Vance · SIH Lead">
+              EV
             </div>
-          </div>
-
-          <div className="flex items-center justify-between sm:justify-start gap-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Stream:</span>
-            <div className="flex items-center bg-[#f0faff] p-0.5 rounded-full border border-[#9ae5fe]/80 text-[10px]">
-              <button
-                id="btn-mode-demo-mobile"
-                className={`mode-pill ${mode === 'DEMO_MODE' ? 'active' : ''}`}
-                onClick={() => {
-                  onModeChange('DEMO_MODE');
-                  setIsDrawerOpen(false);
-                }}
-              >
-                API Weather
-              </button>
-              <button
-                id="btn-mode-scada-mobile"
-                className={`mode-pill ${mode === 'SCADA_MODE' ? 'active' : ''}`}
-                onClick={() => {
-                  onModeChange('SCADA_MODE');
-                  setIsDrawerOpen(false);
-                }}
-              >
-                SCADA PLC
-              </button>
+            <div className="hidden xl:flex flex-col text-left">
+              <span className="text-[11px] font-bold text-slate-800 leading-none">Cmdr. Vance</span>
+              <span className="text-[9px] font-semibold text-slate-400">SIH Lead Op</span>
             </div>
           </div>
         </div>
 
-        {/* Mobile Clock & Live Status */}
-        <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono bg-white/80 px-3 py-1.5 rounded-xl border border-[#9ae5fe]/60">
-          <span className="flex items-center gap-1.5 font-sans font-semibold text-emerald-700">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
-            Microgrid Online
-          </span>
-          <span id="stationClockMobile">{clockTime || '--:--:-- UTC'}</span>
-        </div>
       </div>
     </header>
   );

@@ -1,284 +1,981 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Chart from 'chart.js/auto';
 
 export default function ForecastFullModal({ isOpen, onClose }) {
-  const [horizon, setHorizon] = useState('12m');
-  const chartCanvasRef = useRef(null);
-  const chartInstanceRef = useRef(null);
+  const [activeTab, setActiveTab] = useState('quantiles'); // 'quantiles' | 'deviation' | 'reserve' | 'benchmark' | 'mlops'
+  const [selectedTarget, setSelectedTarget] = useState('electrical_load_kw');
+  const [selectedHorizon, setSelectedHorizon] = useState('24H');
+  const [forecastData, setForecastData] = useState(null);
+  const [deviationData, setDeviationData] = useState(null);
+  const [reserveAdvisory, setReserveAdvisory] = useState(null);
+  const [benchmarkData, setBenchmarkData] = useState(null);
+  const [mlopsData, setMlopsData] = useState(null);
+  const [eventsData, setEventsData] = useState([]);
+  const [auditLogData, setAuditLogData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState(null);
 
-  // Horizon Data Definitions
-  const horizonConfig = {
-    '6h': {
-      peak: '44.5 kW',
-      minRen: '22.0 kW',
-      renFrac: '68%',
-      fuelBurn: '48 L',
-      insight: 'High katabatic wind speeds sustaining majority of electrical demand.',
-      labels: ['+1h', '+2h', '+3h', '+4h', '+5h', '+6h'],
-      demand: [39, 41, 42, 44, 43, 40],
-      wind: [42, 45, 46, 44, 43, 41],
-      solar: [2, 3, 2, 1, 0, 0]
-    },
-    '12h': {
-      peak: '44.5 kW',
-      minRen: '22.0 kW',
-      renFrac: '68%',
-      fuelBurn: '48 L',
-      insight: 'High katabatic wind speeds sustaining majority of electrical demand.',
-      labels: ['+2h', '+4h', '+6h', '+8h', '+10h', '+12h'],
-      demand: [40, 42, 44, 43, 41, 39],
-      wind: [43, 46, 45, 42, 40, 41],
-      solar: [3, 2, 1, 0, 0, 0]
-    },
-    '24h': {
-      peak: '44.5 kW',
-      minRen: '22.0 kW',
-      renFrac: '68%',
-      fuelBurn: '48 L',
-      insight: 'High katabatic wind speeds sustaining majority of electrical demand.',
-      labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-      demand: [38, 41, 43, 44, 42, 39],
-      wind: [40, 43, 45, 44, 42, 41],
-      solar: [0, 0, 2, 3, 1, 0]
-    },
-    '48h': {
-      peak: '49.0 kW',
-      minRen: '14.5 kW',
-      renFrac: '62%',
-      fuelBurn: '280 L',
-      insight: 'Approaching low-pressure depression will reduce solar bifacial harvest.',
-      labels: ['+6h', '+12h', '+18h', '+24h', '+30h', '+36h', '+42h', '+48h'],
-      demand: [40, 42, 45, 48, 46, 43, 41, 40],
-      wind: [44, 42, 36, 28, 35, 42, 45, 43],
-      solar: [3, 4, 3, 1, 2, 4, 3, 2]
-    },
-    '7d': {
-      peak: '49.0 kW',
-      minRen: '14.5 kW',
-      renFrac: '62%',
-      fuelBurn: '280 L',
-      insight: 'Approaching low-pressure depression will reduce solar bifacial harvest.',
-      labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
-      demand: [40, 42, 45, 48, 46, 43, 41],
-      wind: [44, 42, 36, 28, 35, 42, 45],
-      solar: [3, 4, 3, 1, 2, 4, 3]
-    },
-    '12m': {
-      peak: '57.5 kW',
-      minRen: '16 kW',
-      renFrac: '50%',
-      fuelBurn: '58,400 L',
-      insight: 'Annual polar cycle: Continuous 24h sunlight in Dec/Jan transitions to polar night winter (May-Aug) with high heating demand.',
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      demand: [34, 36, 42, 52, 57, 58, 56, 52, 44, 38, 35, 34],
-      wind: [18, 19, 22, 24, 25, 26, 26, 25, 23, 20, 19, 18],
-      solar: [24, 21, 12, 1, 0, 0, 0, 0, 1, 11, 20, 25]
-    },
-    'yearwise': {
-      peak: '57.5 kW',
-      minRen: '16 kW',
-      renFrac: '50%',
-      fuelBurn: '58,400 L',
-      insight: 'Annual polar cycle: Continuous 24h sunlight in Dec/Jan transitions to polar night winter (May-Aug) with high heating demand.',
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      demand: [34, 36, 42, 52, 57, 58, 56, 52, 44, 38, 35, 34],
-      wind: [18, 19, 22, 24, 25, 26, 26, 25, 23, 20, 19, 18],
-      solar: [24, 21, 12, 1, 0, 0, 0, 0, 1, 11, 20, 25]
-    }
-  };
+  const canvasRef = useRef(null);
 
-  const currentCfg = horizonConfig[horizon] || horizonConfig['12m'];
+  const TARGETS = [
+    { id: 'electrical_load_kw', label: 'Electrical Load', unit: 'kWe', icon: 'fa-bolt' },
+    { id: 'heating_load_kw', label: 'Heating Load', unit: 'kWth', icon: 'fa-fire-flame-curved' },
+    { id: 'renewable_generation_kw', label: 'Renewable Gen', unit: 'kW', icon: 'fa-solar-panel' },
+    { id: 'wind_speed_ms', label: 'Wind Speed', unit: 'm/s', icon: 'fa-wind' },
+    { id: 'solar_irradiance_wm2', label: 'Solar Irradiance', unit: 'W/m²', icon: 'fa-sun' },
+    { id: 'temperature_c', label: 'Ambient Temp', unit: '°C', icon: 'fa-temperature-low' },
+    { id: 'total_demand_kw', label: 'Total Demand', unit: 'kW', icon: 'fa-chart-pie' }
+  ];
 
+  const HORIZONS = [
+    { id: '1H', label: '1 Hour', category: 'Short-Term' },
+    { id: '6H', label: '6 Hours', category: 'Short-Term' },
+    { id: '24H', label: '24 Hours', category: 'Operational' },
+    { id: '72H', label: '72 Hours', category: 'Operational' },
+    { id: '7D', label: '7 Days', category: 'Operational' },
+    { id: '30D', label: '30 Days', category: 'Strategic' },
+    { id: '12M', label: '12 Months', category: 'Strategic' }
+  ];
+
+  // Fetch forecast data when target or horizon changes
   useEffect(() => {
     if (!isOpen) return;
+    fetchForecastIntel(selectedTarget, selectedHorizon);
+  }, [isOpen, selectedTarget, selectedHorizon]);
 
-    // Allow DOM to settle
-    const timer = setTimeout(() => {
-      const ctx = chartCanvasRef.current;
-      if (!ctx) return;
+  // Fetch ancillary modules when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+    fetchDeviationData();
+    fetchReserveAdvisory();
+    fetchBenchmarkData();
+    fetchMlopsData();
+    fetchEventsData();
+    fetchAuditLogData();
+  }, [isOpen]);
 
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
+  async function fetchForecastIntel(target, horizon) {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/forecast/intel?target=${target}&horizon=${horizon}`);
+      if (res.ok) {
+        const json = await res.json();
+        setForecastData(json);
       }
+    } catch (err) {
+      console.error('Failed to fetch forecast intel:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
-      chartInstanceRef.current = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: currentCfg.labels,
-          datasets: [
-            {
-              label: 'Station Demand (kW)',
-              data: currentCfg.demand,
-              borderColor: '#127694',
-              backgroundColor: 'rgba(18, 118, 148, 0.05)',
-              borderWidth: 2.5,
-              tension: 0.35,
-              pointRadius: 3,
-              pointBackgroundColor: '#127694',
-              fill: false
-            },
-            {
-              label: 'Wind Generation (kW)',
-              data: currentCfg.wind,
-              borderColor: '#05c5ff',
-              borderWidth: 2,
-              borderDash: [5, 4],
-              tension: 0.35,
-              pointRadius: 2,
-              pointBackgroundColor: '#05c5ff',
-              fill: false
-            },
-            {
-              label: 'Solar PV Harvest (kW)',
-              data: currentCfg.solar,
-              borderColor: '#4499b3',
-              backgroundColor: 'rgba(68, 153, 179, 0.15)',
-              borderWidth: 2,
-              tension: 0.35,
-              pointRadius: 2,
-              pointBackgroundColor: '#4499b3',
-              fill: true
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          plugins: {
-            legend: {
-              display: true,
-              position: 'top',
-              labels: {
-                font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' },
-                color: '#475569',
-                usePointStyle: true,
-                boxWidth: 8
-              }
-            },
-            tooltip: {
-              backgroundColor: 'rgba(18, 118, 148, 0.95)',
-              titleFont: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' },
-              bodyFont: { family: 'JetBrains Mono', size: 11 }
-            }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(154, 229, 254, 0.3)' },
-              ticks: { font: { family: 'Plus Jakarta Sans', size: 10 }, color: '#64748b' }
-            },
-            y: {
-              title: { display: true, text: 'Electric Power (kW)', color: '#64748b', font: { size: 11, weight: 'bold' } },
-              grid: { color: 'rgba(154, 229, 254, 0.3)' },
-              ticks: { font: { family: 'JetBrains Mono', size: 10 }, color: '#64748b' },
-              min: 0,
-              max: 65
-            }
-          }
-        }
-      });
-    }, 50);
+  async function fetchDeviationData() {
+    try {
+      const res = await fetch('/api/forecast/deviation');
+      if (res.ok) setDeviationData(await res.json());
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
-    return () => {
-      clearTimeout(timer);
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-        chartInstanceRef.current = null;
+  async function fetchReserveAdvisory() {
+    try {
+      const res = await fetch('/api/forecast/reserve-advisory');
+      if (res.ok) setReserveAdvisory(await res.json());
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function fetchBenchmarkData() {
+    try {
+      const res = await fetch('/api/forecast/benchmark');
+      if (res.ok) setBenchmarkData(await res.json());
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function fetchMlopsData() {
+    try {
+      const res = await fetch('/api/forecast/mlops');
+      if (res.ok) setMlopsData(await res.json());
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function fetchEventsData() {
+    try {
+      const res = await fetch('/api/forecast/events');
+      if (res.ok) {
+        const json = await res.json();
+        setEventsData(json.events || []);
       }
-    };
-  }, [isOpen, horizon]);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function fetchAuditLogData() {
+    try {
+      const res = await fetch('/api/forecast/audit-log');
+      if (res.ok) {
+        const json = await res.json();
+        setAuditLogData(json.audit_log || []);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function handlePromoteChallenger() {
+    try {
+      const res = await fetch('/api/forecast/champion-challenger/promote', { method: 'POST' });
+      if (res.ok) {
+        const json = await res.json();
+        setActionMessage(json.message);
+        fetchMlopsData();
+        fetchBenchmarkData();
+        setTimeout(() => setActionMessage(null), 4000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function handleRollbackChampion() {
+    try {
+      const res = await fetch('/api/forecast/champion-challenger/rollback', { method: 'POST' });
+      if (res.ok) {
+        const json = await res.json();
+        setActionMessage(json.message);
+        fetchMlopsData();
+        fetchBenchmarkData();
+        setTimeout(() => setActionMessage(null), 4000);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Draw SVG/Canvas Chart for Quantiles & History
+  useEffect(() => {
+    if (activeTab !== 'quantiles' || !forecastData || !canvasRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const hist = forecastData.history_actuals || [];
+    const p10 = forecastData.p10 || [];
+    const p50 = forecastData.p50 || [];
+    const p90 = forecastData.p90 || [];
+
+    const allValues = [...hist, ...p10, ...p50, ...p90];
+    if (allValues.length === 0) return;
+
+    const minVal = Math.min(...allValues);
+    const maxVal = Math.max(...allValues);
+    const valRange = Math.max(1, maxVal - minVal);
+
+    const padding = { top: 30, right: 30, bottom: 40, left: 50 };
+    const chartW = width - padding.left - padding.right;
+    const chartH = height - padding.top - padding.bottom;
+
+    function getY(v) {
+      return padding.top + chartH - ((v - minVal) / valRange) * chartH;
+    }
+
+    const totalPoints = hist.length + p50.length - 1;
+    const xStep = chartW / Math.max(1, totalPoints);
+
+    // Draw horizontal grid lines
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = padding.top + (chartH / 4) * i;
+      const v = maxVal - (valRange / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(width - padding.right, y);
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px monospace';
+      ctx.fillText(v.toFixed(1), 10, y + 3);
+    }
+
+    // Draw divider between Historical Actuals and Forecast Lookahead
+    const splitX = padding.left + (hist.length - 1) * xStep;
+    ctx.strokeStyle = '#0284c7';
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(splitX, padding.top);
+    ctx.lineTo(splitX, height - padding.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#0284c7';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillText('◄ HISTORICAL ACTUALS', splitX - 140, padding.top - 10);
+    ctx.fillText('PROBABILISTIC FORECAST ►', splitX + 15, padding.top - 10);
+
+    // Draw P10-P90 Uncertainty Ribbon (Shaded Area)
+    ctx.fillStyle = 'rgba(14, 165, 233, 0.18)';
+    ctx.beginPath();
+    // Forward along P90
+    for (let i = 0; i < p90.length; i++) {
+      const x = splitX + i * xStep;
+      const y = getY(p90[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    // Backward along P10
+    for (let i = p10.length - 1; i >= 0; i--) {
+      const x = splitX + i * xStep;
+      const y = getY(p10[i]);
+      ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw P90 line (Upper Stress Bound)
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    for (let i = 0; i < p90.length; i++) {
+      const x = splitX + i * xStep;
+      const y = getY(p90[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Draw P10 line (Lower Favorable Bound)
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    for (let i = 0; i < p10.length; i++) {
+      const x = splitX + i * xStep;
+      const y = getY(p10[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw P50 line (Central Forecast)
+    ctx.strokeStyle = '#0369a1';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (let i = 0; i < p50.length; i++) {
+      const x = splitX + i * xStep;
+      const y = getY(p50[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Draw Historical Actuals line (Solid Emerald/Slate)
+    ctx.strokeStyle = '#059669';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    for (let i = 0; i < hist.length; i++) {
+      const x = padding.left + i * xStep;
+      const y = getY(hist[i]);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // Draw data points on Historical
+    hist.forEach((v, i) => {
+      const x = padding.left + i * xStep;
+      const y = getY(v);
+      ctx.fillStyle = '#059669';
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Draw NOW indicator circle at junction
+    ctx.fillStyle = '#0284c7';
+    ctx.beginPath();
+    ctx.arc(splitX, getY(hist[hist.length - 1] || p50[0]), 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(splitX, getY(hist[hist.length - 1] || p50[0]), 2.5, 0, Math.PI * 2);
+    ctx.fill();
+
+  }, [activeTab, forecastData]);
 
   if (!isOpen) return null;
 
+  const currentTargetMeta = TARGETS.find(t => t.id === selectedTarget) || TARGETS[0];
+
   return (
-    <div
-      id="modal-forecast-full"
-      className="modal-backdrop"
-      onClick={(e) => {
-        if (e.target.id === 'modal-forecast-full') onClose();
-      }}
-    >
-      <div className="modal-content p-5 sm:p-6 max-w-[960px]">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
-          <div>
-            <h2 className="text-base font-extrabold text-[#127694] flex items-center gap-2">
-              <i className="fa-solid fa-chart-line text-xs text-[#05c5ff]"></i>
-              Predictive Energy Horizon & Climate Modeling
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              AI projected station demand vs katabatic wind and solar PV generation curve.
-            </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-slate-900/95 border border-sky-500/30 text-slate-100 shadow-[0_0_50px_rgba(2,132,199,0.25)] overflow-hidden">
+        
+        {/* Header Strip */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-400 to-blue-700 flex items-center justify-center text-white shadow-lg">
+              <i className="fa-solid fa-chart-line text-lg"></i>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-black tracking-tight text-white uppercase">
+                  Predictive Intelligence & Forecasting Center
+                </h2>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                  LightGBM Quantiles (P10/P50/P90)
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  Zero-Leakage Architecture
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Multi-Horizon Environmental, Renewable & Demand Uncertainty Quantification for Antarctic Microgrids
+              </p>
+            </div>
           </div>
+
           <button
-            id="btnCloseForecastModal"
-            type="button"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition"
+            className="w-9 h-9 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition border border-slate-700/50"
           >
             <i className="fa-solid fa-xmark text-sm"></i>
           </button>
         </div>
 
-        {/* Horizon Selector Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#f0faff] rounded-2xl border border-[#9ae5fe]/60 mb-3">
-          {['6h', '12h', '24h', '48h', '7d', '12m', 'yearwise'].map((hKey) => {
-            const labels = {
-              '6h': '6 Hours',
-              '12h': '12 Hours',
-              '24h': '24 Hours',
-              '48h': '48 Hours',
-              '7d': '7 Days',
-              '12m': '12 Months',
-              'yearwise': 'Year-wise'
-            };
-            return (
-              <button
-                key={hKey}
-                type="button"
-                className={`horizon-pill ${horizon === hKey ? 'active' : ''}`}
-                data-horizon={hKey}
-                onClick={() => setHorizon(hKey)}
-              >
-                {labels[hKey]}
-              </button>
-            );
-          })}
+        {/* Global Action Message Banner */}
+        {actionMessage && (
+          <div className="px-6 py-2 bg-emerald-500/20 border-b border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-2 animate-fadeIn">
+            <i className="fa-solid fa-circle-check"></i>
+            <span>{actionMessage}</span>
+          </div>
+        )}
+
+        {/* Navigation Tabs */}
+        <div className="flex items-center gap-2 px-6 pt-3 pb-2 border-b border-slate-800 bg-slate-950/40 overflow-x-auto text-xs font-bold">
+          <button
+            onClick={() => setActiveTab('quantiles')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              activeTab === 'quantiles'
+                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <i className="fa-solid fa-chart-area"></i>
+            <span>Probabilistic Quantiles</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('deviation')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              activeTab === 'deviation'
+                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <i className="fa-solid fa-arrows-split-up-and-left"></i>
+            <span>Actual vs Forecast Deviation</span>
+            {deviationData?.active_alert_count > 0 && (
+              <span className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 text-[10px] flex items-center justify-center font-extrabold">
+                {deviationData.active_alert_count}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reserve')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              activeTab === 'reserve'
+                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <i className="fa-solid fa-shield-halved"></i>
+            <span>Forecast-Aware Reserve Advisory</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('benchmark')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              activeTab === 'benchmark'
+                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <i className="fa-solid fa-scale-balanced"></i>
+            <span>Model Benchmark & Pinball Loss</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('mlops')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
+              activeTab === 'mlops'
+                ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            <i className="fa-solid fa-dna"></i>
+            <span>MLOps Drift & Champion/Challenger</span>
+          </button>
         </div>
 
-        {/* Horizon Telemetry Cards Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-3">
-          <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
-            <div className="text-[9px] font-bold text-slate-400 uppercase">Peak Demand</div>
-            <div id="horizonPeakLoad" className="text-sm font-extrabold text-[#127694]">{currentCfg.peak}</div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
-            <div className="text-[9px] font-bold text-slate-400 uppercase">Min Renewable Window</div>
-            <div id="horizonMinRenewable" className="text-sm font-extrabold text-[#0698c4]">{currentCfg.minRen}</div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
-            <div className="text-[9px] font-bold text-slate-400 uppercase">Renewable Fraction</div>
-            <div id="horizonAvgRenewable" className="text-sm font-extrabold text-emerald-600">{currentCfg.renFrac}</div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-white border border-[#9ae5fe] text-center shadow-sm">
-            <div className="text-[9px] font-bold text-slate-400 uppercase">Projected Fuel Burn</div>
-            <div id="horizonFuelLiters" className="text-sm font-extrabold text-slate-800">{currentCfg.fuelBurn}</div>
-          </div>
+        {/* Tab Content Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+          {/* TAB 1: PROBABILISTIC QUANTILES */}
+          {activeTab === 'quantiles' && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Target & Horizon Selector Controls */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+                {/* Target Variables */}
+                <div>
+                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i className="fa-solid fa-crosshairs text-sky-400"></i>
+                    <span>Prediction Target</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {TARGETS.map(t => (
+                      <button
+                        key={t.id}
+                        onClick={() => setSelectedTarget(t.id)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
+                          selectedTarget === t.id
+                            ? 'bg-sky-500 text-slate-950 shadow-sm'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                        }`}
+                      >
+                        <i className={`fa-solid ${t.icon} text-[10px]`}></i>
+                        <span>{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Horizon Durations */}
+                <div>
+                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <i className="fa-solid fa-clock text-sky-400"></i>
+                    <span>Forecast Horizon</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {HORIZONS.map(h => (
+                      <button
+                        key={h.id}
+                        onClick={() => setSelectedHorizon(h.id)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                          selectedHorizon === h.id
+                            ? 'bg-sky-500 text-slate-950 shadow-sm'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                        }`}
+                      >
+                        <span>{h.label}</span>
+                        <span className={`text-[9px] px-1 py-0.2 rounded ${selectedHorizon === h.id ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-900 text-slate-400'}`}>
+                          {h.category}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart Visualizer */}
+              <div className="bg-slate-950/70 p-5 rounded-3xl border border-sky-500/20 relative shadow-inner">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <h3 className="font-extrabold text-sm text-white uppercase flex items-center gap-2">
+                      <i className={`fa-solid ${currentTargetMeta.icon} text-sky-400`}></i>
+                      <span>{currentTargetMeta.label} ({currentTargetMeta.unit}) — {selectedHorizon} Horizon</span>
+                    </h3>
+                    {forecastData && (
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                        forecastData.confidence_level === 'HIGH'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : forecastData.confidence_level === 'MEDIUM'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      }`}>
+                        Confidence: {forecastData.confidence_level} ({Math.round(forecastData.confidence_score * 100)}%)
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-1 bg-emerald-500 rounded-full"></span>
+                      <span className="text-slate-400">Historical Actual</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-1 bg-sky-500 rounded-full"></span>
+                      <span className="text-slate-400 font-bold">P50 Expected</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-3 h-2 bg-sky-500/30 rounded border border-sky-400/50"></span>
+                      <span className="text-slate-400">P10 - P90 Ribbon</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Canvas Render */}
+                <div className="w-full h-72 rounded-2xl bg-slate-900/60 p-2 flex items-center justify-center relative overflow-hidden">
+                  <canvas
+                    ref={canvasRef}
+                    width={960}
+                    height={280}
+                    className="w-full h-full object-contain"
+                  />
+                  {isLoading && (
+                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center text-sky-400 text-xs font-bold gap-2">
+                      <i className="fa-solid fa-spinner fa-spin"></i>
+                      <span>Running LightGBM Quantile Inference...</span>
+                    </div>
+                  )}
+                </div>
+
+                {forecastData && (
+                  <div className="mt-3 text-[11px] text-slate-400 flex items-center justify-between">
+                    <span className="italic">{forecastData.confidence_reason}</span>
+                    <span className="font-mono text-slate-400">Model: {forecastData.model_champion} · Strictly Monotonic</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Quantile Metric Readout Strip */}
+              {forecastData && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      P10 Downside Bound
+                    </div>
+                    <div className="text-xl font-black text-sky-300 font-mono">
+                      {forecastData.p10[0]} <span className="text-xs font-sans text-slate-400">{currentTargetMeta.unit}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-1">10% Probability of occurrence below this floor</div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-sky-950/40 border border-sky-500/40">
+                    <div className="text-[10px] font-extrabold text-sky-300 uppercase tracking-wider mb-1">
+                      P50 Central Expected
+                    </div>
+                    <div className="text-xl font-black text-white font-mono">
+                      {forecastData.p50[0]} <span className="text-xs font-sans text-sky-200">{currentTargetMeta.unit}</span>
+                    </div>
+                    <div className="text-[10px] text-sky-300 mt-1">Median operational baseline for MILP dispatch</div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      P90 Peak Stress Bound
+                    </div>
+                    <div className="text-xl font-black text-cyan-300 font-mono">
+                      {forecastData.p90[0]} <span className="text-xs font-sans text-slate-400">{currentTargetMeta.unit}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-1">Conservative reserve & stress-testing scenario</div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      Prediction Interval Width (Δ)
+                    </div>
+                    <div className="text-xl font-black text-amber-300 font-mono">
+                      ±{forecastData.avg_interval_width} <span className="text-xs font-sans text-slate-400">{currentTargetMeta.unit}</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mt-1">Uncertainty spread (P90 - P10) across horizon</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: ACTUAL VS FORECAST DEVIATION */}
+          {activeTab === 'deviation' && deviationData && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Alert Banner if Active Divergence */}
+              {deviationData.active_alert_count > 0 && (
+                <div className="p-4 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-200 space-y-2">
+                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                    <i className="fa-solid fa-triangle-exclamation text-base"></i>
+                    <span>Forecast Deviation Alert Triggered ({deviationData.active_alert_count} Active Divergence Event)</span>
+                  </div>
+                  {deviationData.alerts.map((al, idx) => (
+                    <div key={idx} className="p-2.5 rounded-xl bg-slate-950/60 border border-amber-500/30 text-xs flex items-center justify-between">
+                      <div>
+                        <span className="font-bold text-white">{al.message}</span>
+                        <div className="text-[11px] text-slate-400 mt-0.5">Mitigation: {al.mitigation}</div>
+                      </div>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 font-bold">
+                        {al.timestamp}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Comparison Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {deviationData.comparison_cards.map(c => (
+                  <div key={c.target} className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-xs text-white uppercase tracking-tight">
+                        {c.target.replace(/_/g, ' ')}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                        c.status === 'NOMINAL'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          : c.status === 'WARNING'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      }`}>
+                        {c.status}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="p-2 rounded-xl bg-slate-900">
+                        <div className="text-[10px] text-slate-400">Actual Realized</div>
+                        <div className="text-base font-black font-mono text-emerald-300">{c.actual}</div>
+                      </div>
+                      <div className="p-2 rounded-xl bg-slate-900">
+                        <div className="text-[10px] text-slate-400">P50 Forecast</div>
+                        <div className="text-base font-black font-mono text-sky-300">{c.forecast_p50}</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+                      <span className="text-slate-400">Residual (Δ): <strong className="font-mono text-white">{c.residual_delta > 0 ? `+${c.residual_delta}` : c.residual_delta}</strong></span>
+                      <span className={`font-mono font-bold ${c.pct_deviation >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
+                        {c.pct_deviation > 0 ? `+${c.pct_deviation}%` : `${c.pct_deviation}%`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* High-Impact Forecast Events Timeline */}
+              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                    <i className="fa-solid fa-bolt-lightning text-amber-400"></i>
+                    <span>Upcoming High-Impact Forecast Events (Prioritized by Severity)</span>
+                  </h4>
+                  <span className="text-xs text-slate-400">4 Lookahead Checkpoints</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {eventsData.map(ev => (
+                    <div key={ev.id} className="p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <span className={`px-2.5 py-1 rounded-lg text-xs font-mono font-black ${
+                          ev.severity === 'CRITICAL' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' :
+                          ev.severity === 'WARNING' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+                          'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                        }`}>
+                          {ev.offset}
+                        </span>
+                        <div>
+                          <div className="text-xs font-bold text-white flex items-center gap-2">
+                            <span>{ev.event}</span>
+                            <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
+                              ev.severity === 'CRITICAL' ? 'bg-rose-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                            }`}>{ev.severity}</span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-1">Impact: {ev.operational_impact}</div>
+                          <div className="text-[11px] text-sky-300 font-semibold mt-0.5">Action: {ev.suggested_action}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: FORECAST-TO-MICROGRID RESERVE ADVISORY */}
+          {activeTab === 'reserve' && reserveAdvisory && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Formula & Advisory Banner */}
+              <div className="p-5 rounded-3xl bg-gradient-to-r from-sky-950/60 to-slate-950/80 border border-sky-500/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-sky-400">
+                    <i className="fa-solid fa-calculator"></i>
+                    <span>Dynamic Spinning Reserve Math: {reserveAdvisory.formula}</span>
+                  </div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
+                    reserveAdvisory.urgency === 'HIGH' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                  }`}>
+                    Status: {reserveAdvisory.urgency} URGENCY
+                  </span>
+                </div>
+                <p className="text-sm font-bold text-slate-100">
+                  {reserveAdvisory.recommendation}
+                </p>
+              </div>
+
+              {/* 6-Hour Step Trajectory Grid */}
+              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-4">
+                <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                  <i className="fa-solid fa-battery-three-quarters text-emerald-400"></i>
+                  <span>6-Hour Lookahead: Demand P90 vs Renewable P10 & Battery Reserve Projection</span>
+                </h4>
+
+                <div className="grid grid-cols-7 gap-2 text-center">
+                  {reserveAdvisory.hours.map((hr, idx) => (
+                    <div key={hr} className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                      <span className="text-xs font-mono font-bold text-sky-400">{hr}</span>
+                      
+                      <div className="space-y-1 text-[11px]">
+                        <div className="text-slate-400">P90 Dem: <span className="font-mono text-white font-bold">{reserveAdvisory.demand_p90[idx]} kW</span></div>
+                        <div className="text-slate-400">P10 Ren: <span className="font-mono text-emerald-300 font-bold">{reserveAdvisory.renewable_p10[idx]} kW</span></div>
+                        <div className="text-slate-400">R_req: <span className="font-mono text-cyan-300 font-bold">{reserveAdvisory.spinning_reserve_required_kw[idx]} kW</span></div>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-800">
+                        <div className="text-[10px] text-slate-400">SoC Proj</div>
+                        <div className={`text-xs font-black font-mono ${reserveAdvisory.projected_bess_soc_pct[idx] <= 30 ? 'text-rose-400' : 'text-emerald-300'}`}>
+                          {reserveAdvisory.projected_bess_soc_pct[idx]}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: MODEL BENCHMARK & PINBALL LOSS */}
+          {activeTab === 'benchmark' && benchmarkData && (
+            <div className="space-y-6 animate-fadeIn">
+              <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+                <div>
+                  <h4 className="font-extrabold text-sm text-white uppercase tracking-tight">
+                    Dual Model Head-to-Head Benchmark
+                  </h4>
+                  <p className="text-xs text-slate-400">
+                    Comparing Primary LightGBM Quantile Regressors vs Project A Gradient Boosting Benchmark on Chronological Test Set
+                  </p>
+                </div>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                  {benchmarkData.evaluation_scope}
+                </span>
+              </div>
+
+              {/* Benchmark Metrics Table */}
+              <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/60">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-900 text-slate-400 font-bold border-b border-slate-800">
+                    <tr>
+                      <th className="py-3 px-4">Prediction Target</th>
+                      <th className="py-3 px-3">LGBM MAE</th>
+                      <th className="py-3 px-3">GBR MAE</th>
+                      <th className="py-3 px-3">MAE Δ %</th>
+                      <th className="py-3 px-3">Pinball P10</th>
+                      <th className="py-3 px-3">Pinball P50</th>
+                      <th className="py-3 px-3">Pinball P90</th>
+                      <th className="py-3 px-4">80% Interval Coverage</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                    {benchmarkData.metrics.map(m => (
+                      <tr key={m.target} className="hover:bg-slate-900/40 transition">
+                        <td className="py-2.5 px-4 font-sans font-bold text-white">
+                          {m.target.replace(/_/g, ' ')}
+                        </td>
+                        <td className="py-2.5 px-3 text-sky-300 font-bold">{m.lightgbm_mae}</td>
+                        <td className="py-2.5 px-3 text-slate-400">{m.gradient_boost_mae}</td>
+                        <td className="py-2.5 px-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            m.mae_improvement_pct >= 0 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'
+                          }`}>
+                            {m.mae_improvement_pct >= 0 ? `+${m.mae_improvement_pct}%` : `${m.mae_improvement_pct}%`}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-slate-300">{m.lightgbm_pinball_p10}</td>
+                        <td className="py-2.5 px-3 text-sky-200 font-bold">{m.lightgbm_pinball_p50}</td>
+                        <td className="py-2.5 px-3 text-slate-300">{m.lightgbm_pinball_p90}</td>
+                        <td className="py-2.5 px-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                              <div
+                                className="h-full bg-sky-400 rounded-full"
+                                style={{ width: `${Math.min(100, m.lightgbm_coverage_80)}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-[11px] text-white font-bold">{m.lightgbm_coverage_80}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: MLOPS, DRIFT & CHAMPION/CHALLENGER */}
+          {activeTab === 'mlops' && mlopsData && (
+            <div className="space-y-6 animate-fadeIn">
+              {/* Feature PSI Drift Meters */}
+              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                      <i className="fa-solid fa-gauge-high text-sky-400"></i>
+                      <span>Population Stability Index (PSI) Covariate Drift Monitor</span>
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Evaluates distribution shift between historical training reference and live telemetry buffer
+                    </p>
+                  </div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase ${
+                    mlopsData.overall_status === 'STABLE' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                  }`}>
+                    {mlopsData.overall_status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {Object.entries(mlopsData.feature_psi).map(([feat, d]) => (
+                    <div key={feat} className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">{feat.replace(/_/g, ' ')}</div>
+                      <div className="text-lg font-black font-mono text-white">{d.psi}</div>
+                      <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-800">
+                        <span className="text-slate-400">Status</span>
+                        <span className={`font-bold ${d.status === 'STABLE' ? 'text-emerald-300' : 'text-amber-300'}`}>{d.status}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Champion vs Challenger Shadow Governance */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Champion Card */}
+                <div className="p-5 rounded-3xl bg-slate-950/60 border border-emerald-500/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-300 uppercase border border-emerald-500/40">
+                      Active Production Champion
+                    </span>
+                    <i className="fa-solid fa-crown text-amber-400"></i>
+                  </div>
+                  <h3 className="text-base font-black text-white">{mlopsData.champion_model.name}</h3>
+                  <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+                    <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="text-[10px] text-slate-400">MAE</div>
+                      <div className="font-bold text-white">{mlopsData.champion_model.mae}</div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="text-[10px] text-slate-400">Pinball</div>
+                      <div className="font-bold text-sky-300">{mlopsData.champion_model.pinball_loss}</div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="text-[10px] text-slate-400">Coverage</div>
+                      <div className="font-bold text-emerald-300">{mlopsData.champion_model.coverage_80}%</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRollbackChampion}
+                    className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition"
+                  >
+                    <i className="fa-solid fa-rotate-left mr-1.5"></i>
+                    Rollback to Previous Stable Release
+                  </button>
+                </div>
+
+                {/* Challenger Card */}
+                <div className="p-5 rounded-3xl bg-slate-950/60 border border-sky-500/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-500/20 text-sky-300 uppercase border border-sky-500/40">
+                      Candidate Challenger (Shadow Mode)
+                    </span>
+                    <i className="fa-solid fa-flask text-sky-400"></i>
+                  </div>
+                  <h3 className="text-base font-black text-white">{mlopsData.challenger_model.name}</h3>
+                  <div className="grid grid-cols-3 gap-2 text-xs font-mono">
+                    <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="text-[10px] text-slate-400">MAE</div>
+                      <div className="font-bold text-emerald-300">{mlopsData.challenger_model.mae}</div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="text-[10px] text-slate-400">Pinball</div>
+                      <div className="font-bold text-sky-300">{mlopsData.challenger_model.pinball_loss}</div>
+                    </div>
+                    <div className="p-2 rounded-xl bg-slate-900">
+                      <div className="text-[10px] text-slate-400">Coverage</div>
+                      <div className="font-bold text-emerald-300">{mlopsData.challenger_model.coverage_80}%</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handlePromoteChallenger}
+                    className="w-full py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition shadow-md shadow-sky-500/30"
+                  >
+                    <i className="fa-solid fa-arrow-up-right-from-square mr-1.5"></i>
+                    Promote Challenger to Production Champion
+                  </button>
+                </div>
+              </div>
+
+              {/* Historical Forecast Audit Trail Log */}
+              <div className="p-5 rounded-3xl bg-slate-950/60 border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                    <i className="fa-solid fa-file-shield text-slate-400"></i>
+                    <span>Archived Forecast Audit Trail (Prediction vs Reality Verification)</span>
+                  </h4>
+                  <span className="text-xs text-slate-400">Showing last {auditLogData.length} records</span>
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/60">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead className="bg-slate-900 text-slate-400 font-bold border-b border-slate-800">
+                      <tr>
+                        <th className="py-2.5 px-3">Archived Timestamp</th>
+                        <th className="py-2.5 px-3">Target</th>
+                        <th className="py-2.5 px-2">Model</th>
+                        <th className="py-2.5 px-2">Horizon</th>
+                        <th className="py-2.5 px-2">P10</th>
+                        <th className="py-2.5 px-2">P50</th>
+                        <th className="py-2.5 px-2">P90</th>
+                        <th className="py-2.5 px-2">Actual</th>
+                        <th className="py-2.5 px-3">Error (Δ)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {auditLogData.map((a, idx) => (
+                        <tr key={idx} className="hover:bg-slate-800/40 transition">
+                          <td className="py-2 px-3 text-slate-400">{a.timestamp}</td>
+                          <td className="py-2 px-3 font-sans font-bold text-white">{a.target.replace(/_/g, ' ')}</td>
+                          <td className="py-2 px-2 text-sky-300">{a.model}</td>
+                          <td className="py-2 px-2">{a.horizon_hours}h</td>
+                          <td className="py-2 px-2 text-slate-400">{a.p10}</td>
+                          <td className="py-2 px-2 text-white font-bold">{a.p50}</td>
+                          <td className="py-2 px-2 text-slate-400">{a.p90}</td>
+                          <td className="py-2 px-2 text-emerald-300 font-bold">{a.actual}</td>
+                          <td className={`py-2 px-3 font-bold ${a.residual_error >= 0 ? 'text-rose-400' : 'text-sky-400'}`}>
+                            {a.residual_error >= 0 ? `+${a.residual_error}` : a.residual_error}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
 
-        {/* Large Forecast Line Chart */}
-        <div className="w-full h-72 relative bg-white p-2 rounded-2xl border border-slate-100">
-          <canvas ref={chartCanvasRef} id="forecastFullCanvas"></canvas>
-        </div>
-
-        <div className="mt-3 p-2.5 bg-[#f8fcfe] rounded-xl border border-[#9ae5fe]/60 flex items-center justify-between text-xs text-slate-600">
-          <span className="flex items-center gap-1.5">
-            <i className="fa-solid fa-circle-info text-xs text-[#0698c4]"></i>
-            <span id="horizonInsightText">{currentCfg.insight}</span>
-          </span>
-          <span className="text-[10px] font-bold text-[#0698c4] bg-[#c2f0fe] px-2 py-0.5 rounded-full">
-            AI Confidence: 94.2%
-          </span>
-        </div>
       </div>
     </div>
   );

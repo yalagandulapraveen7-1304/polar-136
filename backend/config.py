@@ -19,17 +19,18 @@ STATIONS = {
         "lat": -70.7661,
         "lon": 11.7358,
         "elevation_m": 117,
-        "base_load_kwe": 48.0,
-        "peak_load_kwe": 85.0,
-        "base_thermal_kwth": 62.0,
-        "peak_thermal_kwth": 115.0,
-        "genset_1_max_kw": 100.0,
-        "genset_2_max_kw": 100.0,
-        "wind_capacity_kw": 120.0,
-        "solar_capacity_kw": 75.0,
-        "battery_capacity_kwh": 300.0,
+        "base_load_kwe": 179.0,
+        "peak_load_kwe": 412.0,
+        "base_thermal_kwth": 120.0,
+        "peak_thermal_kwth": 268.0,
+        "genset_1_max_kw": 300.0,
+        "genset_2_max_kw": 200.0,
+        "wind_capacity_kw": 100.0,
+        "solar_capacity_kw": 60.0,
+        "battery_capacity_kwh": 400.0,
+        "inverter_rating_kw": 80.0,
         "battery_nominal_v": 480.0,
-        "diesel_fuel_reserve_liters": 45000.0,
+        "diesel_fuel_reserve_liters": 60000.0,
     },
     "BHARATI": {
         "id": "BHARATI",
@@ -38,25 +39,28 @@ STATIONS = {
         "lat": -69.4078,
         "lon": 76.1872,
         "elevation_m": 35,
-        "base_load_kwe": 56.0,
-        "peak_load_kwe": 98.0,
-        "base_thermal_kwth": 72.0,
-        "peak_thermal_kwth": 135.0,
+        "base_load_kwe": 110.0,
+        "peak_load_kwe": 240.0,
+        "base_thermal_kwth": 85.0,
+        "peak_thermal_kwth": 175.0,
         "genset_1_max_kw": 120.0,
         "genset_2_max_kw": 120.0,
-        "wind_capacity_kw": 100.0,
+        "wind_capacity_kw": 120.0,
         "solar_capacity_kw": 90.0,
         "battery_capacity_kwh": 350.0,
+        "inverter_rating_kw": 70.0,
         "battery_nominal_v": 480.0,
         "diesel_fuel_reserve_liters": 60000.0,
     }
 }
 
 # Control & Physics Constants
-DIESEL_SPECIFIC_CONSUMPTION = 0.26   # Liters fuel per kWh produced
-DIESEL_MIN_LOAD_PCT = 0.25           # 25% minimum loading to prevent wet stacking
+DIESEL_SPECIFIC_CONSUMPTION = 0.28   # Liters fuel per kWh produced (0.28 L/kWh)
+DIESEL_MIN_LOAD_PCT = 0.35           # 35% minimum loading to prevent wet stacking & bore glazing
 CHP_THERMAL_RATIO = 1.20             # kWth recovered per kWe of diesel output
 DIESEL_MIN_RUN_TIME_MIN = 60.0       # Minimum mandatory run-time (minutes) to prevent thermal shock
+CRITICAL_LOAD_MIN_KWE = 20.0         # Inviolable life-support floor (kW)
+FLEXIBLE_LOAD_MAX_KWE = 120.0        # Deferrable / sheddable scientific and freezer loads (kW)
 
 # Battery Physical Limits & Derating
 BATTERY_MIN_SOC_PCT = 20.0           # Reserve minimum limit (%)

@@ -1,0 +1,8 @@
+scenario_name,feasible,diesel_capacity_kw,wind_capacity_kw,solar_capacity_kw,battery_capacity_kwh,failed_units,annual_fuel_optimized_l,annual_fuel_baseline_l,litres_saved,savings_pct,cost_saved_usd,co2_avoided_tonnes,recommended_tank_l,ran_out_before_resupply,pct_year_with_alert,capital_cost_usd,incremental_capital_usd,incremental_annual_savings_usd,payback_years
+current_baseline,True,500.0,100.0,60.0,400.0,[],352628.0,471631.0,119003.0,25.2,357009.0,318.9,405522.0,False,37.5,618000.0,0.0,0.0,0.0
+no_renewables_no_battery,True,500.0,0.0,0.0,0.0,[],472271.0,471631.0,-641.0,-0.1,-1922.0,-1.7,543112.0,False,44.4,0.0,-618000.0,-358929.0,inf
+double_wind,True,500.0,200.0,60.0,400.0,[],278802.0,471631.0,192829.0,40.9,578486.0,516.8,320622.0,False,33.4,968000.0,350000.0,221478.0,1.5802923992450717
+double_solar,True,500.0,100.0,120.0,400.0,[],317000.0,471631.0,154631.0,32.8,463894.0,414.4,364549.0,False,37.1,726000.0,108000.0,106884.0,1.0104412260020208
+double_battery,True,500.0,100.0,60.0,800.0,[],352583.0,471631.0,119048.0,25.2,357143.0,319.0,405471.0,False,13.8,778000.0,160000.0,135.0,1185.1851851851852
+double_all_renewables,True,500.0,200.0,120.0,800.0,[],251464.0,471631.0,220166.0,46.7,660499.0,590.0,289184.0,False,19.3,1236000.0,618000.0,303492.0,2.036297497133368
+half_battery,True,500.0,100.0,60.0,200.0,[],352821.0,471631.0,118810.0,25.2,356430.0,318.4,405744.0,False,42.0,538000.0,-80000.0,-579.0,inf
