@@ -188,7 +188,7 @@ export default function RealTimePowerChart({
         <span>Gen: <strong className="text-[#0699C6]">{latestPoint?.generation_kw?.toFixed(1) || '412.0'} kW</strong></span>
         <span>Load: <strong className="text-[#127694]">{latestPoint?.load_kw?.toFixed(1) || '412.0'} kW</strong></span>
         <span>Net: <strong className="text-emerald-600">{latestPoint?.net_balance_kw >= 0 ? `+${latestPoint?.net_balance_kw?.toFixed(1)}` : latestPoint?.net_balance_kw?.toFixed(1)} kW</strong></span>
-        <span className="text-[9px] text-slate-400 font-sans">Physical Invariant: $\sum P_{in} = \sum P_{out}$</span>
+        <span className="text-[9px] text-slate-400 font-sans">Physical Invariant: &Sigma; P(in) = &Sigma; P(out)</span>
       </div>
     </div>
   );

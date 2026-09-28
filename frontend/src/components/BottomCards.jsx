@@ -254,7 +254,15 @@ export default function BottomCards({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => onOpenModal('analytics')}
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#0699C6] to-[#127694] hover:from-[#05C5FF] hover:to-[#0699C6] text-white font-extrabold text-xs transition shadow-sm flex items-center gap-1.5"
+            >
+              <i className="fa-solid fa-chart-column text-xs"></i>
+              <span>ADVANCED ANALYTICS CENTER</span>
+            </button>
             <button
               type="button"
               onClick={() => onOpenModal('monitoring')}

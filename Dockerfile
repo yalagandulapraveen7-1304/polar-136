@@ -18,5 +18,5 @@ COPY . ./
 # Expose the port that Render will provide via $PORT
 EXPOSE $PORT
 
-# Default command (Render overrides this via render.yaml)
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "$PORT"]
+CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
+

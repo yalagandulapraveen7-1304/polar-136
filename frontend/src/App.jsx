@@ -16,6 +16,7 @@ import WeatherModal from './modals/WeatherModal';
 import AlertsModal from './modals/AlertsModal';
 import DeviceMonitoringModal from './modals/DeviceMonitoringModal';
 import StationComparisonModal from './modals/StationComparisonModal';
+import AdvancedAnalyticsModal from './modals/AdvancedAnalyticsModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 
@@ -559,6 +560,13 @@ function AppDashboard({
           setActiveModal(null);
         }}
         activeStationId={stationId}
+      />
+
+      <AdvancedAnalyticsModal
+        isOpen={activeModal === 'analytics'}
+        onClose={() => setActiveModal(null)}
+        stationId={stationId}
+        latestData={latestData}
       />
     </div>
   );

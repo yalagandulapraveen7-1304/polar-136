@@ -17,12 +17,6 @@ export default function MetricCards({
   const stationInfo = STATIONS[stationId] || STATIONS.MAITRI;
   const { buffer } = useTelemetryBuffer();
 
-  // Extract rolling trend series for sparklines (padded with current val if buffer is fresh)
-  const socHistory = buffer.length > 3 ? buffer.map(p => p.soc_pct) : [soc - 1, soc, soc];
-  const loadHistory = buffer.length > 3 ? buffer.map(p => p.load_kw) : [currentLoadKw - 2, currentLoadKw + 1, currentLoadKw];
-  const renHistory = buffer.length > 3 ? buffer.map(p => (p.wind_kw || 0) + (p.solar_kw || 0)) : [totalRenewablesKw - 3, totalRenewablesKw + 1, totalRenewablesKw];
-  const tempHistory = buffer.length > 3 ? buffer.map(p => p.temp_c) : [tempC + 0.2, tempC - 0.1, tempC];
-
 
   // 1. Battery Reserve Calculations
   const soc = activeOverrides?.battery_soc_pct !== undefined && activeOverrides?.battery_soc_pct !== null
@@ -83,6 +77,12 @@ export default function MetricCards({
   const isCutoutActive = windMs >= 25.0;
   const isPolarNight = solarIrr <= 0.0;
   const weatherLabel = isCutoutActive ? 'Cat-3 Blizzard Gale' : (tempC < -35 ? 'Extreme Polar Cold' : 'Nominal Polar Winds');
+
+  // Extract rolling trend series for sparklines (padded with current val if buffer is fresh)
+  const socHistory = buffer.length > 3 ? buffer.map((pt) => pt.soc_pct) : [soc - 1, soc, soc];
+  const loadHistory = buffer.length > 3 ? buffer.map((pt) => pt.load_kw) : [currentLoadKw - 2, currentLoadKw + 1, currentLoadKw];
+  const renHistory = buffer.length > 3 ? buffer.map((pt) => (pt.wind_kw || 0) + (pt.solar_kw || 0)) : [totalRenewablesKw - 3, totalRenewablesKw + 1, totalRenewablesKw];
+  const tempHistory = buffer.length > 3 ? buffer.map((pt) => pt.temp_c) : [tempC + 0.2, tempC - 0.1, tempC];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 w-full">
