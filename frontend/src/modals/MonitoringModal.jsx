@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
+import RealTimePowerChart from '../components/charts/RealTimePowerChart';
+import CurtailmentAnalyticsChart from '../components/charts/CurtailmentAnalyticsChart';
 
 export default function MonitoringModal({
   isOpen,
@@ -349,6 +351,18 @@ export default function MonitoringModal({
               <i className="fa-solid fa-triangle-exclamation text-xs"></i>
               <span>4. Closed-Loop Remediation</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('curtailment')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                activeTab === 'curtailment'
+                  ? 'bg-[#127694] text-white shadow-xs'
+                  : 'text-slate-600 hover:text-[#0699C6]'
+              }`}
+            >
+              <i className="fa-solid fa-leaf text-xs"></i>
+              <span>5. Curtailment Analytics</span>
+            </button>
           </div>
 
           {/* Time range selector for Historical view */}
@@ -420,6 +434,11 @@ export default function MonitoringModal({
                   </div>
                   <span className="text-[10px] text-slate-500 font-semibold block mt-1">20 kW Non-Shed Base</span>
                 </div>
+              </div>
+
+              {/* Live 1 Hz Power & Net Balance Chart */}
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs min-h-[260px]">
+                <RealTimePowerChart />
               </div>
 
               {/* Power Balance & Grid Frequency */}
@@ -720,6 +739,29 @@ export default function MonitoringModal({
                     <span className="text-[10px] text-emerald-700 block mt-0.5">Inviolable 20% floor safe</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: RENEWABLE CURTAILMENT ANALYTICS */}
+          {activeTab === 'curtailment' && (
+            <div className="flex flex-col gap-4 animate-fadeIn">
+              <div className="p-4 rounded-2xl bg-[#f0faff] border border-[#bcecfc] flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-black text-[#127694] uppercase tracking-tight">
+                    Renewable Curtailment &amp; Loss Analytics
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Detailed multi-horizon evaluation of lost wind and solar harvest due to operational and thermal boundaries.
+                  </p>
+                </div>
+                <span className="text-[10px] font-mono font-bold bg-white text-[#0699C6] px-2.5 py-1 rounded-full border border-[#bcecfc]">
+                  96.9% Annual Harvest Efficiency
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
+                <CurtailmentAnalyticsChart />
               </div>
             </div>
           )}

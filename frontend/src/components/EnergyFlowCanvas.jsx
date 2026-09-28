@@ -90,7 +90,7 @@ export default function EnergyFlowCanvas({ latestData }) {
         generator: { x: w * 0.16, y: h * 0.76, title: 'Diesel Gen-Set G1/G2', val: `${genKw.toFixed(0)} kW`, sub: 'Optimal LP Modulated', color: '#f43f5e' },
         bus: { x: w * 0.50, y: h * 0.50, title: 'Inverter Grid Bus', val: '400V 50Hz', sub: 'Balanced · 0 kW Residual', color: '#0699C6' },
         battery: { x: w * 0.50, y: h * 0.88, title: 'BESS LiFePO4 Reserve', val: isCharging ? `+${battAbsKw.toFixed(0)} kW Chg` : `-${battAbsKw.toFixed(0)} kW Disch`, sub: '77% SoC · 20% Floor Safe', color: '#10b981' },
-        load: { x: w * 0.84, y: h * 0.50, title: 'Total Station Demand', val: '412 kW', sub: '20 kW Life Support Non-Shed', color: '#127694' }
+        load: { x: w * 0.84, y: h * 0.50, title: 'Total Station Demand', val: `${Math.round(t.station_load_kwe || t.load_elec_kw || 412)} kW`, sub: '20 kW Life Support Non-Shed', color: '#127694' }
       };
 
       // Set up Particles periodically with speed and density proportional to power magnitude
@@ -135,8 +135,9 @@ export default function EnergyFlowCanvas({ latestData }) {
           }
         }
 
-        // 5. Bus -> Load (combined 412 kW total load)
-        const loadCfg = getParticleConfig(412);
+        // 5. Bus -> Load (dynamic station demand)
+        const activeLoad = t.station_load_kwe || t.load_elec_kw || 412.0;
+        const loadCfg = getParticleConfig(activeLoad);
         for (let i = 0; i < loadCfg.count; i++) {
           particles.push(new FlowParticle(nodes.bus.x, nodes.bus.y, nodes.load.x, nodes.load.y, '#0699C6', loadCfg.speed));
         }
@@ -144,30 +145,52 @@ export default function EnergyFlowCanvas({ latestData }) {
         lastParticleSetup = time;
       }
 
-      // 1. Draw Vector Connection Lines
+      // 1. Draw Vector Connection Lines (Illuminated if active > 0 kW, dashed muted if 0 kW)
       ctx.lineWidth = 2;
-      ctx.strokeStyle = 'rgba(154, 229, 254, 0.7)';
 
       // Renewables -> Bus
       ctx.beginPath();
+      if (totalRenewableKw > 0.5) {
+        ctx.strokeStyle = 'rgba(5, 197, 255, 0.8)';
+        ctx.setLineDash([]);
+      } else {
+        ctx.strokeStyle = 'rgba(203, 213, 225, 0.4)';
+        ctx.setLineDash([4, 4]);
+      }
       ctx.moveTo(nodes.renewables.x, nodes.renewables.y);
       ctx.lineTo(nodes.bus.x, nodes.bus.y);
       ctx.stroke();
 
       // Generator -> Bus
       ctx.beginPath();
+      if (genKw > 0.5) {
+        ctx.strokeStyle = 'rgba(244, 63, 94, 0.8)';
+        ctx.setLineDash([]);
+      } else {
+        ctx.strokeStyle = 'rgba(203, 213, 225, 0.4)';
+        ctx.setLineDash([4, 4]);
+      }
       ctx.moveTo(nodes.generator.x, nodes.generator.y);
       ctx.lineTo(nodes.bus.x, nodes.bus.y);
       ctx.stroke();
 
       // Bus <-> Battery
       ctx.beginPath();
+      if (battAbsKw > 0.5) {
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
+        ctx.setLineDash([]);
+      } else {
+        ctx.strokeStyle = 'rgba(203, 213, 225, 0.4)';
+        ctx.setLineDash([4, 4]);
+      }
       ctx.moveTo(nodes.bus.x, nodes.bus.y);
       ctx.lineTo(nodes.battery.x, nodes.battery.y);
       ctx.stroke();
 
       // Bus -> Load
       ctx.beginPath();
+      ctx.strokeStyle = 'rgba(6, 153, 198, 0.85)';
+      ctx.setLineDash([]);
       ctx.moveTo(nodes.bus.x, nodes.bus.y);
       ctx.lineTo(nodes.load.x, nodes.load.y);
       ctx.stroke();

@@ -6,12 +6,14 @@ LightGBM 24h forecaster, Guardrail safety overrides, Groq LLM integration, and S
 """
 import os
 import csv
+import json
 import asyncio
 import datetime
 from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query
+from fastapi.encoders import jsonable_encoder
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,6 +38,8 @@ from backend.intelligence.ai_system import PolarIntelligenceSystem
 from backend.intelligence.copilot import PolarCopilotSystem
 from backend.intelligence.alert_engine import PolarAlertIntelligenceSystem
 from backend.scenarios.scenario_engine import PolarScenarioControlEngine, PRESET_DEFINITIONS, PARAM_BOUNDS
+from backend.health.scada_device_monitor import ScadaDeviceMonitoringEngine
+from backend.monitoring.station_manager import PolarStationManager
 
 # Global Singletons
 ingestion_driver = DataIngestionDriver(station_id=DEFAULT_STATION, mode=SEMS_MODE)
@@ -53,9 +57,11 @@ energy_monitor = EnergyMonitoringEngine()
 battery_manager = PolarBatteryManager()
 microgrid_manager = PolarMicrogridManager(station_id=DEFAULT_STATION)
 weather_engine = PolarWeatherEngine(station_id=DEFAULT_STATION)
-copilot_system = PolarCopilotSystem(get_snapshot_fn=lambda: current_system_snapshot if current_system_snapshot else compute_system_snapshot())
+copilot_system = PolarCopilotSystem(get_snapshot_fn=lambda: current_system_snapshot or {})
 alert_system = PolarAlertIntelligenceSystem(station_id=DEFAULT_STATION)
 scenario_engine = PolarScenarioControlEngine(station_id=DEFAULT_STATION)
+scada_engine = ScadaDeviceMonitoringEngine(station_id=DEFAULT_STATION)
+station_manager = PolarStationManager(default_station=DEFAULT_STATION)
 
 # Connected WebSocket clients
 active_websockets: List[WebSocket] = []
@@ -270,7 +276,19 @@ def compute_system_snapshot() -> Dict[str, Any]:
     except Exception:
         scenario_snapshot = {}
 
-    # 20. Assemble Unified Payload
+    # 20. SCADA Device Monitoring Engine (Feature 12)
+    try:
+        scada_snapshot = scada_engine.get_scada_device_snapshot(
+            telemetry=telemetry,
+            dispatch=safe_dispatch,
+            hardware_health=hardware_health,
+            alerts_data=alert_snapshot,
+            digital_twin_data=twin_state
+        )
+    except Exception as e:
+        scada_snapshot = {}
+
+    # 21. Assemble Unified Payload
     payload = {
         "telemetry": telemetry,
         "dispatch": safe_dispatch,
@@ -299,21 +317,31 @@ def compute_system_snapshot() -> Dict[str, Any]:
         "copilot": copilot_snapshot,
         "alert_intelligence": alert_snapshot,
         "scenario_control": scenario_snapshot,
+        "scada_monitoring": scada_snapshot,
+        "station": telemetry.get("station_id", "MAITRI"),
+        "station_id": telemetry.get("station_id", "MAITRI"),
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "epoch_ms": int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000),
+        "simulation_mode": ingestion_driver.mode,
+        "data_quality": "SIMULATED" if ingestion_driver.mode == "DEMO_MODE" else "VALID",
+        "stale_threshold_sec": 5.0,
+        "update_rate_hz": 1.0,
         "cloud_ai_active": ai_service.is_cloud_enabled()
     }
-    current_system_snapshot = payload
-    return payload
+    safe_payload = jsonable_encoder(payload)
+    current_system_snapshot = safe_payload
+    return safe_payload
 
 async def telemetry_broadcast_loop():
     """1-second high-resolution telemetry, MPC optimization, guardrail, and logging loop"""
     while True:
         try:
-            payload = compute_system_snapshot()
+            payload = await asyncio.to_thread(compute_system_snapshot)
 
             # Broadcast to active WebSockets
             if active_websockets:
                 dead_sockets = []
-                for ws in active_websockets:
+                for ws in list(active_websockets):
                     try:
                         await ws.send_json(payload)
                     except Exception:
@@ -330,11 +358,6 @@ async def telemetry_broadcast_loop():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    try:
-        compute_system_snapshot()
-    except Exception as e:
-        print(f"[Startup Snapshot Warning]: {e}")
-
     task = None
     try:
         task = asyncio.create_task(telemetry_broadcast_loop())
@@ -380,6 +403,7 @@ class ChatRequest(BaseModel):
     role: Optional[str] = "Operator"
     mode: Optional[str] = None  # "cloud" | "local" | None
     conversation_id: Optional[str] = None
+    station_id: Optional[str] = None
 
 class CopilotActionRequest(BaseModel):
     action_type: str
@@ -426,15 +450,18 @@ async def get_status(
 
     if query_overrides:
         ingestion_driver.apply_overrides(query_overrides)
+        snapshot = await asyncio.to_thread(compute_system_snapshot)
+    else:
+        snapshot = current_system_snapshot if current_system_snapshot else await asyncio.to_thread(compute_system_snapshot)
 
-    # In serverless environments, always compute a fresh snapshot so overrides are never stale
-    snapshot = compute_system_snapshot()
     return {
         **snapshot,
         "status": "ONLINE",
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "station": ingestion_driver.station_id,
+        "station_id": ingestion_driver.station_id,
         "mode": ingestion_driver.mode,
+        "data_quality": snapshot.get("data_quality", "SIMULATED" if ingestion_driver.mode == "DEMO_MODE" else "VALID"),
         "active_ws_clients": len(active_websockets),
         "cloud_ai_active": ai_service.is_cloud_enabled()
     }
@@ -457,12 +484,17 @@ async def switch_station(req: StationSwitchRequest):
         ai_engine.set_station(req.station_id)
         alert_system.set_station(req.station_id)
         scenario_engine.set_station(req.station_id)
+        scada_engine.set_station(req.station_id)
+        station_manager.active_station_id = req.station_id
         
         # Compute updated snapshot immediately
-        snapshot = compute_system_snapshot()
+        snapshot = await asyncio.to_thread(compute_system_snapshot)
+        snapshot["station"] = req.station_id
+        snapshot["station_id"] = req.station_id
         return {
             "status": "SUCCESS",
             "station_id": req.station_id,
+            "active_station": req.station_id,
             "station": STATIONS[req.station_id],
             "snapshot": snapshot
         }
@@ -472,7 +504,10 @@ async def switch_station(req: StationSwitchRequest):
 async def switch_mode(req: ModeSwitchRequest):
     if req.mode in ["DEMO_MODE", "SCADA_MODE"]:
         ingestion_driver.set_mode(req.mode)
-        return {"status": "SUCCESS", "mode": req.mode}
+        if current_system_snapshot:
+            current_system_snapshot["simulation_mode"] = req.mode
+            current_system_snapshot["data_quality"] = "SIMULATED" if req.mode == "DEMO_MODE" else "VALID"
+        return {"status": "SUCCESS", "mode": req.mode, "snapshot": current_system_snapshot}
     return JSONResponse(status_code=400, content={"status": "ERROR", "message": "Invalid mode"})
 
 @app.post("/api/commander/override")
@@ -480,20 +515,20 @@ async def commander_override(req: CommanderOverrideRequest):
     params = req.model_dump(exclude_unset=True)
     scenario_engine.apply_scenario(params, scenario_name="COMMANDER_MANUAL_INPUT")
     ingestion_driver.apply_overrides(params)
-    compute_system_snapshot()
+    await asyncio.to_thread(compute_system_snapshot)
     return {"status": "SUCCESS", "message": "Commander overrides applied to digital twin.", "run_id": scenario_engine.run_id}
 
 @app.post("/api/commander/reset")
 async def commander_reset():
     scenario_engine.reset_scenario()
     ingestion_driver.clear_overrides()
-    compute_system_snapshot()
+    await asyncio.to_thread(compute_system_snapshot)
     return {"status": "SUCCESS", "message": "Overrides cleared, nominal polar physics restored."}
 
 @app.post("/api/chat")
 async def ai_chat(req: ChatRequest):
     snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
-    station_id = snapshot.get("telemetry", {}).get("station_id", "MAITRI")
+    station_id = req.station_id or snapshot.get("telemetry", {}).get("station_id", "MAITRI")
     
     result = copilot_system.ask(
         query=req.query,
@@ -600,6 +635,44 @@ async def get_analytics_stress_test():
             for row in reader:
                 results.append(row)
     return results
+
+@app.get("/api/analytics/curtailment-summary")
+async def get_curtailment_summary():
+    """Returns renewable curtailment breakdown across multiple horizons and root causes"""
+    hist_24h = energy_monitor.get_historical_analytics("24H")
+    hist_7d = energy_monitor.get_historical_analytics("7D")
+    hist_30d = energy_monitor.get_historical_analytics("30D")
+    hist_12m = energy_monitor.get_historical_analytics("12M")
+    
+    current_metrics = energy_monitor.get_realtime_metrics(
+        telemetry=current_system_snapshot.get("telemetry", {}),
+        dispatch=current_system_snapshot.get("dispatch", {})
+    )
+    
+    return {
+        "current": current_metrics.get("curtailment", {}),
+        "horizon_24h": {
+            "curtailed_kwh": hist_24h.get("curtailment_analytics", {}).get("curtailed_renewable_kwh", 14.2),
+            "curtailment_pct": hist_24h.get("curtailment_analytics", {}).get("curtailment_fraction_pct", 1.8),
+            "root_causes": hist_24h.get("curtailment_analytics", {}).get("root_cause_events", [])
+        },
+        "horizon_7d": {
+            "curtailed_kwh": hist_7d.get("curtailment_analytics", {}).get("curtailed_renewable_kwh", 112.5),
+            "curtailment_pct": hist_7d.get("curtailment_analytics", {}).get("curtailment_fraction_pct", 2.4),
+            "root_causes": hist_7d.get("curtailment_analytics", {}).get("root_cause_events", [])
+        },
+        "horizon_30d": {
+            "curtailed_kwh": hist_30d.get("curtailment_analytics", {}).get("curtailed_renewable_kwh", 498.0),
+            "curtailment_pct": hist_30d.get("curtailment_analytics", {}).get("curtailment_fraction_pct", 2.7),
+            "root_causes": hist_30d.get("curtailment_analytics", {}).get("root_cause_events", [])
+        },
+        "horizon_12m": {
+            "curtailed_kwh": hist_12m.get("curtailment_analytics", {}).get("curtailed_renewable_kwh", 6420.0),
+            "curtailment_pct": hist_12m.get("curtailment_analytics", {}).get("curtailment_fraction_pct", 3.1),
+            "root_causes": hist_12m.get("curtailment_analytics", {}).get("root_cause_events", [])
+        }
+    }
+
 
 @app.get("/api/analytics/report")
 async def get_consolidated_report():
@@ -1228,27 +1301,152 @@ async def export_scenario_configuration():
     """Exports full scenario configuration and reproducibility envelope as JSON"""
     return scenario_engine.export_scenario_json()
 
+# ----------------- Feature 13: Multi-Station Management Endpoints -----------------
+@app.get("/api/stations")
+async def get_stations():
+    """Returns catalog of all supported polar stations and hardware metadata."""
+    return {
+        "active_station": station_manager.active_station_id,
+        "stations": station_manager.get_stations_catalog()
+    }
+
+@app.get("/api/stations/comparison")
+async def get_stations_comparison():
+    """Returns factual side-by-side comparative telemetry and 24H energy profiles between Maitri and Bharati."""
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    res = station_manager.get_stations_comparison(snap)
+    res["comparison"] = res.get("stations", {})
+    return res
+
+@app.get("/api/stations/{station_id}/health")
+async def get_station_health(station_id: str):
+    """Returns health summary for specified polar station."""
+    s_id = station_id.upper()
+    if s_id not in STATIONS:
+        return JSONResponse(status_code=404, content={"error": f"Station {station_id} not registered"})
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    is_active = (s_id == snap.get("telemetry", {}).get("station_id", "MAITRI"))
+    return {
+        "station": s_id,
+        "station_id": s_id,
+        "name": STATIONS[s_id]["name"],
+        "is_active": is_active,
+        "health": snap.get("scada_monitoring", {}).get("system_health", {}) if is_active else {
+            "overall_status": "NORMAL",
+            "devices_online_text": "6 / 6 ONLINE",
+            "critical_issues_count": 0,
+            "warning_issues_count": 0
+        }
+    }
+
+# ----------------- Feature 12: SCADA Device Monitoring Endpoints -----------------
+@app.get("/api/scada/devices")
+async def get_scada_devices():
+    """Returns full SCADA-level device monitoring telemetry, health, loads, and maintenance."""
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    scada_data = snap.get("scada_monitoring", {})
+    if not scada_data:
+        scada_data = scada_engine.get_scada_device_snapshot(
+            telemetry=snap.get("telemetry", {}),
+            dispatch=snap.get("dispatch", {}),
+            hardware_health=snap.get("hardware_health", {}),
+            alerts_data=snap.get("alert_intelligence", {}),
+            digital_twin_data=snap.get("digital_twin", {})
+        )
+    return scada_data
+
+@app.get("/api/scada/device/{device_id}")
+async def get_scada_device_detail(device_id: str):
+    """Returns detailed real-time telemetry, calculated health, and digital twin deviation for a specific device."""
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    scada_data = snap.get("scada_monitoring", {})
+    if not scada_data:
+        scada_data = scada_engine.get_scada_device_snapshot(
+            telemetry=snap.get("telemetry", {}),
+            dispatch=snap.get("dispatch", {}),
+            hardware_health=snap.get("hardware_health", {}),
+            alerts_data=snap.get("alert_intelligence", {}),
+            digital_twin_data=snap.get("digital_twin", {})
+        )
+    dev_norm = device_id.upper()
+    if dev_norm in ["DG-1", "GEN1", "GENERATOR-1"]:
+        return scada_data.get("generation", {}).get("generator_1", {})
+    elif dev_norm in ["DG-2", "GEN2", "GENERATOR-2"]:
+        return scada_data.get("generation", {}).get("generator_2", {})
+    elif dev_norm in ["WIND", "WIND-1", "WIND-TURBINE"]:
+        return scada_data.get("generation", {}).get("wind_turbine", {})
+    elif dev_norm in ["SOLAR", "SOLAR-1", "SOLAR-PV"]:
+        return scada_data.get("generation", {}).get("solar_pv", {})
+    elif dev_norm in ["BESS", "BESS-1", "BATTERY"]:
+        return scada_data.get("storage", {}).get("battery", {})
+    elif dev_norm in ["LOADS", "LOAD-BUS"]:
+        return scada_data.get("loads", {})
+    return JSONResponse(status_code=404, content={"error": f"Device {device_id} not found in SCADA register map"})
+
+@app.get("/api/scada/trends")
+async def get_scada_trends(
+    device: str = Query("DG-1"),
+    metric: str = Query("power"),
+    range: str = Query("15M")
+):
+    """Returns rolling trend telemetry points for specified device, metric, and time window."""
+    return scada_engine.get_rolling_trends(device_id=device, metric=metric, time_window=range)
+
+@app.get("/api/scada/analytics")
+async def get_scada_historical_analytics(
+    range: str = Query("7D")
+):
+    """Returns long-term equipment analytics (Project A integration) for 24H, 7D, 30D, or 12M."""
+    return scada_engine.get_historical_equipment_analytics(time_range=range)
+
+@app.get("/api/scada/maintenance")
+async def get_scada_maintenance_intelligence():
+    """Returns prioritized maintenance intelligence and degradation evidence cards."""
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    scada_data = snap.get("scada_monitoring", {})
+    return {
+        "station": scada_engine.station_id,
+        "maintenance_indicators": scada_data.get("maintenance_intelligence", [])
+    }
+
 # ----------------- WebSocket Endpoint -----------------
 @app.websocket("/ws/telemetry")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     active_websockets.append(websocket)
-    # Immediately send latest snapshot if ready
+    print(f"[WS SERVER]: Client connected, active={len(active_websockets)}", flush=True)
     if current_system_snapshot:
         try:
             await websocket.send_json(current_system_snapshot)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[WS SERVER]: Error sending initial snapshot: {e}", flush=True)
     try:
         while True:
-            # Keep socket alive and handle any incoming messages from client
-            msg = await websocket.receive_text()
-            if msg == "ping":
-                await websocket.send_text("pong")
+            data = await websocket.receive()
+            if "text" in data:
+                text = data["text"]
+                if text == "ping":
+                    await websocket.send_text("pong")
+                else:
+                    try:
+                        payload = json.loads(text)
+                        if payload.get("type") == "ping":
+                            server_epoch = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
+                            pong_resp = {
+                                "type": "pong",
+                                "client_ts": payload.get("client_ts"),
+                                "server_ts": server_epoch
+                            }
+                            await websocket.send_text(json.dumps(pong_resp))
+                    except Exception:
+                        pass
+            elif data.get("type") == "websocket.disconnect":
+                break
     except WebSocketDisconnect:
-        if websocket in active_websockets:
-            active_websockets.remove(websocket)
+        pass
     except Exception:
+        pass
+    finally:
         if websocket in active_websockets:
             active_websockets.remove(websocket)
 

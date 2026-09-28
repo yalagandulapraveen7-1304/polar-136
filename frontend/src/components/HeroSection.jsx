@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { STATIONS } from '../constants/stations';
 import EnergyFlowCanvas from './EnergyFlowCanvas';
+import RealTimePowerChart from './charts/RealTimePowerChart';
+import Lookahead24hChart from './charts/Lookahead24hChart';
 
 export default function HeroSection({
   stationId,
@@ -203,6 +205,30 @@ export default function HeroSection({
             </button>
             <button
               type="button"
+              onClick={() => setCenterTab('realtime_chart')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                centerTab === 'realtime_chart'
+                  ? 'bg-[#127694] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-[#0699C6]'
+              }`}
+            >
+              <i className="fa-solid fa-chart-line text-xs"></i>
+              <span>LIVE POWER</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setCenterTab('lookahead_chart')}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
+                centerTab === 'lookahead_chart'
+                  ? 'bg-[#127694] text-white shadow-sm'
+                  : 'text-slate-600 hover:text-[#0699C6]'
+              }`}
+            >
+              <i className="fa-solid fa-chart-area text-xs"></i>
+              <span>24H LOOKAHEAD</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setCenterTab('flow')}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 centerTab === 'flow'
@@ -211,7 +237,7 @@ export default function HeroSection({
               }`}
             >
               <i className="fa-solid fa-diagram-project text-xs"></i>
-              <span>ENERGY FLOW MATRIX</span>
+              <span>FLOW MATRIX</span>
             </button>
           </div>
           <span className="text-[10px] font-bold text-slate-400 uppercase hidden sm:inline">
@@ -473,6 +499,16 @@ export default function HeroSection({
               </div>
             </div>
           </div>
+        </div>
+      ) : centerTab === 'realtime_chart' ? (
+        /* Real-Time Tactical Power & Net Balance Chart */
+        <div className="w-full p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-sm min-h-[300px]">
+          <RealTimePowerChart />
+        </div>
+      ) : centerTab === 'lookahead_chart' ? (
+        /* 24-Hour Probabilistic Lookahead Chart */
+        <div className="w-full p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-sm min-h-[300px]">
+          <Lookahead24hChart stationId={stationId} />
         </div>
       ) : (
         /* Energy Flow Matrix View */

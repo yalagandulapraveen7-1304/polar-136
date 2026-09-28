@@ -1,5 +1,8 @@
 import React from 'react';
 import { STATIONS } from '../constants/stations';
+import Sparkline from './Sparkline';
+import { useTelemetryBuffer } from '../context/TelemetryContext';
+
 
 export default function MetricCards({
   stationId,
@@ -12,6 +15,14 @@ export default function MetricCards({
   const h = latestData?.hardware_health || {};
 
   const stationInfo = STATIONS[stationId] || STATIONS.MAITRI;
+  const { buffer } = useTelemetryBuffer();
+
+  // Extract rolling trend series for sparklines (padded with current val if buffer is fresh)
+  const socHistory = buffer.length > 3 ? buffer.map(p => p.soc_pct) : [soc - 1, soc, soc];
+  const loadHistory = buffer.length > 3 ? buffer.map(p => p.load_kw) : [currentLoadKw - 2, currentLoadKw + 1, currentLoadKw];
+  const renHistory = buffer.length > 3 ? buffer.map(p => (p.wind_kw || 0) + (p.solar_kw || 0)) : [totalRenewablesKw - 3, totalRenewablesKw + 1, totalRenewablesKw];
+  const tempHistory = buffer.length > 3 ? buffer.map(p => p.temp_c) : [tempC + 0.2, tempC - 0.1, tempC];
+
 
   // 1. Battery Reserve Calculations
   const soc = activeOverrides?.battery_soc_pct !== undefined && activeOverrides?.battery_soc_pct !== null
@@ -144,6 +155,22 @@ export default function MetricCards({
               title="20% Protected Reserve Floor"
             ></div>
           </div>
+          <div className="mt-2.5 pt-1 border-t border-slate-100/80">
+            <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 mb-0.5">
+              <span>60s SoC Trend</span>
+              <span className="text-rose-500 font-bold">20% Reserve Floor</span>
+            </div>
+            <Sparkline
+              data={socHistory}
+              color="#0699C6"
+              fillColor="rgba(6, 153, 198, 0.12)"
+              height={28}
+              referenceValue={reserveFloor}
+              referenceColor="#e11d48"
+              minVal={0}
+              maxVal={100}
+            />
+          </div>
         </div>
 
         {/* Footer Meta: Health & Limits */}
@@ -196,6 +223,20 @@ export default function MetricCards({
               style={{ width: `${Math.min(100, (currentLoadKw / peakLoadKw) * 100)}%` }}
             ></div>
           </div>
+          <div className="mt-2.5 pt-1 border-t border-slate-100/80">
+            <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 mb-0.5">
+              <span>60s Load Curve</span>
+              <span className="text-indigo-600 font-bold">{currentLoadKw} kW</span>
+            </div>
+            <Sparkline
+              data={loadHistory}
+              color="#6366f1"
+              fillColor="rgba(99, 102, 241, 0.12)"
+              height={28}
+              referenceValue={peakLoadKw}
+              referenceColor="#94a3b8"
+            />
+          </div>
         </div>
 
         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
@@ -241,6 +282,18 @@ export default function MetricCards({
             <div className="p-1 rounded-lg bg-amber-50 text-center border border-amber-200">
               <span className="text-[9px] font-bold text-amber-700">Solar: {Math.round(solarKw)} kW</span>
             </div>
+          </div>
+          <div className="mt-2.5 pt-1 border-t border-slate-100/80">
+            <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 mb-0.5">
+              <span>60s Renewable Harvest</span>
+              <span className="text-emerald-600 font-bold">{totalRenewablesKw} kW</span>
+            </div>
+            <Sparkline
+              data={renHistory}
+              color="#10b981"
+              fillColor="rgba(16, 185, 129, 0.12)"
+              height={28}
+            />
           </div>
         </div>
 
@@ -289,6 +342,18 @@ export default function MetricCards({
           <div className="w-full mt-2 flex items-center justify-between text-[11px] font-mono bg-slate-50 p-1.5 rounded-lg border border-slate-100">
             <span className="text-slate-500">Solar Irradiance:</span>
             <span className="font-bold text-slate-800">{solarIrr.toFixed(0)} W/m²</span>
+          </div>
+          <div className="mt-2.5 pt-1 border-t border-slate-100/80">
+            <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 mb-0.5">
+              <span>60s Thermal Drift</span>
+              <span className="text-sky-600 font-bold">{tempC.toFixed(1)}°C</span>
+            </div>
+            <Sparkline
+              data={tempHistory}
+              color="#0284c7"
+              fillColor="rgba(2, 132, 199, 0.10)"
+              height={28}
+            />
           </div>
         </div>
 

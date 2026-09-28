@@ -127,7 +127,7 @@ export default function WeatherModal({
               <i className="fa-solid fa-circle-check text-[#0699C6]"></i>
               <span>{simToast}</span>
             </div>
-            <button onClick={() => setSimToast(null)} className="text-[#0699C6] hover:text-white">
+            <button onClick={() => setSimToast(null)} className="text-[#0699C6] hover:text-[#127694]">
               <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -228,7 +228,7 @@ export default function WeatherModal({
                   </div>
                   <div>
                     <span className="text-slate-500 uppercase">Last Updated: </span>
-                    <strong className="text-white">{prov.last_updated_utc || '12:41:08 UTC'}</strong>
+                    <strong className="text-[#127694]">{prov.last_updated_utc || '12:41:08 UTC'}</strong>
                   </div>
                   <div>
                     <span className="text-slate-500 uppercase">Sensor Quality: </span>
@@ -318,7 +318,7 @@ export default function WeatherModal({
                       key={h}
                       onClick={() => setForecastHorizon(h)}
                       className={`px-3 py-1 rounded-lg text-xs font-bold font-mono transition ${
-                        forecastHorizon === h ? 'bg-cyan-500 text-slate-950 shadow' : 'text-slate-400 hover:text-white'
+                        forecastHorizon === h ? 'bg-[#127694] text-white shadow' : 'text-slate-600 hover:text-[#0699C6]'
                       }`}
                     >
                       {h} Hours
@@ -341,7 +341,7 @@ export default function WeatherModal({
                         <div key={idx} className="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200">
                           <span className="text-slate-400">{ts}</span>
                           <span className="text-[#0699C6] font-bold">P10: {forecastData.temperature_c.p10[idx]}°C</span>
-                          <span className="text-white font-bold">P50: {forecastData.temperature_c.p50[idx]}°C</span>
+                          <span className="text-slate-900 font-bold">P50: {forecastData.temperature_c.p50[idx]}°C</span>
                           <span className="text-amber-400 font-bold">P90: {forecastData.temperature_c.p90[idx]}°C</span>
                         </div>
                       ))}
@@ -359,7 +359,7 @@ export default function WeatherModal({
                         <div key={idx} className="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200">
                           <span className="text-slate-400">{ts}</span>
                           <span className="text-blue-400 font-bold">P10: {forecastData.wind_speed_ms.p10[idx]} m/s</span>
-                          <span className="text-white font-bold">P50: {forecastData.wind_speed_ms.p50[idx]} m/s</span>
+                          <span className="text-slate-900 font-bold">P50: {forecastData.wind_speed_ms.p50[idx]} m/s</span>
                           <span className="text-purple-400 font-bold">P90: {forecastData.wind_speed_ms.p90[idx]} m/s</span>
                         </div>
                       ))}
@@ -388,9 +388,9 @@ export default function WeatherModal({
                         {item.time_offset}
                       </span>
                       <div className="space-y-1 flex-1">
-                        <div className="text-white font-bold">{item.condition}</div>
+                        <div className="text-slate-900 font-bold">{item.condition}</div>
                         <div className="text-slate-700 text-[11px]"><span className="text-[#0699C6] font-bold">Impact: </span>{item.impact}</div>
-                        <div className="text-emerald-300 text-[11px]"><span className="text-emerald-400 font-bold">Action: </span>{item.action}</div>
+                        <div className="text-emerald-800 text-[11px]"><span className="text-emerald-400 font-bold">Action: </span>{item.action}</div>
                       </div>
                     </div>
                   ))}
@@ -400,7 +400,7 @@ export default function WeatherModal({
               {/* Explainable Alerts Section */}
               {alertsData.length > 0 && (
                 <div>
-                  <h3 className="text-xs font-bold text-rose-300 uppercase tracking-wider mb-3 font-mono">
+                  <h3 className="text-xs font-bold text-rose-800 uppercase tracking-wider mb-3 font-mono">
                     Active Environmental Risk Alerts
                   </h3>
                   <div className="space-y-3">
@@ -411,13 +411,13 @@ export default function WeatherModal({
                             <i className="fa-solid fa-triangle-exclamation"></i>
                             {alt.title}
                           </span>
-                          <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-300 text-[10px] font-bold border border-rose-500/40">
+                          <span className="px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold border border-rose-500/40">
                             {alt.severity}
                           </span>
                         </div>
                         <div className="text-slate-700"><span className="text-slate-500 font-bold">Trigger: </span>{alt.condition}</div>
                         <div className="text-slate-700"><span className="text-slate-500 font-bold">Impact: </span>{alt.impact}</div>
-                        <div className="text-emerald-300 font-bold"><span className="text-emerald-400">Action: </span>{alt.recommended_action}</div>
+                        <div className="text-emerald-800 font-bold"><span className="text-emerald-400">Action: </span>{alt.recommended_action}</div>
                       </div>
                     ))}
                   </div>
@@ -441,7 +441,7 @@ export default function WeatherModal({
                     onClick={() => handleStressPreset('NORMAL_WINTER')}
                     className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 text-left transition"
                   >
-                    <div className="font-bold text-xs text-white">Normal Winter</div>
+                    <div className="font-bold text-xs text-slate-900">Normal Winter</div>
                     <div className="text-[10px] text-slate-400 mt-1">-22°C · 12 m/s Wind</div>
                   </button>
 
@@ -473,7 +473,7 @@ export default function WeatherModal({
 
               {/* Custom Sliders */}
               <div className="bg-[#f0faff] p-5 rounded-2xl border border-slate-200 space-y-4">
-                <span className="text-xs font-mono font-bold text-white uppercase block">
+                <span className="text-xs font-mono font-bold text-[#127694] uppercase block">
                   Interactive Environmental Parameter Sliders:
                 </span>
 
@@ -607,7 +607,7 @@ export default function WeatherModal({
         {/* Modal Bottom Footer */}
         <div className="flex items-center justify-between px-6 py-3 border-t border-slate-200 bg-slate-50 text-xs font-mono text-slate-400">
           <div className="flex items-center gap-3">
-            <span>STATION: <strong className="text-white">{currentStation.name}</strong></span>
+            <span>STATION: <strong className="text-[#127694]">{currentStation.name}</strong></span>
             <span>SOURCE: <strong className="text-[#0699C6]">{prov.source || 'SYNTHETIC'}</strong></span>
           </div>
           <button

@@ -227,7 +227,7 @@ export default function BottomCards({
             <button
               type="button"
               onClick={() => onOpenModal('manual')}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-50 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
             >
               <i className="fa-solid fa-sliders text-xs"></i>
               <span>MANUAL OVERRIDE</span>

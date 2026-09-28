@@ -21,6 +21,7 @@ from backend.config import (
     DIESEL_MIN_RUN_TIME_MIN,
     BATTERY_LOCKOUT_TEMP_C,
     BATTERY_MIN_SOC_PCT,
+    BATTERY_MAX_SOC_PCT,
     WIND_CUT_OUT_MS,
     CHP_THERMAL_RATIO
 )
@@ -348,6 +349,22 @@ class PolarPolicyEngine:
                         severity=AlarmSeverity.CRITICAL,
                         reason="Station shed science loads to protect Life-Support power."
                     ))
+
+        # Balance surplus generation to preserve physical energy balance equation
+        effective_load = total_load_e - tier_3_shed - tier_2_shed
+        current_gen_actual = p_g1 + p_g2 + p_wind + p_solar + p_dis - p_chg
+        surplus = current_gen_actual - effective_load
+        if surplus > 0.1:
+            if p_dis > 0.05:
+                trim_dis = min(surplus, p_dis)
+                p_dis = max(0.0, p_dis - trim_dis)
+                surplus -= trim_dis
+                safe_dispatch["p_battery_discharge_kw"] = round(p_dis, 1)
+            if surplus > 0.1 and soc < (BATTERY_MAX_SOC_PCT - 0.5):
+                add_chg = min(surplus, 100.0 - p_chg)
+                p_chg += add_chg
+                surplus -= add_chg
+                safe_dispatch["p_battery_charge_kw"] = round(p_chg, 1)
 
         # =============================================================
         # 7. HARD CONSTRAINT: Thermal Life Support Protection

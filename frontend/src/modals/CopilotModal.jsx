@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function CopilotModal({ isOpen, onClose }) {
+export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData }) {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'anomalies' | 'digital_twin' | 'counterfactual' | 'mlops' | 'audit'
 
   // Copilot Controls
@@ -31,11 +31,11 @@ export default function CopilotModal({ isOpen, onClose }) {
   const [proactiveInsights, setProactiveInsights] = useState([]);
   const [suggestedPrompts, setSuggestedPrompts] = useState([
     "What's happening right now?",
+    "Compare Maitri and Bharati station metrics",
+    "Which station has higher renewable share?",
     "Why is Generator 1 running when wind is available?",
-    "What will happen in the next 6 hours?",
     "How is the battery doing?",
-    "Why did the optimizer choose this dispatch?",
-    "What happens if Generator 1 fails?"
+    "Why did the optimizer choose this dispatch?"
   ]);
 
   // Intelligence State
@@ -139,7 +139,8 @@ export default function CopilotModal({ isOpen, onClose }) {
         body: JSON.stringify({
           query: q,
           role: userRole,
-          mode: copilotMode === 'auto' ? null : copilotMode
+          mode: copilotMode === 'auto' ? null : copilotMode,
+          station_id: stationId
         })
       });
       if (res.ok) {
@@ -293,18 +294,18 @@ export default function CopilotModal({ isOpen, onClose }) {
                 {/* Two-Layer Mode Badge */}
                 <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-slate-100 border border-slate-200">
                   <span className="text-slate-400">Mode:</span>
-                  <span className={`flex items-center gap-1 ${activeModeDisplay === 'CLOUD' ? 'text-[#127694]' : 'text-amber-300'}`}>
+                  <span className={`flex items-center gap-1 ${activeModeDisplay === 'CLOUD' ? 'text-[#127694]' : 'text-amber-800'}`}>
                     <span className={`w-2 h-2 rounded-full ${activeModeDisplay === 'CLOUD' ? 'bg-cyan-400 animate-pulse' : 'bg-amber-400'}`}></span>
                     {activeModeDisplay === 'CLOUD' ? 'CLOUD' : 'LOCAL FALLBACK'}
                   </span>
                 </div>
 
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hidden sm:inline">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 border border-emerald-500/40 hidden sm:inline">
                   Deterministic Safety Armed
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Maitri Station · 12:41 UTC · Ask → Understand → Grounded Telemetry → MILP &amp; Digital Twin → Explain
+              <p className="text-xs text-slate-500 font-medium">
+                {stationId} Station · Grounded Telemetry · MILP &amp; Digital Twin · Multi-Station Cross Analysis
               </p>
             </div>
           </div>
@@ -315,21 +316,21 @@ export default function CopilotModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => setCopilotMode('auto')}
-                className={`px-2 py-0.5 rounded-lg transition ${copilotMode === 'auto' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                className={`px-2 py-0.5 rounded-lg transition ${copilotMode === 'auto' ? 'bg-sky-500 text-slate-950' : 'text-slate-500 hover:text-[#127694]'}`}
               >
                 Auto
               </button>
               <button
                 type="button"
                 onClick={() => setCopilotMode('cloud')}
-                className={`px-2 py-0.5 rounded-lg transition ${copilotMode === 'cloud' ? 'bg-cyan-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                className={`px-2 py-0.5 rounded-lg transition ${copilotMode === 'cloud' ? 'bg-cyan-500 text-slate-950' : 'text-slate-500 hover:text-[#127694]'}`}
               >
                 Cloud
               </button>
               <button
                 type="button"
                 onClick={() => setCopilotMode('local')}
-                className={`px-2 py-0.5 rounded-lg transition ${copilotMode === 'local' ? 'bg-amber-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                className={`px-2 py-0.5 rounded-lg transition ${copilotMode === 'local' ? 'bg-amber-500 text-slate-950' : 'text-slate-500 hover:text-[#127694]'}`}
               >
                 Local
               </button>
@@ -362,14 +363,14 @@ export default function CopilotModal({ isOpen, onClose }) {
         {actionNotice && (
           <div className={`px-6 py-2 border-b text-xs font-bold flex items-center justify-between animate-fadeIn ${
             actionNotice.includes('Denied')
-              ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
-              : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+              ? 'bg-rose-50 border-rose-200 text-rose-800'
+              : 'bg-emerald-50 border-emerald-200 text-emerald-800'
           }`}>
             <span className="flex items-center gap-2">
               <i className={`fa-solid ${actionNotice.includes('Denied') ? 'fa-triangle-exclamation' : 'fa-circle-check'}`}></i>
               <span>{actionNotice}</span>
             </span>
-            <button onClick={() => setActionNotice(null)} className="text-slate-400 hover:text-white">
+            <button onClick={() => setActionNotice(null)} className="text-slate-500 hover:text-[#127694]">
               <i className="fa-solid fa-xmark text-xs"></i>
             </button>
           </div>
@@ -382,7 +383,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'chat'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-comment-dots"></i>
@@ -394,7 +395,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'anomalies'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-satellite-dish"></i>
@@ -409,7 +410,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'digital_twin'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-brain"></i>
@@ -424,7 +425,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'counterfactual'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-flask-vial"></i>
@@ -436,7 +437,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'mlops'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-dna"></i>
@@ -448,7 +449,7 @@ export default function CopilotModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'audit'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-clipboard-list"></i>
@@ -462,6 +463,19 @@ export default function CopilotModal({ isOpen, onClose }) {
           {/* TAB 1: INTERACTIVE COPILOT */}
           {activeTab === 'chat' && (
             <div className="space-y-4 animate-fadeIn">
+              {/* Active Station Context Strip */}
+              <div className="flex items-center justify-between px-3.5 py-2 bg-[#edf9fd] border border-[#bcecfc] rounded-xl text-xs font-semibold text-[#127694]">
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-satellite-dish text-[#0699C6]"></i>
+                  <span>Station Context: <strong className="font-bold text-[#127694] underline">{stationId}</strong></span>
+                  <span className="text-slate-300">|</span>
+                  <span className="text-slate-600 font-normal">Telemetry: <strong className="text-emerald-700 font-bold">{latestData ? 'Synchronized' : 'Standby'}</strong></span>
+                </div>
+                <div className="text-[11px] text-[#0699C6] flex items-center gap-1.5">
+                  <i className="fa-solid fa-shield-halved"></i>
+                  <span>Grounded SCADA &amp; High-Confidence MILP</span>
+                </div>
+              </div>
               
               {/* Proactive AI Insights Strip */}
               {proactiveInsights.length > 0 && (
@@ -513,7 +527,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                         <span>·</span>
                         <span>{m.time}</span>
                         {m.sender === 'ai' && (
-                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.mode === 'CLOUD' ? 'bg-cyan-500/20 text-[#127694]' : 'bg-amber-500/20 text-amber-300'}`}>
+                          <span className={`px-1.5 py-0.2 rounded text-[9px] font-extrabold ${m.mode === 'CLOUD' ? 'bg-cyan-500/20 text-[#127694]' : 'bg-amber-500/20 text-amber-800'}`}>
                             {m.mode || 'LOCAL_FALLBACK'}
                           </span>
                         )}
@@ -628,7 +642,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                     key={i}
                     type="button"
                     onClick={() => handleSend(qp)}
-                    className="px-2.5 py-1 rounded-lg bg-[#f0faff] hover:bg-slate-700 text-slate-700 hover:text-white text-[11px] font-semibold transition border border-slate-200"
+                    className="px-2.5 py-1 rounded-lg bg-[#f0faff] hover:bg-slate-100 text-[#127694] hover:text-[#0699C6] text-[11px] font-semibold transition border border-slate-200"
                   >
                     {qp}
                   </button>
@@ -662,7 +676,7 @@ export default function CopilotModal({ isOpen, onClose }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Isolation Forest Anomaly Score</span>
-                  <div className="text-2xl font-black text-white mt-1">
+                  <div className="text-2xl font-black text-[#127694] mt-1">
                     {anomalyData?.score !== undefined ? anomalyData.score.toFixed(3) : '0.052'}
                   </div>
                   <span className="text-[10px] text-emerald-400 font-bold">10-Dimensional Vector Monitored</span>
@@ -700,11 +714,11 @@ export default function CopilotModal({ isOpen, onClose }) {
                       <span className="text-slate-700">{anomalyData.xai_card.why}</span>
                     </div>
                     <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
-                      <strong className="text-amber-300 block mb-1">What Could Happen:</strong>
+                      <strong className="text-amber-800 font-bold block mb-1">What Could Happen:</strong>
                       <span className="text-slate-700">{anomalyData.xai_card.next}</span>
                     </div>
                     <div className="p-2.5 rounded-xl bg-slate-100 border border-slate-200">
-                      <strong className="text-emerald-300 block mb-1">Recommended Action:</strong>
+                      <strong className="text-emerald-800 font-bold block mb-1">Recommended Action:</strong>
                       <span className="text-slate-700">{anomalyData.xai_card.action}</span>
                     </div>
                   </div>
@@ -722,17 +736,17 @@ export default function CopilotModal({ isOpen, onClose }) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase">Battery Cell Temperature</span>
-                  <div className="text-lg font-black text-white mt-1">Physics: 21.4°C | ML: +0.38°C</div>
+                  <div className="text-lg font-black text-slate-900 mt-1">Physics: 21.4°C | ML: +0.38°C</div>
                   <div className="text-xs text-emerald-400 font-bold mt-1">Hybrid: 21.78°C (±15% Safe)</div>
                 </div>
                 <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase">Diesel SFC Fuel Rate</span>
-                  <div className="text-lg font-black text-white mt-1">Physics: 48.2 L/h | ML: -0.82 L/h</div>
+                  <div className="text-lg font-black text-slate-900 mt-1">Physics: 48.2 L/h | ML: -0.82 L/h</div>
                   <div className="text-xs text-emerald-400 font-bold mt-1">Hybrid: 47.38 L/h (±15% Safe)</div>
                 </div>
                 <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase">Station Heating Demand</span>
-                  <div className="text-lg font-black text-white mt-1">Physics: 142 kWth | ML: +3.2 kWth</div>
+                  <div className="text-lg font-black text-slate-900 mt-1">Physics: 142 kWth | ML: +3.2 kWth</div>
                   <div className="text-xs text-emerald-400 font-bold mt-1">Hybrid: 145.2 kWth (±15% Safe)</div>
                 </div>
               </div>
@@ -753,7 +767,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                     className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
                       selectedScenario === sc.id
                         ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                        : 'bg-[#f0faff] text-slate-700 hover:text-white border border-slate-200'
+                        : 'bg-[#f0faff] text-slate-700 hover:text-[#127694] border border-slate-200'
                     }`}
                   >
                     <i className={`fa-solid ${sc.icon}`}></i>
@@ -764,18 +778,18 @@ export default function CopilotModal({ isOpen, onClose }) {
 
               {simulationResult && (
                 <div className="p-4 rounded-2xl bg-[#f0faff] border border-sky-500/30 space-y-3">
-                  <div className="text-sm font-black text-white flex items-center gap-2">
+                  <div className="text-sm font-black text-slate-900 flex items-center gap-2">
                     <i className="fa-solid fa-microchip text-[#0699C6]"></i>
                     <span>Simulated Contingency Result: {simulationResult.scenario_name || selectedScenario}</span>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                     <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Battery Response:</span>
-                      <span className="text-white font-bold">{simulationResult.battery_response || '+42 kW discharge'}</span>
+                      <span className="text-slate-900 font-bold">{simulationResult.battery_response || '+42 kW discharge'}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Generator Status:</span>
-                      <span className="text-white font-bold">{simulationResult.genset_status || 'G2 Started & Synced'}</span>
+                      <span className="text-slate-900 font-bold">{simulationResult.genset_status || 'G2 Started & Synced'}</span>
                     </div>
                     <div className="p-3 rounded-xl bg-slate-100 border border-slate-200">
                       <span className="text-[10px] text-slate-400 font-bold uppercase block">Reserve Margin:</span>
@@ -807,14 +821,14 @@ export default function CopilotModal({ isOpen, onClose }) {
                 </div>
                 <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase">Production Champion</span>
-                  <div className="text-sm font-black text-white mt-1">LightGBM-Quantile-v2.4.1</div>
+                  <div className="text-sm font-black text-[#127694] mt-1">LightGBM-Quantile-v2.4.1</div>
                   <span className="text-[10px] text-[#0699C6]">Serving active 24H inference</span>
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200 flex items-center justify-between">
                 <div>
-                  <h4 className="text-xs font-black text-white uppercase">Model Rollback Governance</h4>
+                  <h4 className="text-xs font-black text-[#127694] uppercase">Model Rollback Governance</h4>
                   <p className="text-[11px] text-slate-400">Instantaneously revert active inference to previous validated checkpoint.</p>
                 </div>
                 <button
@@ -836,7 +850,7 @@ export default function CopilotModal({ isOpen, onClose }) {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Total Queries</span>
-                  <span className="text-xl font-black text-white">{metricsData?.total_queries || 0}</span>
+                  <span className="text-xl font-black text-[#127694]">{metricsData?.total_queries || 0}</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-[#f0faff] border border-slate-200">
                   <span className="text-[10px] font-bold text-slate-500 uppercase block">Fallback Rate</span>
@@ -879,7 +893,7 @@ export default function CopilotModal({ isOpen, onClose }) {
                           <tr key={i} className="hover:bg-slate-50">
                             <td className="py-2 px-3 font-mono text-slate-400">{item.timestamp?.split('T')[1]?.replace('Z', '') || '12:00'}</td>
                             <td className="py-2 px-3"><span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px]">{item.user_role}</span></td>
-                            <td className="py-2 px-3 text-white max-w-xs truncate">{item.query}</td>
+                            <td className="py-2 px-3 text-slate-800 font-medium max-w-xs truncate">{item.query}</td>
                             <td className="py-2 px-3"><span className={`text-[10px] font-bold ${item.copilot_mode === 'CLOUD' ? 'text-[#0699C6]' : 'text-amber-400'}`}>{item.copilot_mode}</span></td>
                             <td className="py-2 px-3 font-mono text-slate-400">{item.latency_ms} ms</td>
                           </tr>

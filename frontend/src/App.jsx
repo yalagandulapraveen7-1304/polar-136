@@ -14,10 +14,26 @@ import BatteryModal from './modals/BatteryModal';
 import MicrogridModal from './modals/MicrogridModal';
 import WeatherModal from './modals/WeatherModal';
 import AlertsModal from './modals/AlertsModal';
+import DeviceMonitoringModal from './modals/DeviceMonitoringModal';
+import StationComparisonModal from './modals/StationComparisonModal';
+import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 
 export default function App() {
-  const [stationId, setStationId] = useState('MAITRI');
+  const [stationId, setStationId] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlStation = params.get('station');
+      if (urlStation && ['MAITRI', 'BHARATI'].includes(urlStation.toUpperCase())) {
+        return urlStation.toUpperCase();
+      }
+      const saved = sessionStorage.getItem('polarops_station');
+      if (saved && ['MAITRI', 'BHARATI'].includes(saved.toUpperCase())) {
+        return saved.toUpperCase();
+      }
+    } catch (e) {}
+    return 'MAITRI';
+  });
   const [mode, setMode] = useState('DEMO_MODE');
   const [currentScenario, setCurrentScenario] = useState('normal');
   const [clockTime, setClockTime] = useState('');
@@ -59,6 +75,21 @@ export default function App() {
   const wsRef = useRef(null);
   const wsConnectedRef = useRef(false);
   const reconnectTimerRef = useRef(null);
+
+  // Initial station sync to ensure backend context matches URL/session
+  useEffect(() => {
+    // Sync initial station to backend
+    fetch('/api/station/switch', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ station_id: stationId })
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.snapshot) setLatestData(data.snapshot);
+      })
+      .catch(() => {});
+  }, []);
 
   // 1. Live UTC Clock
   useEffect(() => {
@@ -212,13 +243,34 @@ export default function App() {
 
   // 5. Handlers
   const handleStationChange = async (id) => {
-    setStationId(id);
+    if (!id) return;
+    if (id === 'COMPARE') {
+      setActiveModal('comparison');
+      return;
+    }
+    const cleanId = id.toUpperCase();
+    setStationId(cleanId);
     try {
-      await fetch('/api/station/switch', {
+      sessionStorage.setItem('polarops_station', cleanId);
+      const url = new URL(window.location);
+      url.searchParams.set('station', cleanId);
+      window.history.replaceState({}, '', url);
+    } catch (e) {}
+
+    try {
+      const res = await fetch('/api/station/switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ station_id: id })
+        body: JSON.stringify({ station_id: cleanId })
       });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.snapshot) {
+          setLatestData(data.snapshot);
+          fetchAuditLogs();
+          return data.snapshot;
+        }
+      }
       fetchAuditLogs();
     } catch (e) {
       console.warn('Switch station endpoint error:', e);
@@ -302,15 +354,88 @@ export default function App() {
   };
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto p-3 sm:p-4 lg:p-5 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
-      {/* 1. Floating Top Navigation Pill */}
-      <Header
+    <TelemetryProvider activeStationId={stationId} mode={mode} initialData={latestData}>
+      <AppDashboard
         stationId={stationId}
         onStationChange={handleStationChange}
         mode={mode}
         onModeChange={handleModeChange}
+        currentScenario={currentScenario}
+        onScenarioChange={handleScenarioChange}
+        onResetScenario={handleResetScenario}
+        clockTime={clockTime}
+        activeModal={activeModal}
+        setActiveModal={setActiveModal}
+        activeOverrides={activeOverrides}
+        onApplyOverrides={handleApplyOverrides}
+        onResetOverrides={handleResetOverrides}
+        auditLogs={auditLogs}
+        initialLatestData={latestData}
+      />
+    </TelemetryProvider>
+  );
+}
+
+function AppDashboard({
+  stationId,
+  onStationChange,
+  mode,
+  onModeChange,
+  currentScenario,
+  onScenarioChange,
+  onResetScenario,
+  clockTime,
+  activeModal,
+  setActiveModal,
+  activeOverrides,
+  onApplyOverrides,
+  onResetOverrides,
+  auditLogs,
+  initialLatestData
+}) {
+  const {
+    telemetryData,
+    connectionState,
+    latencyMs,
+    packetCount,
+    uptimeSeconds,
+    isStale,
+    staleSeconds,
+    quality,
+    reconnectNow,
+    updateTelemetrySnapshot
+  } = useTelemetry();
+
+  // Prefer stream data from central telemetry store, fallback to initial snapshot
+  const latestData = telemetryData || initialLatestData;
+
+  const handleStationSwitchWithStore = async (id) => {
+    const snap = await onStationChange(id);
+    if (snap && updateTelemetrySnapshot) {
+      updateTelemetrySnapshot(snap);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-[1600px] mx-auto p-3 sm:p-4 lg:p-5 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
+      {/* 1. Floating Top Navigation Pill */}
+      <Header
+        stationId={stationId}
+        onStationChange={handleStationSwitchWithStore}
+        mode={mode}
+        onModeChange={onModeChange}
         onOpenModal={(modalName) => setActiveModal(modalName)}
         clockTime={clockTime}
+        telemetryMeta={{
+          connectionState,
+          latencyMs,
+          packetCount,
+          uptimeSeconds,
+          isStale,
+          staleSeconds,
+          quality,
+          reconnectNow
+        }}
       />
 
       {/* 2. Real-Time Operations Gauges (4 Live HUD Cards: Battery, Load, Renewables, Environment) */}
@@ -334,15 +459,15 @@ export default function App() {
         onOpenModal={(modalName) => setActiveModal(modalName)}
         activeOverrides={activeOverrides}
         currentScenario={currentScenario}
-        onScenarioChange={handleScenarioChange}
+        onScenarioChange={onScenarioChange}
       />
 
       {/* 4. Tactical Operations & Annual Strategic Impact KPIs */}
       <BottomCards
         latestData={latestData}
         currentScenario={currentScenario}
-        onScenarioChange={handleScenarioChange}
-        onResetScenario={handleResetScenario}
+        onScenarioChange={onScenarioChange}
+        onResetScenario={onResetScenario}
         onOpenModal={(modalName) => setActiveModal(modalName)}
       />
 
@@ -378,6 +503,7 @@ export default function App() {
       <ForecastFullModal
         isOpen={activeModal === 'forecast'}
         onClose={() => setActiveModal(null)}
+        stationId={stationId}
       />
 
       <DispatchModal
@@ -391,6 +517,8 @@ export default function App() {
       <CopilotModal
         isOpen={activeModal === 'copilot'}
         onClose={() => setActiveModal(null)}
+        stationId={stationId}
+        latestData={latestData}
       />
 
       <MaintenanceModal
@@ -403,8 +531,8 @@ export default function App() {
         isOpen={activeModal === 'manual'}
         onClose={() => setActiveModal(null)}
         activeOverrides={activeOverrides}
-        onApplyOverrides={handleApplyOverrides}
-        onResetOverrides={handleResetOverrides}
+        onApplyOverrides={onApplyOverrides}
+        onResetOverrides={onResetOverrides}
         latestData={latestData}
         stationId={stationId}
       />
@@ -414,6 +542,23 @@ export default function App() {
         onClose={() => setActiveModal(null)}
         latestData={latestData}
         stationId={stationId}
+      />
+
+      <DeviceMonitoringModal
+        isOpen={activeModal === 'devices'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+      />
+
+      <StationComparisonModal
+        isOpen={activeModal === 'comparison'}
+        onClose={() => setActiveModal(null)}
+        onSelectStation={(id) => {
+          handleStationSwitchWithStore(id);
+          setActiveModal(null);
+        }}
+        activeStationId={stationId}
       />
     </div>
   );

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import EnergyFlowCanvas from '../components/EnergyFlowCanvas';
 import AuditLogTable from '../components/AuditLogTable';
+import DispatchStacked24hChart from '../components/charts/DispatchStacked24hChart';
+import StressTestBreakingPointChart from '../components/charts/StressTestBreakingPointChart';
 
 export default function DispatchModal({
   isOpen,
@@ -340,6 +342,20 @@ export default function DispatchModal({
               </div>
             </div>
 
+            {/* 24-Hour MILP Dispatch Stacked Area Chart */}
+            <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 text-xs">
+                <span className="font-extrabold text-[#127694] flex items-center gap-1.5 uppercase tracking-tight">
+                  <i className="fa-solid fa-chart-area text-[#0699C6]"></i>
+                  24-Hour Dispatch Stack vs Station Demand
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  HiGHS LP Solver · 24-Hour Optimal Unit Commitment
+                </span>
+              </div>
+              <DispatchStacked24hChart schedule={schedule24h?.schedule || []} />
+            </div>
+
             {/* 24-Hour Hourly MILP Schedule Table */}
             <div className="overflow-x-auto rounded-2xl border border-[#bcecfc] max-h-[380px]">
               {isLoading24h ? (
@@ -439,6 +455,20 @@ export default function DispatchModal({
                   <span className="text-[9px] text-slate-500 font-bold">68.2% Green Share</span>
                 </div>
               </div>
+            </div>
+
+            {/* Stress Test & Physical Capacity Breaking Point Chart */}
+            <div className="p-3.5 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 text-xs">
+                <span className="font-extrabold text-[#127694] flex items-center gap-1.5 uppercase tracking-tight">
+                  <i className="fa-solid fa-chart-bar text-[#0699C6]"></i>
+                  Physical Capacity Limits &amp; Extreme Stress Test
+                </span>
+                <span className="text-[10px] font-mono text-slate-400">
+                  Full 8,760-Hour Failure Injection Benchmark
+                </span>
+              </div>
+              <StressTestBreakingPointChart />
             </div>
 
             {/* Sizing Sweep Payback Table */}

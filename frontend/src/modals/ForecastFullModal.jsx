@@ -371,7 +371,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'quantiles'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-chart-area"></i>
@@ -383,7 +383,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'deviation'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-arrows-split-up-and-left"></i>
@@ -400,7 +400,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'reserve'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-shield-halved"></i>
@@ -412,7 +412,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'benchmark'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-scale-balanced"></i>
@@ -424,7 +424,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl transition ${
               activeTab === 'mlops'
                 ? 'bg-sky-500 text-slate-950 shadow-md shadow-sky-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-50'
+                : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
             <i className="fa-solid fa-dna"></i>
@@ -454,7 +454,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
                           selectedTarget === t.id
                             ? 'bg-sky-500 text-slate-950 shadow-sm'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-700 hover:text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-[#127694]'
                         }`}
                       >
                         <i className={`fa-solid ${t.icon} text-[10px]`}></i>
@@ -478,7 +478,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                         className={`px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                           selectedHorizon === h.id
                             ? 'bg-sky-500 text-slate-950 shadow-sm'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-700 hover:text-white'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-[#127694]'
                         }`}
                       >
                         <span>{h.label}</span>
@@ -495,7 +495,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               <div className="bg-[#f0faff] p-5 rounded-3xl border border-sky-500/20 relative shadow-inner">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <h3 className="font-extrabold text-sm text-white uppercase flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm text-[#127694] uppercase flex items-center gap-2">
                       <i className={`fa-solid ${currentTargetMeta.icon} text-[#0699C6]`}></i>
                       <span>{currentTargetMeta.label} ({currentTargetMeta.unit}) — {selectedHorizon} Horizon</span>
                     </h3>
@@ -569,7 +569,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     <div className="text-[10px] font-extrabold text-[#127694] uppercase tracking-wider mb-1">
                       P50 Central Expected
                     </div>
-                    <div className="text-xl font-black text-white font-mono">
+                    <div className="text-xl font-black text-[#127694] font-mono">
                       {forecastData.p50[0]} <span className="text-xs font-sans text-sky-200">{currentTargetMeta.unit}</span>
                     </div>
                     <div className="text-[10px] text-[#127694] mt-1">Median operational baseline for MILP dispatch</div>
@@ -612,7 +612,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                   {deviationData.alerts.map((al, idx) => (
                     <div key={idx} className="p-2.5 rounded-xl bg-[#f0faff] border border-amber-500/30 text-xs flex items-center justify-between">
                       <div>
-                        <span className="font-bold text-white">{al.message}</span>
+                        <span className="font-bold text-slate-900">{al.message}</span>
                         <div className="text-[11px] text-slate-400 mt-0.5">Mitigation: {al.mitigation}</div>
                       </div>
                       <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/20 text-amber-300 font-bold">
@@ -628,7 +628,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                 {deviationData.comparison_cards.map(c => (
                   <div key={c.target} className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="font-extrabold text-xs text-white uppercase tracking-tight">
+                      <span className="font-extrabold text-xs text-[#127694] uppercase tracking-tight">
                         {c.target.replace(/_/g, ' ')}
                       </span>
                       <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
@@ -654,7 +654,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-200/80 text-xs">
-                      <span className="text-slate-400">Residual (Δ): <strong className="font-mono text-white">{c.residual_delta > 0 ? `+${c.residual_delta}` : c.residual_delta}</strong></span>
+                      <span className="text-slate-400">Residual (Δ): <strong className="font-mono text-slate-900">{c.residual_delta > 0 ? `+${c.residual_delta}` : c.residual_delta}</strong></span>
                       <span className={`font-mono font-bold ${c.pct_deviation >= 0 ? 'text-rose-400' : 'text-[#0699C6]'}`}>
                         {c.pct_deviation > 0 ? `+${c.pct_deviation}%` : `${c.pct_deviation}%`}
                       </span>
@@ -666,7 +666,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               {/* High-Impact Forecast Events Timeline */}
               <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm text-[#127694] uppercase tracking-tight flex items-center gap-2">
                     <i className="fa-solid fa-bolt-lightning text-amber-400"></i>
                     <span>Upcoming High-Impact Forecast Events (Prioritized by Severity)</span>
                   </h4>
@@ -685,7 +685,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                           {ev.offset}
                         </span>
                         <div>
-                          <div className="text-xs font-bold text-white flex items-center gap-2">
+                          <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
                             <span>{ev.event}</span>
                             <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
                               ev.severity === 'CRITICAL' ? 'bg-rose-500 text-slate-950' : 'bg-slate-100 text-slate-700'
@@ -725,7 +725,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
 
               {/* 6-Hour Step Trajectory Grid */}
               <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-4">
-                <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                <h4 className="font-extrabold text-sm text-[#127694] uppercase tracking-tight flex items-center gap-2">
                   <i className="fa-solid fa-battery-three-quarters text-emerald-400"></i>
                   <span>6-Hour Lookahead: Demand P90 vs Renewable P10 & Battery Reserve Projection</span>
                 </h4>
@@ -736,7 +736,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                       <span className="text-xs font-mono font-bold text-[#0699C6]">{hr}</span>
                       
                       <div className="space-y-1 text-[11px]">
-                        <div className="text-slate-400">P90 Dem: <span className="font-mono text-white font-bold">{reserveAdvisory.demand_p90[idx]} kW</span></div>
+                        <div className="text-slate-400">P90 Dem: <span className="font-mono text-slate-900 font-bold">{reserveAdvisory.demand_p90[idx]} kW</span></div>
                         <div className="text-slate-400">P10 Ren: <span className="font-mono text-emerald-300 font-bold">{reserveAdvisory.renewable_p10[idx]} kW</span></div>
                         <div className="text-slate-400">R_req: <span className="font-mono text-[#127694] font-bold">{reserveAdvisory.spinning_reserve_required_kw[idx]} kW</span></div>
                       </div>
@@ -759,7 +759,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             <div className="space-y-6 animate-fadeIn">
               <div className="p-4 rounded-2xl bg-[#f0faff] border border-slate-200 flex items-center justify-between">
                 <div>
-                  <h4 className="font-extrabold text-sm text-white uppercase tracking-tight">
+                  <h4 className="font-extrabold text-sm text-[#127694] uppercase tracking-tight">
                     Dual Model Head-to-Head Benchmark
                   </h4>
                   <p className="text-xs text-slate-400">
@@ -789,7 +789,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                   <tbody className="divide-y divide-slate-100/60 font-mono">
                     {benchmarkData.metrics.map(m => (
                       <tr key={m.target} className="hover:bg-slate-50 transition">
-                        <td className="py-2.5 px-4 font-sans font-bold text-white">
+                        <td className="py-2.5 px-4 font-sans font-bold text-slate-900">
                           {m.target.replace(/_/g, ' ')}
                         </td>
                         <td className="py-2.5 px-3 text-[#127694] font-bold">{m.lightgbm_mae}</td>
@@ -812,7 +812,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                                 style={{ width: `${Math.min(100, m.lightgbm_coverage_80)}%` }}
                               ></div>
                             </div>
-                            <span className="text-[11px] text-white font-bold">{m.lightgbm_coverage_80}%</span>
+                            <span className="text-[11px] text-[#127694] font-bold">{m.lightgbm_coverage_80}%</span>
                           </div>
                         </td>
                       </tr>
@@ -830,7 +830,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                    <h4 className="font-extrabold text-sm text-[#127694] uppercase tracking-tight flex items-center gap-2">
                       <i className="fa-solid fa-gauge-high text-[#0699C6]"></i>
                       <span>Population Stability Index (PSI) Covariate Drift Monitor</span>
                     </h4>
@@ -849,7 +849,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                   {Object.entries(mlopsData.feature_psi).map(([feat, d]) => (
                     <div key={feat} className="p-3.5 rounded-2xl bg-slate-100 border border-slate-200 space-y-1">
                       <div className="text-[10px] text-slate-500 uppercase font-bold">{feat.replace(/_/g, ' ')}</div>
-                      <div className="text-lg font-black font-mono text-white">{d.psi}</div>
+                      <div className="text-lg font-black font-mono text-[#127694]">{d.psi}</div>
                       <div className="flex items-center justify-between text-[10px] pt-1 border-t border-slate-200">
                         <span className="text-slate-400">Status</span>
                         <span className={`font-bold ${d.status === 'STABLE' ? 'text-emerald-300' : 'text-amber-300'}`}>{d.status}</span>
@@ -869,11 +869,11 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     </span>
                     <i className="fa-solid fa-crown text-amber-400"></i>
                   </div>
-                  <h3 className="text-base font-black text-white">{mlopsData.champion_model.name}</h3>
+                  <h3 className="text-base font-black text-slate-900">{mlopsData.champion_model.name}</h3>
                   <div className="grid grid-cols-3 gap-2 text-xs font-mono">
                     <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">MAE</div>
-                      <div className="font-bold text-white">{mlopsData.champion_model.mae}</div>
+                      <div className="font-bold text-[#127694]">{mlopsData.champion_model.mae}</div>
                     </div>
                     <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">Pinball</div>
@@ -901,7 +901,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                     </span>
                     <i className="fa-solid fa-flask text-[#0699C6]"></i>
                   </div>
-                  <h3 className="text-base font-black text-white">{mlopsData.challenger_model.name}</h3>
+                  <h3 className="text-base font-black text-slate-900">{mlopsData.challenger_model.name}</h3>
                   <div className="grid grid-cols-3 gap-2 text-xs font-mono">
                     <div className="p-2 rounded-xl bg-slate-100">
                       <div className="text-[10px] text-slate-400">MAE</div>
@@ -929,7 +929,7 @@ export default function ForecastFullModal({ isOpen, onClose }) {
               {/* Historical Forecast Audit Trail Log */}
               <div className="p-5 rounded-3xl bg-[#f0faff] border border-slate-200 space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-extrabold text-sm text-white uppercase tracking-tight flex items-center gap-2">
+                  <h4 className="font-extrabold text-sm text-[#127694] uppercase tracking-tight flex items-center gap-2">
                     <i className="fa-solid fa-file-shield text-slate-400"></i>
                     <span>Archived Forecast Audit Trail (Prediction vs Reality Verification)</span>
                   </h4>
@@ -955,11 +955,11 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                       {auditLogData.map((a, idx) => (
                         <tr key={idx} className="hover:bg-slate-50 transition">
                           <td className="py-2 px-3 text-slate-400">{a.timestamp}</td>
-                          <td className="py-2 px-3 font-sans font-bold text-white">{a.target.replace(/_/g, ' ')}</td>
+                          <td className="py-2 px-3 font-sans font-bold text-slate-900">{a.target.replace(/_/g, ' ')}</td>
                           <td className="py-2 px-2 text-[#127694]">{a.model}</td>
                           <td className="py-2 px-2">{a.horizon_hours}h</td>
                           <td className="py-2 px-2 text-slate-400">{a.p10}</td>
-                          <td className="py-2 px-2 text-white font-bold">{a.p50}</td>
+                          <td className="py-2 px-2 text-[#127694] font-bold">{a.p50}</td>
                           <td className="py-2 px-2 text-slate-400">{a.p90}</td>
                           <td className="py-2 px-2 text-emerald-300 font-bold">{a.actual}</td>
                           <td className={`py-2 px-3 font-bold ${a.residual_error >= 0 ? 'text-rose-400' : 'text-[#0699C6]'}`}>

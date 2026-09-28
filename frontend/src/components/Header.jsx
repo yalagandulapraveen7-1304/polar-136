@@ -8,16 +8,21 @@ export default function Header({
   onModeChange,
   onOpenModal,
   clockTime,
-  connectionStatus = 'SATELLITE LINK ACTIVE'
+  connectionStatus = 'SATELLITE LINK ACTIVE',
+  telemetryMeta = {}
 }) {
   const [isStationMenuOpen, setIsStationMenuOpen] = useState(false);
+  const [isDiagOpen, setIsDiagOpen] = useState(false);
   const currentStation = STATIONS[stationId] || STATIONS.MAITRI;
 
-  // Close dropdown on click outside
+  // Close dropdown and diag on click outside
   useEffect(() => {
     function handleClickOutside(e) {
       if (!e.target.closest('#stationDropdownContainer')) {
         setIsStationMenuOpen(false);
+      }
+      if (!e.target.closest('#diagPopoverContainer')) {
+        setIsDiagOpen(false);
       }
     }
     document.addEventListener('click', handleClickOutside);
@@ -34,8 +39,9 @@ export default function Header({
           </div>
           <div className="flex items-center gap-2">
             <span className="font-extrabold tracking-tight text-lg text-[#127694] leading-none">POLAR EMS</span>
-            <span className="text-[10px] tracking-wider uppercase font-bold px-2 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc]">
-              MISSION CONTROL
+            <span className="text-[10px] tracking-wider uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc] flex items-center gap-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              {currentStation.name.split(' ')[0]} · OPERATIONAL
             </span>
           </div>
         </div>
@@ -81,6 +87,19 @@ export default function Header({
                   {stationId === st.id && <i className="fa-solid fa-check text-xs text-white"></i>}
                 </button>
               ))}
+              <div className="pt-1.5 mt-1 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsStationMenuOpen(false);
+                    onOpenModal('comparison');
+                  }}
+                  className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold text-[#127694] hover:bg-[#e5f6fd] hover:text-[#0699C6] flex items-center gap-2 transition"
+                >
+                  <i className="fa-solid fa-code-compare text-xs text-[#0699C6]"></i>
+                  <span>Compare Stations Side-by-Side</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -127,6 +146,20 @@ export default function Header({
             onClick={() => onOpenModal('monitoring')}
           >
             <i className="fa-solid fa-chart-pie text-xs"></i> Monitor
+          </button>
+          <button
+            className="nav-pill text-[#127694] hover:text-[#0699C6]"
+            onClick={() => onOpenModal('devices')}
+            title="SCADA-Level Device Monitoring & PLC Telemetry"
+          >
+            <i className="fa-solid fa-server text-xs text-[#0699C6]"></i> Devices
+          </button>
+          <button
+            className="nav-pill text-[#127694] hover:text-[#0699C6]"
+            onClick={() => onOpenModal('comparison')}
+            title="Multi-Station Side-by-Side Comparison"
+          >
+            <i className="fa-solid fa-code-compare text-xs text-[#0699C6]"></i> Compare
           </button>
           <button
             className="nav-pill text-emerald-700 hover:text-emerald-800"
@@ -191,10 +224,107 @@ export default function Header({
             <span className="font-mono text-xs font-bold text-slate-800 tracking-tight">
               {clockTime || 'ANTARCTIC UTC'}
             </span>
-            <span className="text-[9px] font-semibold text-cyan-700 flex items-center gap-1 justify-end">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-              {connectionStatus}
-            </span>
+            
+            {/* Real-Time Telemetry & Connection Status Pill with Interactive Diagnostic Popover */}
+            <div className="relative inline-block" id="diagPopoverContainer">
+              <button
+                type="button"
+                onClick={() => setIsDiagOpen(!isDiagOpen)}
+                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border transition flex items-center gap-1.5 justify-end shadow-xs cursor-pointer ${
+                  telemetryMeta.connectionState === 'RECONNECTING'
+                    ? 'bg-sky-50 text-sky-800 border-sky-300 animate-pulse'
+                    : telemetryMeta.isStale
+                    ? 'bg-rose-50 text-rose-800 border-rose-300'
+                    : mode === 'SCADA_MODE'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                    : 'bg-[#edf9fd] text-[#127694] border-[#bcecfc]'
+                }`}
+                title="Click to view live telemetry diagnostics"
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${
+                  telemetryMeta.connectionState === 'RECONNECTING'
+                    ? 'bg-sky-500 animate-ping'
+                    : telemetryMeta.isStale
+                    ? 'bg-rose-500'
+                    : mode === 'SCADA_MODE'
+                    ? 'bg-emerald-500 animate-pulse'
+                    : 'bg-[#05C5FF] animate-pulse'
+                }`}></span>
+                <span>
+                  {telemetryMeta.connectionState === 'RECONNECTING'
+                    ? `↻ RECONNECTING (${telemetryMeta.retryCount || 1}/5)`
+                    : telemetryMeta.isStale
+                    ? `● DATA STALE (${telemetryMeta.staleSeconds}s ago)`
+                    : mode === 'SCADA_MODE'
+                    ? '● LIVE SCADA'
+                    : '● SIMULATION (1 Hz)'}
+                </span>
+                <span className="text-[8px] font-mono text-slate-400">({telemetryMeta.latencyMs || 12}ms)</span>
+              </button>
+
+              {/* Diagnostic Hover/Click Popover */}
+              {isDiagOpen && (
+                <div className="absolute right-0 mt-1.5 w-72 bg-white rounded-2xl shadow-xl border border-[#bcecfc] p-3 z-50 text-left animate-fadeIn font-sans">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2">
+                    <span className="text-[10px] font-black uppercase text-[#127694] tracking-wider flex items-center gap-1.5">
+                      <i className="fa-solid fa-satellite-dish text-[#0699C6]"></i>
+                      Telemetry Diagnostics
+                    </span>
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                      telemetryMeta.isStale ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                    }`}>
+                      {telemetryMeta.connectionState || 'CONNECTED'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Station Stream:</span>
+                      <strong className="font-bold text-[#127694]">{stationId}</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Round-Trip Latency:</span>
+                      <span className="font-mono font-bold text-slate-800">{telemetryMeta.latencyMs || 12} ms</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Packets Ingested:</span>
+                      <span className="font-mono font-bold text-slate-800">{telemetryMeta.packetCount || 0}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Session Uptime:</span>
+                      <span className="font-mono font-bold text-slate-800">
+                        {Math.floor((telemetryMeta.uptimeSeconds || 0) / 60)}m {(telemetryMeta.uptimeSeconds || 0) % 60}s
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Data Quality:</span>
+                      <span className="font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] border border-emerald-200">
+                        {telemetryMeta.quality || (mode === 'DEMO_MODE' ? 'SIMULATED' : 'VALID')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Last Valid Packet:</span>
+                      <span className="font-mono text-slate-600 text-[10px]">
+                        {telemetryMeta.staleSeconds < 2 ? 'Just now (<1s)' : `${telemetryMeta.staleSeconds}s ago`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] text-slate-400">Cadence: ~1.0 Hz WebSocket</span>
+                    {telemetryMeta.reconnectNow && (
+                      <button
+                        type="button"
+                        onClick={telemetryMeta.reconnectNow}
+                        className="px-2 py-1 rounded-lg bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] font-bold text-[10px] border border-[#bcecfc] transition"
+                      >
+                        Force Resync
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2 pl-2 border-l border-slate-200">

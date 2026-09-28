@@ -9,6 +9,7 @@ export default function AlertsModal({
 }) {
   const [activeTab, setActiveTab] = useState('realtime'); // 'realtime' | 'compound' | 'matrix' | 'worst' | 'history'
   const [filterSeverity, setFilterSeverity] = useState('ALL'); // 'ALL' | 'EMERGENCY' | 'CRITICAL' | 'HIGH' | 'WARNING' | 'INFO' | 'PREDICTIVE'
+  const [stationFilter, setStationFilter] = useState('ALL'); // 'ALL' | 'MAITRI' | 'BHARATI'
   const [annualMatrix, setAnnualMatrix] = useState(null);
   const [worstEvent, setWorstEvent] = useState(null);
   const [historyLogs, setHistoryLogs] = useState([]);
@@ -80,11 +81,11 @@ export default function AlertsModal({
       case 'EMERGENCY':
         return 'bg-purple-950/80 text-purple-300 border-purple-500/80 animate-pulse ring-1 ring-purple-500';
       case 'CRITICAL':
-        return 'bg-rose-50/80 text-rose-300 border-rose-500/80 ring-1 ring-rose-500/50';
+        return 'bg-rose-50 text-rose-700 border-rose-300 ring-1 ring-rose-400/50';
       case 'HIGH':
         return 'bg-orange-950/80 text-orange-300 border-orange-500/80';
       case 'WARNING':
-        return 'bg-amber-50/80 text-amber-300 border-amber-500/80';
+        return 'bg-amber-50 text-amber-800 border-amber-300';
       case 'INFO':
       default:
         return 'bg-[#e5f6fd]/80 text-[#127694] border-cyan-500/80';
@@ -115,6 +116,10 @@ export default function AlertsModal({
 
   // Filtered lists
   const filteredActive = activeAlerts.filter((a) => {
+    if (stationFilter !== 'ALL') {
+      const aStation = ((a.station_id || a.station || stationId) + '').toUpperCase();
+      if (!aStation.includes(stationFilter)) return false;
+    }
     if (filterSeverity === 'ALL') return true;
     if (filterSeverity === 'PREDICTIVE') return false;
     return a.severity === filterSeverity;
@@ -123,8 +128,8 @@ export default function AlertsModal({
   const showPredictive = filterSeverity === 'ALL' || filterSeverity === 'PREDICTIVE';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-50/40 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-slate-100 border border-cyan-500/30 shadow-2xl shadow-cyan-950/50 text-slate-800 overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/40 backdrop-blur-sm animate-fadeIn">
+      <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-white border border-[#bcecfc] shadow-2xl shadow-cyan-950/50 text-slate-800 overflow-hidden font-sans">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] shrink-0">
@@ -134,17 +139,17 @@ export default function AlertsModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-extrabold tracking-tight text-white uppercase">
+                <h2 className="text-lg font-extrabold tracking-tight text-[#127694] uppercase">
                   Alerts & Risk Intelligence
                 </h2>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-rose-50 text-rose-700 border border-rose-200">
                   SCADA Layer 1 & 2
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-cyan-500/10 text-[#127694] border border-cyan-500/20">
                   {currentStation.name}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500">
                 Deterministic Hysteresis Engine · 4-Part Explainability · Compound Risk Scenarios · 8,760H Breaking Point
               </p>
             </div>
@@ -161,12 +166,12 @@ export default function AlertsModal({
 
         {/* Global Toast Notification */}
         {ackToast && (
-          <div className="px-6 py-2 bg-emerald-50/80 border-b border-emerald-500/40 text-emerald-300 text-xs flex items-center justify-between animate-fadeIn">
+          <div className="px-6 py-2 bg-emerald-50/80 border-b border-emerald-500/40 text-emerald-800 text-xs flex items-center justify-between animate-fadeIn">
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-circle-check text-emerald-400"></i>
               <span className="font-semibold">{ackToast}</span>
             </div>
-            <button onClick={() => setAckToast(null)} className="text-emerald-400 hover:text-white text-xs">
+            <button onClick={() => setAckToast(null)} className="text-emerald-700 hover:text-emerald-950 text-xs font-bold">
               &times;
             </button>
           </div>
@@ -202,7 +207,7 @@ export default function AlertsModal({
             >
               <i className="fa-solid fa-layer-group text-xs"></i>
               <span>Compound Risk Engine</span>
-              <span className={`px-1.5 py-0.2 rounded text-[10px] font-extrabold ${compoundRisk.score >= 8 ? 'bg-rose-500 text-white' : 'bg-amber-500/20 text-amber-300'}`}>
+              <span className={`px-1.5 py-0.2 rounded text-[10px] font-extrabold ${compoundRisk.score >= 8 ? 'bg-rose-500 text-white' : 'bg-amber-50 text-amber-800 border border-amber-200'}`}>
                 {compoundRisk.score}/15
               </span>
             </button>
@@ -263,7 +268,7 @@ export default function AlertsModal({
                 <div className="p-3 rounded-xl bg-[#f0faff] border border-slate-200 flex items-center justify-between">
                   <div>
                     <div className="text-[10px] uppercase font-bold text-slate-400">Total Active</div>
-                    <div className="text-xl font-mono font-black text-white">{activeAlerts.length}</div>
+                    <div className="text-xl font-mono font-black text-[#127694]">{activeAlerts.length}</div>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-cyan-500/10 text-[#0699C6] flex items-center justify-center font-bold">
                     <i className="fa-solid fa-list-check"></i>
@@ -272,8 +277,8 @@ export default function AlertsModal({
 
                 <div className="p-3 rounded-xl bg-[#f0faff] border border-purple-500/30 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-purple-300">Emergency</div>
-                    <div className="text-xl font-mono font-black text-purple-400">{emergencyCount}</div>
+                    <div className="text-[10px] uppercase font-bold text-purple-800">Emergency</div>
+                    <div className="text-xl font-mono font-black text-purple-700">{emergencyCount}</div>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
                     <i className="fa-solid fa-radiation animate-pulse"></i>
@@ -282,8 +287,8 @@ export default function AlertsModal({
 
                 <div className="p-3 rounded-xl bg-[#f0faff] border border-rose-500/30 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-rose-300">Critical</div>
-                    <div className="text-xl font-mono font-black text-rose-400">{criticalCount}</div>
+                    <div className="text-[10px] uppercase font-bold text-rose-800">Critical</div>
+                    <div className="text-xl font-mono font-black text-rose-700">{criticalCount}</div>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold">
                     <i className="fa-solid fa-triangle-exclamation"></i>
@@ -292,8 +297,8 @@ export default function AlertsModal({
 
                 <div className="p-3 rounded-xl bg-[#f0faff] border border-amber-500/30 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-amber-300">Warning</div>
-                    <div className="text-xl font-mono font-black text-amber-400">{warningCount}</div>
+                    <div className="text-[10px] uppercase font-bold text-amber-800">Warning</div>
+                    <div className="text-xl font-mono font-black text-amber-700">{warningCount}</div>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
                     <i className="fa-solid fa-bell"></i>
@@ -314,7 +319,22 @@ export default function AlertsModal({
               {/* Filter Pills */}
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mr-1">Filter:</span>
+                  <span className="text-[10px] font-bold text-[#127694] uppercase tracking-wider mr-1">Station:</span>
+                  {['ALL', 'MAITRI', 'BHARATI'].map((stn) => (
+                    <button
+                      key={stn}
+                      onClick={() => setStationFilter(stn)}
+                      className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition ${
+                        stationFilter === stn
+                          ? 'bg-[#127694] text-white shadow-sm'
+                          : 'bg-[#edf9fd] text-[#127694] hover:bg-[#bcecfc]'
+                      }`}
+                    >
+                      {stn}
+                    </button>
+                  ))}
+                  <span className="text-slate-300 mx-1">|</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mr-1">Severity:</span>
                   {['ALL', 'EMERGENCY', 'CRITICAL', 'WARNING', 'INFO', 'PREDICTIVE'].map((sev) => (
                     <button
                       key={sev}
@@ -330,7 +350,7 @@ export default function AlertsModal({
                   ))}
                 </div>
 
-                <div className="text-xs text-slate-400 flex items-center gap-2">
+                <div className="text-xs text-slate-500 flex items-center gap-2">
                   <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                   <span className="font-mono text-[11px]">SCADA Telemetry Active</span>
                 </div>
@@ -354,7 +374,7 @@ export default function AlertsModal({
                       <i className="fa-solid fa-shield-halved"></i>
                     </div>
                     <div className="text-sm font-bold text-slate-700">No Active Alarms in Selected Category</div>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    <p className="text-xs text-slate-500 max-w-md mx-auto">
                       All polar microgrid parameters (Battery SoC, Thermal Loop, Katabatic Wind, and Diesel Gensets) are within nominal boundaries.
                     </p>
                   </div>
@@ -389,7 +409,7 @@ export default function AlertsModal({
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-[#127694] border border-cyan-500/20">
                               {alert.category} · {alert.subsystem}
                             </span>
-                            <h4 className="text-sm font-bold text-white tracking-tight">{alert.title}</h4>
+                            <h4 className="text-sm font-bold text-slate-900 tracking-tight">{alert.title}</h4>
                           </div>
 
                           <div className="flex items-center gap-2">
@@ -397,7 +417,7 @@ export default function AlertsModal({
                               {alert.detected_at?.replace('T', ' ').substring(11, 19)} UTC
                             </span>
                             {isAck ? (
-                              <span className="px-2 py-1 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                              <span className="px-2 py-1 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-1">
                                 <i className="fa-solid fa-check"></i>
                                 <span>ACKNOWLEDGED</span>
                               </span>
@@ -444,7 +464,7 @@ export default function AlertsModal({
                               <i className="fa-solid fa-wrench text-[#0699C6]"></i>
                               <span className="uppercase tracking-wider">4. Recommended Action</span>
                             </div>
-                            <p className="text-cyan-200 font-semibold leading-relaxed pl-4">{alert.action}</p>
+                            <p className="text-[#127694] font-bold leading-relaxed pl-4">{alert.action}</p>
                           </div>
                         </div>
 
@@ -455,7 +475,7 @@ export default function AlertsModal({
                               <span className="font-bold text-[10px] uppercase tracking-wider text-slate-500">Telemetry Evidence:</span>
                               {Object.entries(alert.evidence).map(([k, v]) => (
                                 <span key={k} className="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 font-mono text-[#127694]">
-                                  {k}: <strong className="text-white">{String(v)}</strong>
+                                  {k}: <strong className="text-slate-900 font-bold">{String(v)}</strong>
                                 </span>
                               ))}
                             </div>
@@ -489,16 +509,16 @@ export default function AlertsModal({
                     {predictiveAlerts.map((pred) => (
                       <div
                         key={pred.id}
-                        className="p-4 rounded-xl bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 shadow-md space-y-2.5"
+                        className="p-4 rounded-xl bg-gradient-to-br from-white to-[#f0faff] border border-[#bcecfc] shadow-md space-y-2.5"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-cyan-500/20 text-[#127694] border border-cyan-500/30">
                               PREDICTIVE
                             </span>
-                            <span className="text-xs font-bold text-white">{pred.title}</span>
+                            <span className="text-xs font-bold text-slate-900">{pred.title}</span>
                           </div>
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
                             Horizon: {pred.horizon}
                           </span>
                         </div>
@@ -526,7 +546,7 @@ export default function AlertsModal({
             <div className="space-y-6">
               
               {/* Score Meter Banner */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-800/90 to-slate-900/90 border border-cyan-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#f0faff] via-white to-[#f0faff] border border-[#bcecfc] flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
                 <div className="space-y-2 text-center md:text-left">
                   <div className="flex items-center justify-center md:justify-start gap-2">
                     <span className="text-xs font-extrabold uppercase tracking-wider text-[#0699C6]">
@@ -536,10 +556,10 @@ export default function AlertsModal({
                       {compoundRisk.risk_tier} RISK
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black text-white">
+                  <h3 className="text-2xl font-black text-[#127694]">
                     {compoundRisk.score} <span className="text-sm font-normal text-slate-400">/ {compoundRisk.max_score} Maximum Risk Points</span>
                   </h3>
-                  <p className="text-xs text-slate-400 max-w-lg">
+                  <p className="text-xs text-slate-500 max-w-lg">
                     Deterministic additive factor scoring across 5 physical polar failure vectors. An alert triggers when compounding atmospheric and equipment stresses overlap.
                   </p>
                 </div>
@@ -624,10 +644,10 @@ export default function AlertsModal({
                           }`}>
                             {sc.id}
                           </span>
-                          <span className="text-xs font-bold text-white">{sc.name}</span>
+                          <span className="text-xs font-bold text-slate-900">{sc.name}</span>
                         </div>
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                          sc.is_active ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' : 'bg-slate-100 text-slate-500'
+                          sc.is_active ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-500'
                         }`}>
                           {sc.is_active ? 'ACTIVE MULTI-FAULT' : 'NOMINAL'}
                         </span>
@@ -688,19 +708,19 @@ export default function AlertsModal({
 
                 <div className="p-4 rounded-xl bg-[#f0faff] border border-cyan-500/30">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Annual Duration</div>
-                  <div className="text-2xl font-mono font-black text-amber-300">37.4%</div>
+                  <div className="text-2xl font-mono font-black text-amber-700">37.4%</div>
                   <div className="text-[10px] text-slate-500 mt-1">Fraction of year with &ge;1 active alert</div>
                 </div>
 
                 <div className="p-4 rounded-xl bg-[#f0faff] border border-cyan-500/30">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Peak Risk Season</div>
-                  <div className="text-2xl font-mono font-black text-rose-300">Jun – Aug</div>
+                  <div className="text-2xl font-mono font-black text-rose-700">Jun – Aug</div>
                   <div className="text-[10px] text-slate-500 mt-1">78.4% of all compound contingencies</div>
                 </div>
 
                 <div className="p-4 rounded-xl bg-[#f0faff] border border-cyan-500/30">
                   <div className="text-[10px] uppercase font-bold text-slate-400">Genset Overload Hours</div>
-                  <div className="text-2xl font-mono font-black text-emerald-400">0.0 <span className="text-xs font-normal text-slate-400">hrs</span></div>
+                  <div className="text-2xl font-mono font-black text-emerald-700">0.0 <span className="text-xs font-normal text-slate-500">hrs</span></div>
                   <div className="text-[10px] text-emerald-400/80 mt-1">100% prevented by MILP dispatch</div>
                 </div>
               </div>
@@ -715,8 +735,8 @@ export default function AlertsModal({
                   <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400">
                     <span>Intensity:</span>
                     <span className="px-1.5 py-0.5 rounded bg-[#e5f6fd] text-[#127694] border border-cyan-800">Low (&lt;50h)</span>
-                    <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-300 border border-amber-800">Med (50-200h)</span>
-                    <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-300 border border-rose-800">High (&gt;200h)</span>
+                    <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-300">Med (50-200h)</span>
+                    <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-300">High (&gt;200h)</span>
                   </div>
                 </div>
 
@@ -744,8 +764,8 @@ export default function AlertsModal({
                             {annualMatrix?.categories?.map((c) => {
                               const hrs = row[c] || 0;
                               let cellClass = 'bg-slate-50 text-slate-400';
-                              if (hrs >= 200) cellClass = 'bg-rose-50/70 text-rose-200 font-bold border border-rose-700/50';
-                              else if (hrs >= 50) cellClass = 'bg-amber-50/60 text-amber-200 font-semibold border border-amber-700/40';
+                              if (hrs >= 200) cellClass = 'bg-rose-100 text-rose-800 font-bold border border-rose-300';
+                              else if (hrs >= 50) cellClass = 'bg-amber-100 text-amber-800 font-semibold border border-amber-300';
                               else if (hrs > 0) cellClass = 'bg-[#e5f6fd]/40 text-[#127694]';
                               return (
                                 <td key={c} className={`py-1.5 px-2 text-center rounded m-0.5 ${cellClass}`}>
@@ -769,21 +789,21 @@ export default function AlertsModal({
             <div className="space-y-6">
               
               {/* Worst Event: Hour 3,410 Card */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-950/40 to-slate-900/90 border border-rose-500/50 shadow-xl space-y-4">
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-50 via-white to-rose-50 border-2 border-rose-300 shadow-xl space-y-4">
                 <div className="flex items-start justify-between flex-wrap gap-3">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-rose-500 text-white">
                         BENCHMARK EVENT: HOUR 3,410
                       </span>
-                      <span className="text-xs text-rose-300 font-semibold">May 22, 02:00 UTC · Austral Polar Night</span>
+                      <span className="text-xs text-rose-800 font-bold">May 22, 02:00 UTC · Austral Polar Night</span>
                     </div>
-                    <h3 className="text-xl font-black text-white mt-1">
+                    <h3 className="text-xl font-black text-rose-950 mt-1">
                       Worst Multi-System Compound Outage of 8,760-Hour Cycle
                     </h3>
                   </div>
 
-                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1.5">
                     <i className="fa-solid fa-triangle-exclamation"></i>
                     5 Concurrent Active Alarms
                   </span>
@@ -804,7 +824,7 @@ export default function AlertsModal({
 
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
                     <div className="text-[10px] text-slate-400">Electrical + Thermal Load</div>
-                    <div className="text-lg font-bold text-white">411.32 kW</div>
+                    <div className="text-lg font-bold text-slate-900">411.32 kW</div>
                     <div className="text-[10px] text-slate-500">+195.4 kWth heating</div>
                   </div>
 
@@ -826,13 +846,13 @@ export default function AlertsModal({
               </div>
 
               {/* Physical Infeasible Breaking Point Card */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-cyan-500/30 space-y-4 shadow-xl">
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-white to-[#f0faff] border-2 border-[#bcecfc] space-y-4 shadow-xl">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <span className="text-[10px] font-bold font-mono uppercase px-2 py-0.5 rounded bg-cyan-500/20 text-[#127694] border border-cyan-500/30">
                       PHYSICAL STRESS LIMIT
                     </span>
-                    <h3 className="text-lg font-black text-white mt-1">
+                    <h3 className="text-lg font-black text-[#127694] mt-1">
                       Antarctic Station Physical Breaking Point Analysis
                     </h3>
                   </div>
@@ -852,7 +872,7 @@ export default function AlertsModal({
 
                   <div className="p-3.5 rounded-xl bg-[#f0faff] border border-slate-200 space-y-1">
                     <div className="text-[10px] font-bold uppercase text-slate-400">Peak Polar Blast Demand</div>
-                    <div className="text-xl font-mono font-black text-rose-400">616.0 kW</div>
+                    <div className="text-xl font-mono font-black text-rose-700">616.0 kW</div>
                     <p className="text-[11px] text-slate-400">
                       At -47.57°C ambient temperature and 50.6 m/s wind storm, total electrical and thermal heating load hits 616 kW.
                     </p>
@@ -918,10 +938,10 @@ export default function AlertsModal({
                           <td className="py-2 px-2">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                               log.state === 'ACTIVE'
-                                ? 'bg-rose-500/20 text-rose-300'
+                                ? 'bg-rose-50 text-rose-700 border border-rose-200'
                                 : log.state === 'ACKNOWLEDGED'
-                                ? 'bg-amber-500/20 text-amber-300'
-                                : 'bg-emerald-500/20 text-emerald-300'
+                                ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                                : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                             }`}>
                               {log.state}
                             </span>
@@ -940,7 +960,7 @@ export default function AlertsModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-3 border-t border-cyan-500/20 bg-slate-100/90 text-xs text-slate-400 shrink-0">
+        <div className="flex items-center justify-between px-6 py-3 border-t border-cyan-500/20 bg-slate-100/90 text-xs text-slate-500 shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
             <span>POLAR-EMS Safety Supervisor: Autonomous Multi-Tier Contingency Armed</span>
