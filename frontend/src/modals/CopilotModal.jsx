@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { generateCopilotResponse, getFallbackIntelligenceState, getFallbackSimulation } from '../utils/copilotEngine';
 
 export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData }) {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'anomalies' | 'digital_twin' | 'counterfactual' | 'mlops' | 'audit'
@@ -26,8 +27,8 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
   const [inputVal, setInputVal] = useState('');
   const [isSending, setIsSending] = useState(false);
   const chatThreadRef = useRef(null);
-
   // Proactive Insights & Prompts
+  const fallbackState = getFallbackIntelligenceState(stationId);
   const [proactiveInsights, setProactiveInsights] = useState([]);
   const [suggestedPrompts, setSuggestedPrompts] = useState([
     "What's happening right now?",
@@ -38,14 +39,14 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
     "Why did the optimizer choose this dispatch?"
   ]);
 
-  // Intelligence State
-  const [statusData, setStatusData] = useState(null);
-  const [anomalyData, setAnomalyData] = useState(null);
-  const [residualData, setResidualData] = useState(null);
-  const [mlopsData, setMlopsData] = useState(null);
-  const [timelineData, setTimelineData] = useState([]);
-  const [auditData, setAuditData] = useState([]);
-  const [metricsData, setMetricsData] = useState(null);
+  // Intelligence State (Initialized with grounded station models)
+  const [statusData, setStatusData] = useState(() => fallbackState.status);
+  const [anomalyData, setAnomalyData] = useState(() => fallbackState.anomalies);
+  const [residualData, setResidualData] = useState(() => fallbackState.residuals);
+  const [mlopsData, setMlopsData] = useState(() => fallbackState.mlops);
+  const [timelineData, setTimelineData] = useState(() => fallbackState.timeline);
+  const [auditData, setAuditData] = useState(() => fallbackState.audit);
+  const [metricsData, setMetricsData] = useState(() => fallbackState.metrics);
   
   // Counterfactual State
   const [selectedScenario, setSelectedScenario] = useState('GENSET_1_FAILURE');
@@ -122,7 +123,7 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
     }
   }
 
-  const handleSend = async (queryText) => {
+    const handleSend = async (queryText) => {
     const q = queryText || inputVal;
     if (!q || !q.trim()) return;
 
@@ -163,36 +164,28 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
         ]);
         fetchCopilotMetadata();
       } else {
+        const localResp = generateCopilotResponse(q, stationId, latestData, userRole);
+        setActiveModeDisplay('LOCAL_FALLBACK');
         setMessages((prev) => [
           ...prev,
           {
             sender: 'ai',
             role: 'Copilot',
             time: timeStr,
-            answer: 'Optimal LP balance maintained across solar, wind, and battery buffers.',
-            evidence: 'Local fallback engine responding.',
-            impact: 'Zero life-support interruption.',
-            recommendation: 'Continue monitoring.',
-            sources: ['Local Offline Rules'],
-            action_card: null,
-            mode: 'LOCAL_FALLBACK'
+            ...localResp
           }
         ]);
       }
     } catch (e) {
+      const localResp = generateCopilotResponse(q, stationId, latestData, userRole);
+      setActiveModeDisplay('LOCAL_FALLBACK');
       setMessages((prev) => [
         ...prev,
         {
           sender: 'ai',
           role: 'Copilot',
           time: timeStr,
-          answer: 'Current conditions: -28.0°C with wind at 14.2 m/s. Tank reserve margin at +52,895 L, battery at 77% SoC. LP optimizer is suppressing diesel burn while protecting life support.',
-          evidence: 'Offline cache verified.',
-          impact: 'Stable.',
-          recommendation: 'Maintain dispatch.',
-          sources: ['Offline Cache'],
-          action_card: null,
-          mode: 'LOCAL_FALLBACK'
+          ...localResp
         }
       ]);
     } finally {
@@ -224,7 +217,7 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
     }
   };
 
-  const handleRunCounterfactual = async (scId) => {
+    const handleRunCounterfactual = async (scId) => {
     const targetScenario = scId || selectedScenario;
     setIsSimulating(true);
     try {
@@ -236,9 +229,11 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
       if (res.ok) {
         const json = await res.json();
         setSimulationResult(json);
+      } else {
+        setSimulationResult(getFallbackSimulation(targetScenario, stationId));
       }
     } catch (e) {
-      console.error(e);
+      setSimulationResult(getFallbackSimulation(targetScenario, stationId));
     } finally {
       setIsSimulating(false);
     }
