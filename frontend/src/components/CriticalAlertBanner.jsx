@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { STATIONS } from '../constants/stations';
 
 export default function CriticalAlertBanner({
@@ -10,28 +10,15 @@ export default function CriticalAlertBanner({
   isG2Dispatched = false,
   onAcceptRecommendation
 }) {
-  const t = latestData?.telemetry || {};
-  const g = latestData?.guardrail || {};
-  const stationInfo = STATIONS[stationId] || STATIONS.MAITRI;
+  const [isDismissed, setIsDismissed] = useState(false);
 
-  const windMs = activeOverrides?.wind_speed_ms !== undefined
-    ? activeOverrides.wind_speed_ms
-    : (t.wind_speed_ms !== undefined ? t.wind_speed_ms : 25.9);
-
-  const soc = activeOverrides?.battery_soc_pct !== undefined && activeOverrides?.battery_soc_pct !== null
-    ? parseFloat(activeOverrides.battery_soc_pct)
-    : (t.battery_soc_pct !== undefined ? t.battery_soc_pct : 77.0);
-
-  const isCutoutActive = windMs >= 25.0;
-  const isEmergency = g.is_overridden || isCutoutActive || soc < 30 || currentScenario === 'blizzard' || currentScenario === 'trip';
-
-  if (!isEmergency && !isG2Dispatched) {
+  if (isDismissed) {
     return null;
   }
 
   return (
     <div className="w-full animate-fadeIn transition-all duration-300">
-      {isEmergency && !isG2Dispatched ? (
+      {!isG2Dispatched ? (
         <div className="w-full p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 border-2 border-rose-300 flex flex-wrap items-center justify-between gap-3 shadow-md animate-pulse">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
@@ -64,6 +51,14 @@ export default function CriticalAlertBanner({
               className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-rose-200 transition shadow-xs cursor-pointer"
             >
               Inspect Why
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsDismissed(true)}
+              className="w-8 h-8 rounded-xl bg-rose-100/60 hover:bg-rose-200 text-rose-700 font-bold text-xs flex items-center justify-center transition cursor-pointer"
+              title="Dismiss Notification"
+            >
+              <i className="fa-solid fa-xmark text-sm"></i>
             </button>
           </div>
         </div>
