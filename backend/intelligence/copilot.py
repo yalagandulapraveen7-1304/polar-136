@@ -346,10 +346,9 @@ class PolarCopilotSystem:
         self.api_key = api_key or os.getenv("GROQ_API_KEY", GROQ_API_KEY)
         self.client = None
         self.preferred_models = [
-            "openai/gpt-oss-20b",
-            "qwen/qwen3.6-27b",
             "qwen/qwen3.8-27b",
-            "openai/gpt-oss-120b"
+            "openai/gpt-oss-120b",
+            "openai/gpt-oss-20b"
         ]
         self.active_model = None
         self._init_cloud_client()
@@ -1064,46 +1063,58 @@ class PolarCopilotSystem:
 
         response_payload = None
 
-        # 3. Attempt Cloud LLM if mode is CLOUD
+        # 3. Attempt Cloud LLM if mode is CLOUD (with multi-model rate-limit failover)
         if mode == "CLOUD":
-            try:
-                self.metrics["cloud_queries"] += 1
-                system_prompt = f"""You are Polar AI, the Chief Microgrid Operations Engineer for Indian Antarctic Research Station {context['station']}.
+            self.metrics["cloud_queries"] += 1
+            system_prompt = f"""You are Polar AI, the Chief Microgrid Operations Engineer for Indian Antarctic Research Station {context['station']}.
 Ground your answers STRICTLY in the provided operational context. NEVER invent telemetry or forecast values.
 Operational Context:
 {json.dumps(context, indent=2)}
 
 You must respond in a clear, professional mission-control tone.
 Structure your operational answer to be authoritative, citing exact kW, temperatures, and constraints."""
-                
-                resp = self.client.chat.completions.create(
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": query}
-                    ],
-                    model=self.active_model,
-                    temperature=0.2,
-                    max_tokens=450
-                )
-                raw_ans = resp.choices[0].message.content
-                cleaned_ans = self._clean_response(raw_ans)
-                
-                if cleaned_ans:
-                    # Parse or synthesize 4-part structure from Cloud response
-                    local_ref = self._execute_local_commander(query, context, role)
-                    response_payload = {
-                        "answer": cleaned_ans,
-                        "evidence": local_ref.get("evidence", f"Live telemetry timestamped {context['timestamp']}."),
-                        "impact": local_ref.get("impact", "Microgrid operational equilibrium preserved."),
-                        "recommendation": local_ref.get("recommendation", "Maintain verified dispatch setpoints."),
-                        "sources": local_ref.get("sources", [f"Live telemetry — {context['timestamp']}", "Cloud LLM reasoning"]),
-                        "action_card": local_ref.get("action_card"),
-                        "copilot_mode": "CLOUD",
-                        "tools_used": local_ref.get("tools_used", ["get_current_telemetry"]),
-                        "structured_breakdown": local_ref.get("section", "GENERAL")
-                    }
-            except Exception as e:
-                print(f"[Copilot Failover] Cloud LLM error: {e}. Falling back to Local Commander.")
+
+            # Try primary active model, then failover to other preferred models if 429/rate-limited
+            candidates = [self.active_model] if self.active_model else []
+            for m in self.preferred_models:
+                if m not in candidates:
+                    candidates.append(m)
+
+            for model_name in candidates:
+                try:
+                    resp = self.client.chat.completions.create(
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": query}
+                        ],
+                        model=model_name,
+                        temperature=0.2,
+                        max_tokens=450
+                    )
+                    raw_ans = resp.choices[0].message.content
+                    cleaned_ans = self._clean_response(raw_ans)
+
+                    if cleaned_ans:
+                        self.active_model = model_name
+                        local_ref = self._execute_local_commander(query, context, role)
+                        response_payload = {
+                            "answer": cleaned_ans,
+                            "evidence": local_ref.get("evidence", f"Live telemetry timestamped {context['timestamp']}."),
+                            "impact": local_ref.get("impact", "Microgrid operational equilibrium preserved."),
+                            "recommendation": local_ref.get("recommendation", "Maintain verified dispatch setpoints."),
+                            "sources": local_ref.get("sources", [f"Live telemetry — {context['timestamp']}", f"Groq Cloud LLM ({model_name})"]),
+                            "action_card": local_ref.get("action_card"),
+                            "copilot_mode": "CLOUD",
+                            "tools_used": local_ref.get("tools_used", ["get_current_telemetry"]),
+                            "structured_breakdown": local_ref.get("section", "GENERAL")
+                        }
+                        break
+                except Exception as e:
+                    print(f"[Copilot Model Failover] Groq model '{model_name}' encountered: {e}. Trying next available model...")
+                    continue
+
+            if not response_payload:
+                print("[Copilot Failover] All Groq Cloud models exhausted or rate-limited. Falling back to Local Commander.")
                 mode = "LOCAL_FALLBACK"
 
         # 4. Execute Local Commander Assistant if mode is LOCAL_FALLBACK or failed

@@ -15,10 +15,9 @@ class GroqAIService:
         self.api_key = api_key or os.getenv("GROQ_API_KEY", GROQ_API_KEY)
         self.client = None
         self.preferred_models = [
-            "openai/gpt-oss-20b",
-            "qwen/qwen3.6-27b",
             "qwen/qwen3.8-27b",
-            "openai/gpt-oss-120b"
+            "openai/gpt-oss-120b",
+            "openai/gpt-oss-20b"
         ]
         self.active_model = None
         
