@@ -318,10 +318,10 @@ export default function HeroSection({
                   <button
                     type="button"
                     onClick={() => onOpenModal('recommendations')}
-                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-yellow-500 text-slate-900 font-black text-xs border border-amber-300 shadow-sm hover:shadow-md hover:shadow-amber-500/20 transition flex items-center gap-1.5 cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-50 via-yellow-50/90 to-amber-100/70 hover:from-amber-100 hover:to-yellow-100 text-amber-900/85 hover:text-amber-900 font-bold text-xs border border-amber-200/90 shadow-xs transition flex items-center gap-1.5 cursor-pointer"
                     title="Open Full Engineering & Operational Recommendations Console"
                   >
-                    <i className="fa-solid fa-list-check text-slate-900"></i>
+                    <i className="fa-solid fa-list-check text-amber-600"></i>
                     <span>VIEW RECOMMENDATIONS ({latestData?.recommendations?.items?.length || 4})</span>
                   </button>
                   <button
