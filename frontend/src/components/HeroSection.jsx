@@ -60,7 +60,7 @@ export default function HeroSection({
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q })
+        body: JSON.stringify({ query: q, station_id: stationId })
       });
       if (res.ok) {
         const data = await res.json();
