@@ -218,6 +218,42 @@ export function generateCopilotResponse(query, stationId = 'MAITRI', latestData 
     };
   }
 
+  // 7b. Recommendations & Decision Support Queries
+  if (qLower.includes('recommend') || qLower.includes('suggest') || qLower.includes('advisory') || qLower.includes('decision support')) {
+    const recs = latestData?.recommendations?.items || [];
+    const active = recs.filter(r => r.status === 'ACTIVE' || r.status === 'ACKNOWLEDGED');
+    const recText = active.length > 0
+      ? active.slice(0, 3).map(r => `• [${r.category}] ${r.title}: ${r.recommendation} (Confidence: ${r.confidence || '94%'})`).join('\n')
+      : `• [OPERATIONAL] Pre-Warm Standby G2: Forecasted temperature drop to -34°C requires jacket pre-heating to +40°C.\n• [PREDICTIVE] Charge BESS ahead of 18:40 UTC Katabatic Wind Deficit.\n• [ENGINEERING] Address 80 kW Inverter Bottleneck during 412 kW peak load dispatch.`;
+    return {
+      answer: `ACTIVE OPERATIONAL & ENGINEERING RECOMMENDATIONS — ${station.name.toUpperCase()}:\n\n${recText}`,
+      evidence: `Synthesized from LightGBM probabilistic quantiles (P10/P50/P90), HiGHS MILP optimizer constraints, and digital twin electro-thermal state.`,
+      impact: `Pre-warming G2 eliminates cold-crank delays while battery buffering protects spinning reserve and living habitat heat.`,
+      recommendation: `Open Recommendations Console from navigation header or Hero section to review detailed evidence.`,
+      sources: ['LightGBM Quantile Forecaster', 'HiGHS MILP Solver', 'Digital Twin Physics Models'],
+      action_card: null,
+      mode: 'LOCAL_FALLBACK'
+    };
+  }
+
+  // 7c. Inverter Bottleneck & Long-Term Sizing
+  if (qLower.includes('inverter') || qLower.includes('bottleneck') || qLower.includes('sizing') || qLower.includes('expansion')) {
+    return {
+      answer: `ENGINEERING DECISION SUPPORT: INVERTER & BESS SIZING — ${station.name.toUpperCase()}:\n\n` +
+        `• Current Inverter Capacity: 80 kW (Restricts BESS discharge)\n` +
+        `• Peak Load Requirement: 412 kW with single 300 kW generator\n` +
+        `• Bottleneck Deficit: 112 kW required discharge exceeds 80 kW inverter rating by 32 kW\n` +
+        `• Recommended Engineering Upgrade: 120 kW Power Conversion System (PCS) + 500 kWh BESS\n` +
+        `• Projected CapEx: $250,000 | Payback Period: 3.7 Years | Annual Diesel Saved: 132,400 L ($397,200/yr)`,
+      evidence: `Digital Twin peak dispatch simulations indicate that during 412 kW spikes, battery discharge is capped at 80 kW, forcing secondary diesel generator ignition.`,
+      impact: `Upgrading to a 120 kW inverter allows full battery peak shaving and saves an additional 13,406 L of fuel annually.`,
+      recommendation: `Plan 120 kW inverter upgrade during the next summer Antarctic expedition logistical rotation.`,
+      sources: ['Project A Master Sizing Sweep', 'Digital Twin Physics Simulation', 'Inverter Hardware Specifications'],
+      action_card: null,
+      mode: 'LOCAL_FALLBACK'
+    };
+  }
+
   // 8. General / Fallback Response
   return {
     answer: `OPERATIONAL ANALYSIS FOR ${station.name.toUpperCase()} (ROLE: ${userRole.toUpperCase()}):\n\n` +

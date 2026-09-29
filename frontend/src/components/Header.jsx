@@ -323,6 +323,18 @@ export default function Header({
             <i className="fa-solid fa-code-fork text-xs"></i> Dispatch
           </button>
           <button
+            className="nav-pill text-[#127694] hover:text-[#0699C6] font-bold shrink-0 relative"
+            onClick={() => onOpenModal('recommendations')}
+            title="Feature 18: Forecast-Based Recommendations & Decision Support"
+          >
+            <i className="fa-solid fa-lightbulb text-xs text-amber-500"></i> Recommendations
+            {telemetryMeta?.recommendationsCount > 0 && (
+              <span className="ml-1.5 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-black shadow-xs">
+                {telemetryMeta.recommendationsCount}
+              </span>
+            )}
+          </button>
+          <button
             className="nav-pill shrink-0"
             onClick={() => onOpenModal('copilot')}
           >

@@ -270,14 +270,23 @@ export default function HeroSection({
                     Autonomous Dispatch Advisory
                   </span>
                 </div>
-                <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Real-Time Neural LP
-                </span>
+                <div className="flex items-center gap-1.5">
+                  {latestData?.recommendations?.items?.[0]?.confidence && (
+                    <span className="text-[9px] font-mono font-bold text-[#0699C6] bg-[#edf9fd] px-2 py-0.5 rounded-full border border-[#bcecfc]">
+                      {latestData.recommendations.items[0].confidence} Confidence
+                    </span>
+                  )}
+                  <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Feature 18 Engine
+                  </span>
+                </div>
               </div>
 
               {/* Dynamic Insight Sentence */}
               <p className="text-sm font-semibold text-slate-800 leading-snug">
-                "Battery reserve is declining due to a projected renewable generation deficit over the next 6 hours."
+                "{latestData?.recommendations?.items?.[0]?.title
+                  ? `${latestData.recommendations.items[0].title}: ${latestData.recommendations.items[0].recommendation}`
+                  : 'Battery reserve is declining due to a projected renewable generation deficit over the next 6 hours.'}"
               </p>
 
               {/* 3-Part Mission Control Assessment */}
@@ -285,33 +294,44 @@ export default function HeroSection({
                 <div className="p-2 rounded-xl bg-[#f0faff] border border-[#bcecfc]/60">
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">1. DETECTED</span>
                   <p className="text-[11px] font-bold text-slate-800 mt-0.5">
-                    Renewable deficit expected (Blizzard gale &gt; 25 m/s)
+                    {latestData?.recommendations?.items?.[0]?.reason || 'Renewable deficit expected (Blizzard gale > 25 m/s)'}
                   </p>
                 </div>
                 <div className="p-2 rounded-xl bg-amber-50/70 border border-amber-200/80">
-                  <span className="text-[9px] font-black text-amber-700 uppercase tracking-wider block">2. FORECAST</span>
+                  <span className="text-[9px] font-black text-amber-700 uppercase tracking-wider block">2. FORECAST IMPACT</span>
                   <p className="text-[11px] font-bold text-slate-800 mt-0.5">
-                    36 kW shortfall over next 6h window
+                    {latestData?.recommendations?.items?.[0]?.expected_impact || '36 kW shortfall over next 6h window'}
                   </p>
                 </div>
                 <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-200/80">
                   <span className="text-[9px] font-black text-emerald-700 uppercase tracking-wider block">3. RECOMMENDATION</span>
                   <p className="text-[11px] font-bold text-slate-800 mt-0.5">
-                    Dispatch Generator G2 at optimized 85 kW load
+                    {latestData?.recommendations?.items?.[0]?.action_label || 'Dispatch Generator G2 at optimized 85 kW load'}
                   </p>
                 </div>
               </div>
 
               {/* Operator Action CTAs */}
               <div className="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                <button
-                  type="button"
-                  onClick={() => onOpenModal('copilot')}
-                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-extrabold text-xs border border-[#bcecfc] transition shadow-sm flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-lightbulb text-amber-500"></i>
-                  <span>VIEW EXPLANATION</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onOpenModal('recommendations')}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] font-extrabold text-xs border border-[#bcecfc] transition shadow-xs flex items-center gap-1.5"
+                    title="Open Full Engineering & Operational Recommendations Console"
+                  >
+                    <i className="fa-solid fa-list-check text-[#0699C6]"></i>
+                    <span>VIEW RECOMMENDATIONS ({latestData?.recommendations?.items?.length || 4})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onOpenModal('copilot')}
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-extrabold text-xs border border-slate-200 transition shadow-xs flex items-center gap-1.5"
+                  >
+                    <i className="fa-solid fa-lightbulb text-amber-500"></i>
+                    <span>AI EXPLANATION</span>
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={handleAcceptRecommendation}

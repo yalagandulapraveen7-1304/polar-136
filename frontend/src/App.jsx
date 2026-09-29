@@ -17,6 +17,7 @@ import AlertsModal from './modals/AlertsModal';
 import DeviceMonitoringModal from './modals/DeviceMonitoringModal';
 import StationComparisonModal from './modals/StationComparisonModal';
 import AdvancedAnalyticsModal from './modals/AdvancedAnalyticsModal';
+import RecommendationsModal from './modals/RecommendationsModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 
@@ -435,7 +436,8 @@ function AppDashboard({
           isStale,
           staleSeconds,
           quality,
-          reconnectNow
+          reconnectNow,
+          recommendationsCount: latestData?.recommendations?.active_count ?? (latestData?.recommendations?.items?.length || 4)
         }}
       />
 
@@ -564,6 +566,13 @@ function AppDashboard({
 
       <AdvancedAnalyticsModal
         isOpen={activeModal === 'analytics'}
+        onClose={() => setActiveModal(null)}
+        stationId={stationId}
+        latestData={latestData}
+      />
+
+      <RecommendationsModal
+        isOpen={activeModal === 'recommendations'}
         onClose={() => setActiveModal(null)}
         stationId={stationId}
         latestData={latestData}

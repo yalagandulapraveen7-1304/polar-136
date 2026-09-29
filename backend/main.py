@@ -40,6 +40,7 @@ from backend.intelligence.alert_engine import PolarAlertIntelligenceSystem
 from backend.scenarios.scenario_engine import PolarScenarioControlEngine, PRESET_DEFINITIONS, PARAM_BOUNDS
 from backend.health.scada_device_monitor import ScadaDeviceMonitoringEngine
 from backend.monitoring.station_manager import PolarStationManager
+from backend.recommendations.recommendation_engine import PolarRecommendationEngine
 
 # Global Singletons
 ingestion_driver = DataIngestionDriver(station_id=DEFAULT_STATION, mode=SEMS_MODE)
@@ -62,6 +63,7 @@ alert_system = PolarAlertIntelligenceSystem(station_id=DEFAULT_STATION)
 scenario_engine = PolarScenarioControlEngine(station_id=DEFAULT_STATION)
 scada_engine = ScadaDeviceMonitoringEngine(station_id=DEFAULT_STATION)
 station_manager = PolarStationManager(default_station=DEFAULT_STATION)
+recommendation_engine = PolarRecommendationEngine(station_id=DEFAULT_STATION)
 
 # Connected WebSocket clients
 active_websockets: List[WebSocket] = []
@@ -288,7 +290,36 @@ def compute_system_snapshot() -> Dict[str, Any]:
     except Exception as e:
         scada_snapshot = {}
 
-    # 21. Assemble Unified Payload
+    # 21. Recommendation & Engineering Decision Support Engine (Feature 18)
+    try:
+        recommendations_list = recommendation_engine.evaluate(
+            telemetry=telemetry,
+            dispatch=safe_dispatch,
+            forecast_data=predictive_snapshot.get("deviations", {}),
+            twin_data=twin_state,
+            alert_data=alert_snapshot
+        )
+        recommendations_snapshot = {
+            "station_id": telemetry.get("station_id", "MAITRI"),
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "active_count": len([r for r in recommendations_list if r.status.value == "ACTIVE"]),
+            "total_count": len(recommendations_list),
+            "items": [r.model_dump() for r in recommendations_list],
+            "engineering_summary": recommendation_engine.get_engineering_analysis(telemetry.get("station_id", "MAITRI")),
+            "resilience_summary": recommendation_engine.get_resilience_analysis(telemetry.get("station_id", "MAITRI"))
+        }
+    except Exception as e:
+        recommendations_snapshot = {
+            "station_id": telemetry.get("station_id", "MAITRI"),
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "active_count": 0,
+            "total_count": 0,
+            "items": [],
+            "engineering_summary": {},
+            "resilience_summary": {}
+        }
+
+    # 22. Assemble Unified Payload
     payload = {
         "telemetry": telemetry,
         "dispatch": safe_dispatch,
@@ -318,6 +349,7 @@ def compute_system_snapshot() -> Dict[str, Any]:
         "alert_intelligence": alert_snapshot,
         "scenario_control": scenario_snapshot,
         "scada_monitoring": scada_snapshot,
+        "recommendations": recommendations_snapshot,
         "station": telemetry.get("station_id", "MAITRI"),
         "station_id": telemetry.get("station_id", "MAITRI"),
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -486,6 +518,7 @@ async def switch_station(req: StationSwitchRequest):
         scenario_engine.set_station(req.station_id)
         scada_engine.set_station(req.station_id)
         station_manager.active_station_id = req.station_id
+        recommendation_engine.station_id = req.station_id
         
         # Compute updated snapshot immediately
         snapshot = await asyncio.to_thread(compute_system_snapshot)
@@ -1408,6 +1441,139 @@ async def get_scada_maintenance_intelligence():
         "station": scada_engine.station_id,
         "maintenance_indicators": scada_data.get("maintenance_intelligence", [])
     }
+
+# ----------------- Feature 18: Forecast-Based Recommendations Endpoints -----------------
+class RecommendationAcknowledgeRequest(BaseModel):
+    operator: Optional[str] = "Operator"
+
+class RecommendationDismissRequest(BaseModel):
+    operator: Optional[str] = "Operator"
+    reason: Optional[str] = "Not required under current operational context"
+
+class RecommendationApplyRequest(BaseModel):
+    operator: Optional[str] = "Operator"
+    authorized: Optional[bool] = True
+
+@app.get("/api/recommendations")
+async def get_recommendations_endpoint(
+    category: Optional[str] = None,
+    severity: Optional[str] = None,
+    status: Optional[str] = None,
+    horizon: Optional[str] = None,
+    station: Optional[str] = None
+):
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    st_id = (station if isinstance(station, str) else snap.get("telemetry", {}).get("station_id", "MAITRI")).upper()
+    cat_str = category if isinstance(category, str) else None
+    sev_str = severity if isinstance(severity, str) else None
+    stat_str = status if isinstance(status, str) else None
+    hor_str = horizon if isinstance(horizon, str) else None
+    recs = recommendation_engine.get_recommendations(
+        station_id=st_id,
+        category=cat_str,
+        severity=sev_str,
+        status=stat_str,
+        horizon=hor_str
+    )
+    return {
+        "station_id": st_id,
+        "count": len(recs),
+        "recommendations": [r.model_dump() for r in recs],
+        "summary": {
+            "active": len([r for r in recs if r.status.value == "ACTIVE"]),
+            "acknowledged": len([r for r in recs if r.status.value == "ACKNOWLEDGED"]),
+            "applied": len([r for r in recs if r.status.value == "APPLIED"]),
+            "dismissed": len([r for r in recs if r.status.value == "DISMISSED"])
+        }
+    }
+
+@app.get("/api/recommendations/history")
+async def get_recommendations_history(limit: int = 50):
+    lim = limit if isinstance(limit, int) else 50
+    return {
+        "station_id": recommendation_engine.station_id,
+        "count": len(recommendation_engine.history_log[:lim]),
+        "history": recommendation_engine.history_log[:lim]
+    }
+
+@app.get("/api/recommendations/engineering")
+async def get_recommendations_engineering(station: Optional[str] = None):
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    st_id = (station if isinstance(station, str) else snap.get("telemetry", {}).get("station_id", "MAITRI")).upper()
+    return recommendation_engine.get_engineering_analysis(station_id=st_id)
+
+@app.get("/api/recommendations/resilience")
+async def get_recommendations_resilience(station: Optional[str] = None):
+    snap = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
+    st_id = (station if isinstance(station, str) else snap.get("telemetry", {}).get("station_id", "MAITRI")).upper()
+    return recommendation_engine.get_resilience_analysis(station_id=st_id)
+
+@app.get("/api/recommendations/{rec_id}")
+async def get_recommendation_by_id(rec_id: str):
+    rec = recommendation_engine.get_by_id(rec_id)
+    if not rec:
+        return JSONResponse(status_code=404, content={"status": "ERROR", "message": f"Recommendation {rec_id} not found."})
+    return rec.model_dump()
+
+@app.get("/api/recommendations/{rec_id}/evidence")
+async def get_recommendation_evidence(rec_id: str):
+    rec = recommendation_engine.get_by_id(rec_id)
+    if not rec:
+        return JSONResponse(status_code=404, content={"status": "ERROR", "message": f"Recommendation {rec_id} not found."})
+    return {
+        "id": rec.id,
+        "title": rec.title,
+        "category": rec.category.value,
+        "severity": rec.severity.value,
+        "confidence": rec.confidence,
+        "confidence_val": rec.confidence_val,
+        "evidence": rec.evidence.model_dump(),
+        "source_models": rec.source_models,
+        "optimization_reference": rec.optimization_reference,
+        "digital_twin_reference": rec.digital_twin_reference,
+        "timestamp": rec.timestamp,
+        "expires_at": rec.expires_at
+    }
+
+@app.post("/api/recommendations/{rec_id}/acknowledge")
+async def acknowledge_recommendation(rec_id: str, req: Optional[RecommendationAcknowledgeRequest] = None):
+    op = req.operator if req and req.operator else "Operator"
+    res = recommendation_engine.acknowledge(rec_id, operator_name=op)
+    if res.get("status") == "ERROR":
+        return JSONResponse(status_code=404, content=res)
+    logger.log_chat_interaction(f"OPERATOR_ACK: {rec_id}", f"Recommendation {rec_id} acknowledged by {op}.")
+    await asyncio.to_thread(compute_system_snapshot)
+    return res
+
+@app.post("/api/recommendations/{rec_id}/dismiss")
+async def dismiss_recommendation(rec_id: str, req: Optional[RecommendationDismissRequest] = None):
+    op = req.operator if req and req.operator else "Operator"
+    res = recommendation_engine.dismiss(rec_id, operator_name=op)
+    if res.get("status") == "ERROR":
+        return JSONResponse(status_code=404, content=res)
+    logger.log_chat_interaction(f"OPERATOR_DISMISS: {rec_id}", f"Recommendation {rec_id} dismissed by {op}.")
+    await asyncio.to_thread(compute_system_snapshot)
+    return res
+
+@app.post("/api/recommendations/{rec_id}/apply")
+async def apply_recommendation(rec_id: str, req: Optional[RecommendationApplyRequest] = None):
+    op = req.operator if req and req.operator else "Commander"
+    authorized = req.authorized if req else True
+    if not authorized:
+        return JSONResponse(status_code=403, content={"status": "FORBIDDEN", "message": "Action execution requires authorized role credentials."})
+    
+    res = recommendation_engine.apply_action(rec_id, operator_name=op)
+    if res.get("status") == "ERROR":
+        return JSONResponse(status_code=404, content=res)
+    
+    # Human-in-the-loop: If the recommendation maps to an advisory scenario or dispatch adjustment
+    action_type = res.get("action_executed")
+    if action_type == "DISPATCH_G2_PREWARM":
+        scenario_engine.apply_scenario({"genset_2_prewarm": True}, scenario_name="PREWARM_G2_ADVISORY")
+    
+    logger.log_chat_interaction(f"OPERATOR_APPLY: {rec_id}", f"Recommendation {rec_id} action applied by {op}.")
+    await asyncio.to_thread(compute_system_snapshot)
+    return res
 
 # ----------------- WebSocket Endpoint -----------------
 @app.websocket("/ws/telemetry")
