@@ -32,11 +32,12 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
   const fallbackState = getFallbackIntelligenceState(stationId);
   const [proactiveInsights, setProactiveInsights] = useState([]);
   const [suggestedPrompts, setSuggestedPrompts] = useState([
-    "Explain the latest system decision and dispatch action",
+    "Explain current dispatch",
+    "Why is Generator 1 running?",
+    "Assess blizzard risk for next 12h",
+    "How can we reduce diesel use tonight?",
     "Why did Diesel Generator 2 start or run?",
     "Why is the battery charging or discharging?",
-    "Why did the optimizer choose this dispatch?",
-    "Why are renewables curtailed or buffered into storage?",
     "What's happening right now?",
     "Compare Maitri and Bharati station metrics"
   ]);

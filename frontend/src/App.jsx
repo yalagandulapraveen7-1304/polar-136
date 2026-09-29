@@ -21,6 +21,8 @@ import RecommendationsModal from './modals/RecommendationsModal';
 import DatabaseModal from './modals/DatabaseModal';
 import EnergyModal from './modals/EnergyModal';
 import EnvironmentModal from './modals/EnvironmentModal';
+import DigitalTwinModal from './modals/DigitalTwinModal';
+import ReportsModal from './modals/ReportsModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 import { getWsUrl } from './constants/api';
@@ -488,6 +490,7 @@ function AppDashboard({
           staleSeconds,
           quality,
           reconnectNow,
+          alertCount: latestData?.alerts?.active_count || (latestData?.alerts?.items?.length || 0),
           recommendationsCount: latestData?.recommendations?.active_count ?? (latestData?.recommendations?.items?.length || 4)
         }}
       />
@@ -578,6 +581,7 @@ function AppDashboard({
         isOpen={activeModal === 'forecast'}
         onClose={() => setActiveModal(null)}
         stationId={stationId}
+        onOpenModal={handleOpenModal}
       />
 
       <DispatchModal
@@ -659,6 +663,24 @@ function AppDashboard({
         onClose={() => setActiveModal(null)}
         stationId={stationId}
         latestData={latestData}
+      />
+
+      {/* Feature 2: Digital Twin Workspace Modal */}
+      <DigitalTwinModal
+        isOpen={activeModal === 'digital_twin'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+        onOpenModal={handleOpenModal}
+      />
+
+      {/* Feature 5: Export Reports Workspace Modal */}
+      <ReportsModal
+        isOpen={activeModal === 'reports'}
+        onClose={() => setActiveModal(null)}
+        stationId={stationId}
+        latestData={latestData}
+        auditLogs={auditLogs}
       />
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import EnergyFlowCanvas from '../components/EnergyFlowCanvas';
 import DispatchStacked24hChart from '../components/charts/DispatchStacked24hChart';
 import StressTestBreakingPointChart from '../components/charts/StressTestBreakingPointChart';
+import OptimizationStatusPanel from '../components/OptimizationStatusPanel';
 import { STATIONS } from '../constants/stations';
 
 export default function EnergyModal({
@@ -424,6 +425,9 @@ export default function EnergyModal({
           {/* ================= TAB 3: HIGHS OPTIMAL DISPATCH ================= */}
           {activeTab === 'dispatch' && (
             <div className="space-y-6">
+              {/* Feature 2: Optimizer Transparency Panel */}
+              <OptimizationStatusPanel latestData={latestData} />
+
               {/* Tier Selector */}
               <div className="flex items-center justify-between bg-white p-2.5 rounded-2xl border border-[#bcecfc] shadow-xs">
                 <div className="flex items-center gap-1.5">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-export default function ForecastFullModal({ isOpen, onClose }) {
+export default function ForecastFullModal({ isOpen, onClose, stationId = 'MAITRI', onOpenModal }) {
   const [activeTab, setActiveTab] = useState('quantiles'); // 'quantiles' | 'deviation' | 'reserve' | 'benchmark' | 'mlops'
   const [selectedTarget, setSelectedTarget] = useState('electrical_load_kw');
   const [selectedHorizon, setSelectedHorizon] = useState('24H');
@@ -348,12 +348,36 @@ export default function ForecastFullModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition border border-slate-200"
-          >
-            <i className="fa-solid fa-xmark text-sm"></i>
-          </button>
+          <div className="flex items-center gap-2">
+            {onOpenModal && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onOpenModal('energy')}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#05C5FF] to-[#0699C6] text-white text-xs font-bold shadow-xs hover:opacity-95 transition flex items-center gap-1.5 cursor-pointer"
+                  title="Send predicted load profile to Energy Matrix"
+                >
+                  <i className="fa-solid fa-bolt"></i>
+                  <span>Send to Energy Matrix</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onOpenModal('digital_twin')}
+                  className="px-3 py-1.5 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] text-xs font-bold border border-[#bcecfc] transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  title="Evaluate forecast impacts in Digital Twin"
+                >
+                  <i className="fa-solid fa-cube text-[#0699C6]"></i>
+                  <span>Evaluate in Digital Twin</span>
+                </button>
+              </>
+            )}
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition border border-slate-200"
+            >
+              <i className="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
         </div>
 
         {/* Global Action Message Banner */}
@@ -488,6 +512,46 @@ export default function ForecastFullModal({ isOpen, onClose }) {
                       </button>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* Polar Microgrid Critical Load Breakdown & Risk Advisory Banner */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 rounded-2xl bg-[#edf9fd] border border-[#bcecfc] flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Life-Support Critical Load</span>
+                    <strong className="text-sm font-black text-[#127694] font-mono">142.0 kW (44.4%)</strong>
+                    <span className="text-[10px] text-emerald-600 block">Protected: Habitat heating & comms</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-800">
+                    NON-SHEDDABLE
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-[#edf9fd] border border-[#bcecfc] flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Auxiliary / Science Load</span>
+                    <strong className="text-sm font-black text-slate-700 font-mono">178.0 kW (55.6%)</strong>
+                    <span className="text-[10px] text-slate-500 block">Sheddable during severe deficit</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-slate-200 text-slate-700">
+                    SHED BUFFER
+                  </span>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-black text-amber-800 uppercase tracking-wider block">Upcoming Deficit Window</span>
+                    <strong className="text-xs font-black text-amber-900 block">18:00 – 22:00 UTC Peak</strong>
+                    <span className="text-[10px] text-amber-700 block">Wind drops to 6.2 m/s; BESS scheduled to buffer</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onOpenModal && onOpenModal('energy')}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[10px] shadow-xs cursor-pointer"
+                  >
+                    Dispatch Now
+                  </button>
                 </div>
               </div>
 

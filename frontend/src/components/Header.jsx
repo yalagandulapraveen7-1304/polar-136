@@ -198,6 +198,26 @@ export default function Header({
             </span>
           </div>
 
+          {/* Real-Time Alerts Quick Indicator Pill */}
+          <button
+            type="button"
+            onClick={() => onOpenModal('alerts')}
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold shadow-xs transition cursor-pointer ${
+              telemetryMeta?.alertCount > 0
+                ? 'bg-rose-50 border-rose-300 text-rose-800'
+                : 'bg-[#edf9fd] border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe]'
+            }`}
+            title="SCADA Alarms & Real-Time Operational Alerts"
+          >
+            <i className={`fa-solid fa-triangle-exclamation text-xs ${telemetryMeta?.alertCount > 0 ? 'text-rose-600' : 'text-[#0699C6]'}`}></i>
+            <span>ALERTS</span>
+            {telemetryMeta?.alertCount > 0 && (
+              <span className="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full">
+                {telemetryMeta.alertCount}
+              </span>
+            )}
+          </button>
+
           {/* Live Antarctic Time & Connection Diagnostic Pill */}
           <div className="flex flex-col text-right">
             <span className="font-mono text-xs font-bold text-slate-800 tracking-tight leading-tight">
@@ -348,268 +368,68 @@ export default function Header({
       </div>
 
       {/* =========================================================================
-          ROW 2: UNIFIED PRIMARY NAVIGATION BAR (EXACT 12 ITEMS IN EXACT ORDER)
-          Overview -> Monitor -> Devices -> Energy -> Environment -> Storage ->
-          Compare -> Recommendations -> Database -> AI Copilot -> Alerts -> Maintenance
+          ROW 2: 5 PRIMARY USER-FACING POLAR EMS FEATURES
+          1. LOAD FORECAST  2. DIGITAL TWIN  3. ENERGY MATRIX  4. COPILOT  5. EXPORT REPORTS
           ========================================================================= */}
       <div className="w-full pt-1.5 border-t border-[#bcecfc]/50">
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 justify-center py-0.5">
+        <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 justify-center py-0.5">
           
-          {/* 1. Overview */}
+          {/* Overview HUD Tab */}
           <button
             type="button"
-            className={`nav-pill ${(!activeModal || activeModal === 'overview') ? 'active' : ''}`}
+            className={`nav-pill font-bold ${(!activeModal || activeModal === 'overview') ? 'active' : ''}`}
             onClick={() => {
               onOpenModal(null);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            title="Operational Overview & HUD"
+            title="Operational Overview HUD & Live Polar Gauges"
           >
             <i className="fa-solid fa-table-cells-large text-xs"></i>
-            <span>Overview</span>
+            <span>OVERVIEW</span>
           </button>
 
-          {/* 2. Monitor */}
+          {/* 1. LOAD FORECAST */}
           <button
             type="button"
-            className={`nav-pill ${activeModal === 'monitoring' ? 'active' : ''}`}
-            onClick={() => onOpenModal('monitoring')}
-            title="Real-Time Grid & Subsystem Monitoring"
+            className={`nav-pill font-black ${activeModal === 'forecast' ? 'active' : ''}`}
+            onClick={() => onOpenModal('forecast')}
+            title="Feature 1: Probabilistic Load & Renewable Predictions (P10/P50/P90), Multi-Horizon & Weather Inputs"
           >
-            <i className="fa-solid fa-chart-pie text-xs"></i>
-            <span>Monitor</span>
+            <i className="fa-solid fa-chart-line text-xs text-sky-500"></i>
+            <span>LOAD FORECAST</span>
           </button>
 
-          {/* 3. Devices */}
+          {/* 2. DIGITAL TWIN */}
           <button
             type="button"
-            className={`nav-pill ${activeModal === 'devices' ? 'active' : ''}`}
-            onClick={() => onOpenModal('devices')}
-            title="SCADA-Level Device Monitoring & PLC Telemetry"
+            className={`nav-pill font-black ${(activeModal === 'digital_twin' || activeModal === 'monitoring' || activeModal === 'devices' || activeModal === 'maintenance') ? 'active' : ''}`}
+            onClick={() => onOpenModal('digital_twin')}
+            title="Feature 2: Equipment SCADA Registers, Asset Degradation, Electro-Thermal Twin & Cause-and-Effect Analysis"
           >
-            <i className="fa-solid fa-server text-xs"></i>
-            <span>Devices</span>
+            <i className="fa-solid fa-cube text-xs text-[#0699C6]"></i>
+            <span>DIGITAL TWIN</span>
           </button>
 
-          {/* 4. Energy (Unified Group: Microgrid + Dispatch + Flow) */}
-          <div className="relative" id="energyDropdownContainer">
-            <button
-              type="button"
-              onClick={() => setIsEnergyMenuOpen(!isEnergyMenuOpen)}
-              className={`nav-pill cursor-pointer ${
-                (activeModal === 'energy' || activeModal === 'microgrid' || activeModal === 'dispatch') ? 'active' : ''
-              }`}
-              title="Energy Workspace: Microgrid Topology, HiGHS Dispatch & Power Flow"
-            >
-              <i className="fa-solid fa-bolt text-xs text-amber-500"></i>
-              <span>Energy</span>
-              <i className={`fa-solid fa-chevron-down text-[9px] opacity-70 transition-transform duration-200 ${isEnergyMenuOpen ? 'rotate-180' : ''}`}></i>
-            </button>
-
-            {/* Energy Dropdown Menu */}
-            {isEnergyMenuOpen && (
-              <div className="absolute left-0 mt-1.5 w-60 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-[#bcecfc] p-1.5 z-50 animate-fadeIn text-left font-sans">
-                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1">
-                  Energy Management Workspace
-                </div>
-                
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnergyMenuOpen(false);
-                    onOpenModal('energy', 'balance');
-                  }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-bolt text-amber-500 text-xs"></i>
-                  <div>
-                    <span className="block">Energy Workspace (All-in-One)</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Unified power balance &amp; dispatch</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnergyMenuOpen(false);
-                    onOpenModal('energy', 'microgrid');
-                  }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-network-wired text-[#0699C6] text-xs"></i>
-                  <div>
-                    <span className="block">Microgrid Topology &amp; State</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Grid frequency, bus voltage, genset sync</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnergyMenuOpen(false);
-                    onOpenModal('energy', 'dispatch');
-                  }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-code-fork text-emerald-600 text-xs"></i>
-                  <div>
-                    <span className="block">HiGHS Optimal Dispatch</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Level 3 MILP, 24h rolling schedule</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnergyMenuOpen(false);
-                    onOpenModal('energy', 'balance');
-                  }}
-                  className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-diagram-project text-cyan-600 text-xs"></i>
-                  <span>Live Energy Flow &amp; Balance</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnergyMenuOpen(false);
-                    onOpenModal('energy', 'analytics');
-                  }}
-                  className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-chart-line text-sky-600 text-xs"></i>
-                  <span>Generation &amp; Consumption Analytics</span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 5. Environment (Unified Group: Weather + Forecast) */}
-          <div className="relative" id="environmentDropdownContainer">
-            <button
-              type="button"
-              onClick={() => setIsEnvironmentMenuOpen(!isEnvironmentMenuOpen)}
-              className={`nav-pill cursor-pointer ${
-                (activeModal === 'environment' || activeModal === 'weather' || activeModal === 'forecast') ? 'active' : ''
-              }`}
-              title="Environment Workspace: Live Polar Weather & Probabilistic Forecasts"
-            >
-              <i className="fa-solid fa-cloud-sun text-xs text-sky-500"></i>
-              <span>Environment</span>
-              <i className={`fa-solid fa-chevron-down text-[9px] opacity-70 transition-transform duration-200 ${isEnvironmentMenuOpen ? 'rotate-180' : ''}`}></i>
-            </button>
-
-            {/* Environment Dropdown Menu */}
-            {isEnvironmentMenuOpen && (
-              <div className="absolute left-0 mt-1.5 w-60 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-[#bcecfc] p-1.5 z-50 animate-fadeIn text-left font-sans">
-                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider px-2.5 py-1">
-                  Environmental Intelligence
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnvironmentMenuOpen(false);
-                    onOpenModal('environment', 'current');
-                  }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-cloud-sun text-sky-500 text-xs"></i>
-                  <div>
-                    <span className="block">Environment Workspace (All-in-One)</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Live conditions &amp; probabilistic forecast</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnvironmentMenuOpen(false);
-                    onOpenModal('environment', 'current');
-                  }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-snowflake text-[#0699C6] text-xs"></i>
-                  <div>
-                    <span className="block">Live Polar Weather &amp; Conditions</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Ambient temp, wind speed, solar GHI</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnvironmentMenuOpen(false);
-                    onOpenModal('environment', 'forecast');
-                  }}
-                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-chart-line text-indigo-600 text-xs"></i>
-                  <div>
-                    <span className="block">Probabilistic Forecast (P10/P50/P90)</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Multi-horizon quantile predictions</span>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnvironmentMenuOpen(false);
-                    onOpenModal('environment', 'impact');
-                  }}
-                  className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-plug-circle-bolt text-amber-600 text-xs"></i>
-                  <span>Microgrid Energy Impacts</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsEnvironmentMenuOpen(false);
-                    onOpenModal('environment', 'simulator');
-                  }}
-                  className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-[#edf9fd] hover:text-[#127694] flex items-center gap-2.5 transition cursor-pointer"
-                >
-                  <i className="fa-solid fa-wind text-cyan-600 text-xs"></i>
-                  <span>Extreme Weather Scenario Simulator</span>
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* 6. Storage */}
+          {/* 3. ENERGY MATRIX */}
           <button
             type="button"
-            className={`nav-pill ${activeModal === 'battery' ? 'active' : ''}`}
-            onClick={() => onOpenModal('battery')}
-            title="LiFePO4 Energy Storage Subsystem & Thermal Management"
+            className={`nav-pill font-black ${(activeModal === 'energy' || activeModal === 'microgrid' || activeModal === 'dispatch' || activeModal === 'battery') ? 'active' : ''}`}
+            onClick={() => onOpenModal('energy')}
+            title="Feature 3: 3-Tier HiGHS MILP Optimizer, Power Balance Flow, Storage Coordination & Safety Constraints"
           >
-            <i className="fa-solid fa-car-battery text-xs text-emerald-600"></i>
-            <span>Storage</span>
+            <i className="fa-solid fa-bolt text-xs text-amber-500"></i>
+            <span>ENERGY MATRIX</span>
           </button>
 
-          {/* 7. Compare */}
+          {/* 4. COPILOT */}
           <button
             type="button"
-            className={`nav-pill ${activeModal === 'comparison' ? 'active' : ''}`}
-            onClick={() => onOpenModal('comparison')}
-            title="Multi-Station Comparative Benchmarking"
+            className={`nav-pill font-black ${activeModal === 'copilot' ? 'active' : ''}`}
+            onClick={() => onOpenModal('copilot')}
+            title="Feature 4: Autonomous Polar Operational Assistant & Grounded 6-Part Decision Explanations"
           >
-            <i className="fa-solid fa-code-compare text-xs text-[#0699C6]"></i>
-            <span>Compare</span>
-          </button>
-
-          {/* 8. Recommendations */}
-          <button
-            type="button"
-            className={`nav-pill relative ${activeModal === 'recommendations' ? 'active' : ''}`}
-            onClick={() => onOpenModal('recommendations')}
-            title="Feature 18: Forecast-Based Recommendations & Engineering Support"
-          >
-            <i className="fa-solid fa-lightbulb text-xs text-amber-500"></i>
-            <span>Recommendations</span>
+            <i className="fa-solid fa-robot text-xs text-indigo-500"></i>
+            <span>COPILOT</span>
             {telemetryMeta?.recommendationsCount > 0 && (
               <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-black shadow-xs">
                 {telemetryMeta.recommendationsCount}
@@ -617,48 +437,15 @@ export default function Header({
             )}
           </button>
 
-          {/* 9. Database */}
+          {/* 5. EXPORT REPORTS */}
           <button
             type="button"
-            className={`nav-pill ${activeModal === 'database' ? 'active' : ''}`}
-            onClick={() => onOpenModal('database')}
-            title="Feature 24: Database & Historical Data Layer (SQLite WAL)"
+            className={`nav-pill font-black ${(activeModal === 'reports' || activeModal === 'analytics') ? 'active' : ''}`}
+            onClick={() => onOpenModal('reports')}
+            title="Feature 5: Logistics Savings Evidence, Baseline vs PolarOPS Evaluation, Printable HTML & CSV/JSON Data Exports"
           >
-            <i className="fa-solid fa-database text-xs text-[#0699C6]"></i>
-            <span>Database</span>
-          </button>
-
-          {/* 10. AI Copilot */}
-          <button
-            type="button"
-            className={`nav-pill ${activeModal === 'copilot' ? 'active' : ''}`}
-            onClick={() => onOpenModal('copilot')}
-            title="Autonomous Polar Operational Assistant & RAG Query"
-          >
-            <i className="fa-solid fa-robot text-xs text-indigo-600"></i>
-            <span>AI Copilot</span>
-          </button>
-
-          {/* 11. Alerts */}
-          <button
-            type="button"
-            className={`nav-pill ${activeModal === 'alerts' ? 'active' : ''}`}
-            onClick={() => onOpenModal('alerts')}
-            title="Real-Time SCADA Alarms & Compound Polar Risk Intelligence"
-          >
-            <i className="fa-solid fa-triangle-exclamation text-xs text-rose-600"></i>
-            <span>Alerts</span>
-          </button>
-
-          {/* 12. Maintenance */}
-          <button
-            type="button"
-            className={`nav-pill ${activeModal === 'maintenance' ? 'active' : ''}`}
-            onClick={() => onOpenModal('maintenance')}
-            title="Preventive Maintenance & Arctic Asset Health Supervisor"
-          >
-            <i className="fa-solid fa-shield-halved text-xs text-slate-600"></i>
-            <span>Maintenance</span>
+            <i className="fa-solid fa-file-invoice text-xs text-emerald-600"></i>
+            <span>EXPORT REPORTS</span>
           </button>
 
         </nav>
@@ -666,163 +453,172 @@ export default function Header({
         {/* Mobile / Tablet Responsive Drawer Navigation Menu */}
         {isMobileMenuOpen && (
           <div className="lg:hidden mt-2 p-3 bg-white rounded-2xl border border-[#bcecfc] shadow-xl animate-fadeIn space-y-3 font-sans">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-1">
-              Primary System Navigation
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                5 Primary Polar EMS Workspaces
+              </span>
+              <span className="text-[9px] font-mono text-[#0699C6] font-bold">
+                {stationId} &middot; {mode === 'SCADA_MODE' ? 'SCADA' : 'DEMO'}
+              </span>
             </div>
 
-            {/* Current State Group */}
-            <div className="space-y-1">
-              <span className="text-[9px] font-bold text-[#127694] uppercase tracking-wider block px-2">Operational State</span>
-              <div className="grid grid-cols-3 gap-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal(null);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="px-2 py-1.5 rounded-lg text-xs font-bold text-left bg-slate-50 hover:bg-[#edf9fd] flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-table-cells-large text-[11px] text-[#127694]"></i> Overview
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('monitoring');
-                  }}
-                  className="px-2 py-1.5 rounded-lg text-xs font-bold text-left bg-slate-50 hover:bg-[#edf9fd] flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-chart-pie text-[11px] text-[#0699C6]"></i> Monitor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('devices');
-                  }}
-                  className="px-2 py-1.5 rounded-lg text-xs font-bold text-left bg-slate-50 hover:bg-[#edf9fd] flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-server text-[11px] text-[#0699C6]"></i> Devices
-                </button>
-              </div>
+            {/* The 5 Primary Views in Mobile Drawer */}
+            <div className="space-y-1.5">
+              
+              {/* Overview HUD */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal(null);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  (!activeModal || activeModal === 'overview')
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-table-cells-large text-[#127694]"></i>
+                  <span>OVERVIEW HUD</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">Real-Time Gauges</span>
+              </button>
+
+              {/* 1. LOAD FORECAST */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('forecast');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'forecast'
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-chart-line text-sky-500"></i>
+                  <span>1. LOAD FORECAST</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">P10/P50/P90 Predictions</span>
+              </button>
+
+              {/* 2. DIGITAL TWIN */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('digital_twin');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'digital_twin'
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-cube text-[#0699C6]"></i>
+                  <span>2. DIGITAL TWIN</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">Assets &amp; What-If</span>
+              </button>
+
+              {/* 3. ENERGY MATRIX */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('energy');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'energy'
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-bolt text-amber-500"></i>
+                  <span>3. ENERGY MATRIX</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">HiGHS Dispatch &amp; Flow</span>
+              </button>
+
+              {/* 4. COPILOT */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('copilot');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'copilot'
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-robot text-indigo-500"></i>
+                  <span>4. COPILOT</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">Decision Explanations</span>
+              </button>
+
+              {/* 5. EXPORT REPORTS */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('reports');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'reports'
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-file-invoice text-emerald-600"></i>
+                  <span>5. EXPORT REPORTS</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">Savings &amp; Evidence</span>
+              </button>
             </div>
 
-            {/* Energy & Environment Workspaces */}
-            <div className="space-y-1 pt-1 border-t border-slate-100">
-              <span className="text-[9px] font-bold text-[#127694] uppercase tracking-wider block px-2">Core Workspaces</span>
-              <div className="grid grid-cols-2 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('energy');
-                  }}
-                  className="p-2 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] border border-[#bcecfc] text-left"
-                >
-                  <div className="text-xs font-black text-[#127694] flex items-center gap-1.5">
-                    <i className="fa-solid fa-bolt text-amber-500"></i> Energy
-                  </div>
-                  <span className="text-[10px] text-slate-500 block mt-0.5">Microgrid + Dispatch</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('environment');
-                  }}
-                  className="p-2 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] border border-[#bcecfc] text-left"
-                >
-                  <div className="text-xs font-black text-[#127694] flex items-center gap-1.5">
-                    <i className="fa-solid fa-cloud-sun text-sky-500"></i> Environment
-                  </div>
-                  <span className="text-[10px] text-slate-500 block mt-0.5">Weather + Forecast</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Analysis & System Modules */}
-            <div className="space-y-1 pt-1 border-t border-slate-100">
-              <span className="text-[9px] font-bold text-[#127694] uppercase tracking-wider block px-2">Analysis &amp; Governance</span>
-              <div className="grid grid-cols-3 gap-1 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('battery');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-car-battery text-emerald-600 text-[11px]"></i> Storage
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('comparison');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-code-compare text-[#0699C6] text-[11px]"></i> Compare
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('recommendations');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-lightbulb text-amber-500 text-[11px]"></i> Advisories
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('database');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-database text-[#0699C6] text-[11px]"></i> Database
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('copilot');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-robot text-indigo-600 text-[11px]"></i> AI Copilot
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('alerts');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-triangle-exclamation text-rose-600 text-[11px]"></i> Alerts
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onOpenModal('maintenance');
-                  }}
-                  className="px-2 py-1.5 rounded-lg bg-slate-50 hover:bg-[#edf9fd] text-left flex items-center gap-1.5"
-                >
-                  <i className="fa-solid fa-shield-halved text-slate-600 text-[11px]"></i> Maintain
-                </button>
-              </div>
+            {/* Quick Diagnostic / Safety Utilities in Mobile Drawer */}
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1 text-[11px] font-bold">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('alerts');
+                }}
+                className="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1"
+              >
+                <i className="fa-solid fa-triangle-exclamation text-rose-600 text-[10px]"></i> Alerts
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('manual');
+                }}
+                className="px-2 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1"
+              >
+                <i className="fa-solid fa-sliders text-amber-600 text-[10px]"></i> Override
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('database');
+                }}
+                className="px-2 py-1 rounded-lg bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] border border-[#bcecfc] flex items-center gap-1"
+              >
+                <i className="fa-solid fa-database text-[#0699C6] text-[10px]"></i> Database
+              </button>
             </div>
           </div>
         )}
