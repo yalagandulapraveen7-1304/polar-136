@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { getWsUrl } from '../constants/api';
 
 const TelemetryContext = createContext(null);
 
@@ -89,8 +90,7 @@ export function TelemetryProvider({ children, activeStationId = 'MAITRI', mode =
       return;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws/telemetry`;
+    const wsUrl = getWsUrl();
 
     setConnectionState((prev) => (retryCountRef.current > 0 ? 'RECONNECTING' : 'CONNECTING'));
 

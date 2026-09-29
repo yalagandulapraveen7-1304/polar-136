@@ -416,9 +416,13 @@ app = FastAPI(title="PolarOPS SEMS", version="1.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "*",                                   # keep for local dev
-        "https://YOUR_VERCEL_SUBDOMAIN.vercel.app"   # <-- replace with your Vercel URL
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000",
+        "https://polar-61ps.onrender.com",
     ],
+    allow_origin_regex=r"^https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

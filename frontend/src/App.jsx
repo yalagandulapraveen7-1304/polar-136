@@ -23,6 +23,7 @@ import EnergyModal from './modals/EnergyModal';
 import EnvironmentModal from './modals/EnvironmentModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
+import { getWsUrl } from './constants/api';
 
 export default function App() {
   const [stationId, setStationId] = useState(() => {
@@ -131,8 +132,7 @@ export default function App() {
   // 3. WebSocket Connection
   useEffect(() => {
     function connectWs() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/telemetry`;
+      const wsUrl = getWsUrl();
 
       try {
         const ws = new WebSocket(wsUrl);
