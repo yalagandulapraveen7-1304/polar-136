@@ -422,9 +422,14 @@ function AppDashboard({
   };
 
   const [modalInitialTab, setModalInitialTab] = useState(null);
+  const [copilotInitialQuery, setCopilotInitialQuery] = useState(null);
 
-  const handleOpenModal = useCallback((modalName, tab = null) => {
-    setModalInitialTab(tab);
+  const handleOpenModal = useCallback((modalName, payload = null) => {
+    if (modalName === 'copilot' && typeof payload === 'string') {
+      setCopilotInitialQuery(payload);
+    } else {
+      setModalInitialTab(payload);
+    }
     setActiveModal(modalName);
   }, [setActiveModal]);
 
@@ -470,7 +475,7 @@ function AppDashboard({
       <HeroSection
         stationId={stationId}
         latestData={latestData}
-        onOpenModal={(modalName) => setActiveModal(modalName)}
+        onOpenModal={handleOpenModal}
         activeOverrides={activeOverrides}
         currentScenario={currentScenario}
         onScenarioChange={onScenarioChange}
@@ -549,10 +554,14 @@ function AppDashboard({
 
       <CopilotModal
         isOpen={activeModal === 'copilot'}
-        onClose={() => setActiveModal(null)}
+        onClose={() => {
+          setActiveModal(null);
+          setCopilotInitialQuery(null);
+        }}
         stationId={stationId}
         latestData={latestData}
         onOpenModal={handleOpenModal}
+        initialQuery={copilotInitialQuery}
       />
 
       <MaintenanceModal

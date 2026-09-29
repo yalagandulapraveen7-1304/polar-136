@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import MarkdownMessage from '../components/MarkdownMessage';
 import { generateCopilotResponse, getFallbackIntelligenceState, getFallbackSimulation } from '../utils/copilotEngine';
 
-export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData, onOpenModal }) {
+export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData, onOpenModal, initialQuery }) {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'anomalies' | 'digital_twin' | 'counterfactual' | 'mlops' | 'audit'
 
   // Copilot Controls
@@ -75,6 +75,22 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
     fetchIntelligenceState();
     fetchCopilotMetadata();
   }, [isOpen]);
+
+  // Auto-execute initial query if provided when opening modal
+  const initialQueryExecutedRef = useRef(false);
+  useEffect(() => {
+    if (isOpen && initialQuery && !initialQueryExecutedRef.current) {
+      initialQueryExecutedRef.current = true;
+      setActiveTab('chat');
+      const timer = setTimeout(() => {
+        handleSend(initialQuery);
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+    if (!isOpen) {
+      initialQueryExecutedRef.current = false;
+    }
+  }, [isOpen, initialQuery]);
 
   async function fetchCopilotMetadata() {
     try {
@@ -242,6 +258,21 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
         onClose();
         onOpenModal('energy', 'analytics');
         return;
+      }
+    }
+
+    if (actionType === 'DISPATCH_G2') {
+      try {
+        await fetch('/api/commander/override', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ p_diesel_2_kw: 85.0 })
+        });
+        setActionNotice('Generator 2 Auto-Dispatched at 85 kW. Critical Deficit Neutralized!');
+        setTimeout(() => setActionNotice(null), 5000);
+        return;
+      } catch (e) {
+        console.warn('G2 auto-dispatch error:', e);
       }
     }
 

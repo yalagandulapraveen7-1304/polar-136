@@ -159,7 +159,7 @@ export default function HeroSection({
             </button>
             <button
               type="button"
-              onClick={() => onOpenModal('copilot')}
+              onClick={() => onOpenModal('copilot', 'Why is a critical renewable deficit predicted at 18:40 UTC, and why must Generator G2 be dispatched at 85 kW?')}
               className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-rose-200 transition"
             >
               Inspect Why

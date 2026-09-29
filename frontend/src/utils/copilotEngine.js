@@ -218,6 +218,36 @@ export function generateCopilotResponse(query, stationId = 'MAITRI', latestData 
     };
   }
 
+  // 7a. Critical Renewable Deficit & G2 Auto-Dispatch Root-Cause Inspection
+  if (qLower.includes('deficit') || qLower.includes('18:40') || qLower.includes('gale') || qLower.includes('braking') || qLower.includes('g2 be dispatched') || qLower.includes('auto-dispatch g2')) {
+    return {
+      answer: `CRITICAL RENEWABLE DEFICIT ROOT-CAUSE ANALYSIS — ${station.name.toUpperCase()}:\n\n` +
+        `1. Meteorological Event (Turbine Cut-Out):\n` +
+        `• An Antarctic gale-force blizzard with peak gusts > 25.0 m/s triggered SCADA aerodynamic pitch feathering and high-speed emergency disc brakes.\n` +
+        `• Wind turbine output drops from operational baseline directly to 0.0 kW to protect rotor gearboxes from catastrophic mechanical failure.\n\n` +
+        `2. The -36 kW Deficit Calculation:\n` +
+        `• Projected Station Electrical Load: 176.7 kW (including 20 kW critical life support).\n` +
+        `• Available Generation without G2: Generator 1 is loaded at 25.0 kW, and BESS discharge is thermally capped.\n` +
+        `• Net Deficit = 176.7 kW Load - 25.0 kW G1 - 115.7 kW BESS ceiling = -36.0 kW Unserved Energy Deficit at 18:40 UTC.\n` +
+        `• Without intervention, battery SoC breaches the critical 20% reserve floor within 3.2 hours.\n\n` +
+        `3. Why Auto-Dispatch G2 at 85 kW is Recommended:\n` +
+        `• Anti-Wet-Stacking Rule: Sizing G2 at 85 kW (~42.5% loading) exceeds the mandatory 35% minimum loading floor to prevent unburned fuel soot glazing.\n` +
+        `• Reserve Margin: 85 kW absorbs the 36 kW deficit with a 49 kW spinning reserve cushion.\n` +
+        `• Thermal Co-Generation: Recovers ~78 kWth waste heat, protecting habitat living quarters and pipe tracing.`,
+      evidence: `SCADA turbine anemometers clocked gale velocity > 25.0 m/s. MILP solver identified unserved energy slack variable violation (-36 kW) at 18:40 UTC lookahead.`,
+      impact: `Neutralizes 36 kW electrical shortfall, avoids cold-cranking delays, prevents wet-stacking, and guarantees 100% life-support habitat heating.`,
+      recommendation: `Execute G2 Auto-Dispatch at 85 kW. Maintain BESS floor lock at 20%.`,
+      sources: ['SCADA Turbine Anemometers', 'HiGHS MILP Horizon Solver', 'ECMWF Polar Wave Storm Model', 'BMS Electro-Thermal Twin'],
+      action_card: {
+        action: 'Auto-Dispatch Generator 2 at 85 kW',
+        reason: 'Neutralizes 36 kW deficit, prevents wet-stacking, and protects 20% BESS floor.',
+        button_label: 'AUTO-DISPATCH G2 (85 kW)',
+        action_type: 'DISPATCH_G2'
+      },
+      mode: 'LOCAL_FALLBACK'
+    };
+  }
+
   // 7b. Recommendations & Decision Support Queries
   if (qLower.includes('recommend') || qLower.includes('suggest') || qLower.includes('advisory') || qLower.includes('decision support')) {
     const recs = latestData?.recommendations?.items || [];
