@@ -44,12 +44,6 @@ export default function App() {
   const [clockTime, setClockTime] = useState('');
   const [latestData, setLatestData] = useState(null);
   const [activeModal, setActiveModal] = useState(null);
-  const [modalInitialTab, setModalInitialTab] = useState(null);
-
-  const handleOpenModal = useCallback((modalName, tab = null) => {
-    setModalInitialTab(tab);
-    setActiveModal(modalName);
-  }, []);
   const [activeOverrides, setActiveOverrides] = useState(() => {
     try {
       const saved = localStorage.getItem('polarops_overrides');
@@ -426,6 +420,13 @@ function AppDashboard({
       updateTelemetrySnapshot(snap);
     }
   };
+
+  const [modalInitialTab, setModalInitialTab] = useState(null);
+
+  const handleOpenModal = useCallback((modalName, tab = null) => {
+    setModalInitialTab(tab);
+    setActiveModal(modalName);
+  }, [setActiveModal]);
 
   return (
     <div className="w-full max-w-[1600px] mx-auto p-3 sm:p-4 lg:p-5 flex flex-col gap-3.5 sm:gap-4 lg:gap-5">
