@@ -230,6 +230,21 @@ export default function Header({
                         {telemetryMeta.staleSeconds < 2 ? 'Just now (<1s)' : `${telemetryMeta.staleSeconds}s ago`}
                       </span>
                     </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Database Layer:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsDiagOpen(false);
+                          onOpenModal('database');
+                        }}
+                        className="font-bold text-[#127694] hover:text-[#0699C6] bg-[#edf9fd] hover:bg-[#c2f0fe] px-1.5 py-0.5 rounded text-[10px] border border-[#bcecfc] flex items-center gap-1 transition cursor-pointer"
+                        title="Open Database & Historical Explorer"
+                      >
+                        <i className="fa-solid fa-database text-[9px] text-[#0699C6]"></i>
+                        SQLite WAL (Feature 24)
+                      </button>
+                    </div>
                   </div>
 
                   <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
@@ -333,6 +348,13 @@ export default function Header({
                 {telemetryMeta.recommendationsCount}
               </span>
             )}
+          </button>
+          <button
+            className="nav-pill text-[#127694] hover:text-[#0699C6] font-bold shrink-0"
+            onClick={() => onOpenModal('database')}
+            title="Feature 24: Database & Historical Data Layer (SQLite WAL)"
+          >
+            <i className="fa-solid fa-database text-xs text-[#0699C6]"></i> Database
           </button>
           <button
             className="nav-pill shrink-0"

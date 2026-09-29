@@ -41,6 +41,7 @@ from backend.scenarios.scenario_engine import PolarScenarioControlEngine, PRESET
 from backend.health.scada_device_monitor import ScadaDeviceMonitoringEngine
 from backend.monitoring.station_manager import PolarStationManager
 from backend.recommendations.recommendation_engine import PolarRecommendationEngine
+from backend.database.service import db_service
 
 # Global Singletons
 ingestion_driver = DataIngestionDriver(station_id=DEFAULT_STATION, mode=SEMS_MODE)
@@ -64,6 +65,7 @@ scenario_engine = PolarScenarioControlEngine(station_id=DEFAULT_STATION)
 scada_engine = ScadaDeviceMonitoringEngine(station_id=DEFAULT_STATION)
 station_manager = PolarStationManager(default_station=DEFAULT_STATION)
 recommendation_engine = PolarRecommendationEngine(station_id=DEFAULT_STATION)
+database_service = db_service
 
 # Connected WebSocket clients
 active_websockets: List[WebSocket] = []
@@ -362,6 +364,11 @@ def compute_system_snapshot() -> Dict[str, Any]:
     }
     safe_payload = jsonable_encoder(payload)
     current_system_snapshot = safe_payload
+    # Feature 24: Asynchronous non-blocking persistence
+    try:
+        db_service.ingest_snapshot(safe_payload)
+    except Exception:
+        pass
     return safe_payload
 
 async def telemetry_broadcast_loop():
@@ -369,6 +376,10 @@ async def telemetry_broadcast_loop():
     while True:
         try:
             payload = await asyncio.to_thread(compute_system_snapshot)
+
+            # Periodic non-blocking flush of telemetry buffer to SQLite
+            if int(datetime.datetime.now().timestamp()) % 2 == 0:
+                await asyncio.to_thread(db_service.repository.flush_telemetry_buffer)
 
             # Broadcast to active WebSockets
             if active_websockets:
@@ -524,6 +535,15 @@ async def switch_station(req: StationSwitchRequest):
         snapshot = await asyncio.to_thread(compute_system_snapshot)
         snapshot["station"] = req.station_id
         snapshot["station_id"] = req.station_id
+        db_service.record_audit(
+            station_id=req.station_id,
+            actor_type="OPERATOR",
+            actor_id="Cmdr. Vance",
+            action="STATION_SWITCH",
+            resource_type="STATION",
+            resource_id=req.station_id,
+            metadata={"new_station": req.station_id}
+        )
         return {
             "status": "SUCCESS",
             "station_id": req.station_id,
@@ -540,6 +560,15 @@ async def switch_mode(req: ModeSwitchRequest):
         if current_system_snapshot:
             current_system_snapshot["simulation_mode"] = req.mode
             current_system_snapshot["data_quality"] = "SIMULATED" if req.mode == "DEMO_MODE" else "VALID"
+        db_service.record_audit(
+            station_id=current_system_snapshot.get("station_id", "MAITRI") if current_system_snapshot else "MAITRI",
+            actor_type="OPERATOR",
+            actor_id="Cmdr. Vance",
+            action="MODE_SWITCH",
+            resource_type="SIMULATION_MODE",
+            resource_id=req.mode,
+            metadata={"new_mode": req.mode}
+        )
         return {"status": "SUCCESS", "mode": req.mode, "snapshot": current_system_snapshot}
     return JSONResponse(status_code=400, content={"status": "ERROR", "message": "Invalid mode"})
 
@@ -548,6 +577,14 @@ async def commander_override(req: CommanderOverrideRequest):
     params = req.model_dump(exclude_unset=True)
     scenario_engine.apply_scenario(params, scenario_name="COMMANDER_MANUAL_INPUT")
     ingestion_driver.apply_overrides(params)
+    db_service.record_audit(
+        station_id="MAITRI",
+        actor_type="OPERATOR",
+        actor_id="Cmdr. Vance",
+        action="MANUAL_OVERRIDE",
+        resource_type="CONTROL_BUS",
+        metadata=params
+    )
     await asyncio.to_thread(compute_system_snapshot)
     return {"status": "SUCCESS", "message": "Commander overrides applied to digital twin.", "run_id": scenario_engine.run_id}
 
@@ -555,6 +592,13 @@ async def commander_override(req: CommanderOverrideRequest):
 async def commander_reset():
     scenario_engine.reset_scenario()
     ingestion_driver.clear_overrides()
+    db_service.record_audit(
+        station_id="MAITRI",
+        actor_type="OPERATOR",
+        actor_id="Cmdr. Vance",
+        action="RESET_OVERRIDE",
+        resource_type="CONTROL_BUS"
+    )
     await asyncio.to_thread(compute_system_snapshot)
     return {"status": "SUCCESS", "message": "Overrides cleared, nominal polar physics restored."}
 
@@ -570,6 +614,15 @@ async def ai_chat(req: ChatRequest):
         force_mode=req.mode
     )
     logger.log_chat_interaction(req.query, result.get("answer", ""))
+    db_service.record_copilot(
+        station_id=station_id,
+        request_id=f"COPILOT-{int(datetime.datetime.now().timestamp()*1000)}",
+        intent=req.query[:100],
+        tools_used=result.get("tools_used", []),
+        model=result.get("copilot_mode", "CLOUD"),
+        response_status="SUCCESS",
+        latency_ms=result.get("latency_ms", 12.0)
+    )
     return result
 
 @app.get("/api/scada/registers")
@@ -602,6 +655,136 @@ async def get_model_drift():
 async def get_digital_twin_state():
     snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
     return snapshot.get("digital_twin", {})
+
+# ----------------- Feature 24: Database & Historical Data Layer Endpoints -----------------
+@app.get("/api/health/database")
+async def get_database_health():
+    """Returns database connection status, WAL health, latency, storage size, and record counts."""
+    return db_service.get_health()
+
+@app.get("/api/history/telemetry")
+async def get_historical_telemetry(
+    station_id: Optional[str] = None,
+    device_id: Optional[str] = None,
+    start_time: Optional[str] = None,
+    end_time: Optional[str] = None,
+    limit: int = 100,
+    page: int = 1
+):
+    """Returns bounded, paginated historical telemetry records."""
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    return db_service.get_telemetry_history(
+        station_id=st,
+        device_id=device_id,
+        start_time=start_time,
+        end_time=end_time,
+        limit=limit,
+        page=page
+    )
+
+@app.get("/api/history/energy")
+async def get_historical_energy(
+    station_id: Optional[str] = None,
+    range: str = "7D",
+    resolution: str = "hour",
+    limit: int = 200
+):
+    """Returns multi-resolution energy aggregations (24H, 7D, 30D, 12M) without scanning millions of raw rows."""
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    return db_service.get_energy_history(
+        station_id=st,
+        time_range=range,
+        resolution=resolution,
+        limit=limit
+    )
+
+@app.get("/api/history/dispatch")
+async def get_historical_dispatch(
+    station_id: Optional[str] = None,
+    limit: int = 50
+):
+    """Returns recent optimizer dispatch records."""
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    rows = db_service.get_dispatch_history(station_id=st, limit=limit)
+    return {"station": st, "limit": limit, "count": len(rows), "dispatch": rows}
+
+@app.get("/api/history/alerts")
+async def get_historical_alerts(
+    station_id: Optional[str] = None,
+    status: Optional[str] = None,
+    severity: Optional[str] = None,
+    limit: int = 50
+):
+    """Returns alert history with full lifecycle tracking."""
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    rows = db_service.get_alerts_history(
+        station_id=st,
+        status=status,
+        severity=severity,
+        limit=limit
+    )
+    return {"station": st, "limit": limit, "count": len(rows), "alerts": rows}
+
+@app.get("/api/history/audit")
+async def get_audit_trail(
+    station_id: Optional[str] = None,
+    actor_type: Optional[str] = None,
+    limit: int = 50,
+    page: int = 1
+):
+    """Returns immutable system & operator audit log."""
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    res = db_service.get_audit_logs(
+        station_id=st,
+        actor_type=actor_type,
+        limit=limit,
+        page=page
+    )
+    res["audit"] = res.get("logs", [])
+    return res
+
+@app.get("/api/history/models")
+async def get_mlops_model_registry(station_id: Optional[str] = None):
+    """Returns MLOps champion/challenger governance records."""
+    rows = db_service.get_model_registry(station_id=station_id)
+    return {"count": len(rows), "models": rows}
+
+@app.get("/api/database/stats")
+async def get_database_statistics():
+    """Returns table-by-table record counts and storage breakdown."""
+    return db_service.repository.get_database_stats()
+
+@app.post("/api/database/backup")
+async def trigger_database_backup():
+    """Performs an online, zero-downtime, crash-consistent SQLite backup."""
+    res = db_service.backup_database()
+    backup_path = res.get("backup_path", "")
+    res["backup_filename"] = os.path.basename(backup_path) if backup_path else "backup.db"
+    res["backup_mb"] = round(res.get("file_size_bytes", 0) / (1024 * 1024), 2)
+    db_service.record_audit(
+        station_id="MAITRI",
+        actor_type="ADMIN",
+        actor_id="Operator",
+        action="DATABASE_BACKUP",
+        resource_type="DATABASE",
+        metadata=res
+    )
+    return res
+
+@app.post("/api/database/cleanup")
+async def trigger_retention_cleanup(raw_days: int = 7):
+    """Prunes raw 1-second telemetry beyond retention policy while preserving historical aggregates and audits."""
+    res = db_service.cleanup_retention(raw_telemetry_days=raw_days)
+    res["deleted_telemetry"] = res.get("telemetry_rows_pruned", 0)
+    db_service.record_audit(
+        station_id="MAITRI",
+        actor_type="SYSTEM",
+        actor_id="RetentionEngine",
+        action="DATABASE_CLEANUP",
+        resource_type="DATABASE",
+        metadata=res
+    )
+    return res
 
 
 # ----------------- Project A Analytics & Verification Endpoints -----------------

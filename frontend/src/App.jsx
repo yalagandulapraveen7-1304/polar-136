@@ -18,6 +18,7 @@ import DeviceMonitoringModal from './modals/DeviceMonitoringModal';
 import StationComparisonModal from './modals/StationComparisonModal';
 import AdvancedAnalyticsModal from './modals/AdvancedAnalyticsModal';
 import RecommendationsModal from './modals/RecommendationsModal';
+import DatabaseModal from './modals/DatabaseModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 
@@ -573,6 +574,13 @@ function AppDashboard({
 
       <RecommendationsModal
         isOpen={activeModal === 'recommendations'}
+        onClose={() => setActiveModal(null)}
+        stationId={stationId}
+        latestData={latestData}
+      />
+
+      <DatabaseModal
+        isOpen={activeModal === 'database'}
         onClose={() => setActiveModal(null)}
         stationId={stationId}
         latestData={latestData}
