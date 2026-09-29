@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import MarkdownMessage from '../components/MarkdownMessage';
 import { generateCopilotResponse, getFallbackIntelligenceState, getFallbackSimulation } from '../utils/copilotEngine';
 
-export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData }) {
+export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData, onOpenModal }) {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'anomalies' | 'digital_twin' | 'counterfactual' | 'mlops' | 'audit'
 
   // Copilot Controls
@@ -196,12 +196,61 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
 
   const handleExecuteAction = async (actionCard) => {
     if (!actionCard) return;
+    const actionType = actionCard.action_type || '';
+
+    // Handle navigational VIEW actions: open corresponding system modal
+    if (onOpenModal && (
+      actionType.startsWith('VIEW_') || 
+      actionType === 'INSPECT_SIZING' || 
+      actionType === 'INSPECT_ANOMALY'
+    )) {
+      if (actionType === 'VIEW_OPTIMIZATION' || actionType === 'VIEW_DISPATCH') {
+        onClose();
+        onOpenModal('dispatch');
+        return;
+      }
+      if (
+        actionType === 'VIEW_RECOMMENDATIONS' ||
+        actionType === 'VIEW_ENGINEERING_SIZING' ||
+        actionType === 'VIEW_RESILIENCE'
+      ) {
+        onClose();
+        onOpenModal('recommendations');
+        return;
+      }
+      if (actionType === 'VIEW_SCADA_DEVICES') {
+        onClose();
+        onOpenModal('devices');
+        return;
+      }
+      if (actionType === 'VIEW_MAINTENANCE') {
+        onClose();
+        onOpenModal('maintenance');
+        return;
+      }
+      if (actionType === 'VIEW_STATION_COMPARISON') {
+        onClose();
+        onOpenModal('comparison');
+        return;
+      }
+      if (actionType === 'VIEW_DATABASE') {
+        onClose();
+        onOpenModal('database');
+        return;
+      }
+      if (actionType === 'VIEW_ANALYTICS') {
+        onClose();
+        onOpenModal('energy', 'analytics');
+        return;
+      }
+    }
+
     try {
       const res = await fetch('/api/copilot/action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action_type: actionCard.action_type || 'ACK_ALERT',
+          action_type: actionType || 'ACK_ALERT',
           role: userRole
         })
       });

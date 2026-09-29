@@ -552,6 +552,7 @@ function AppDashboard({
         onClose={() => setActiveModal(null)}
         stationId={stationId}
         latestData={latestData}
+        onOpenModal={handleOpenModal}
       />
 
       <MaintenanceModal
