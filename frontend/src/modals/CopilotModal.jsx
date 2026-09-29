@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import MarkdownMessage from '../components/MarkdownMessage';
 import { generateCopilotResponse, getFallbackIntelligenceState, getFallbackSimulation } from '../utils/copilotEngine';
 
 export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData }) {
@@ -536,8 +537,12 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
                             : 'bg-slate-100/90 text-slate-800 border border-slate-200 rounded-tl-none font-medium'
                         }`}
                       >
-                        <div className="whitespace-pre-line font-medium text-slate-800">
-                          {m.answer}
+                        <div className="font-medium text-slate-800">
+                          {m.sender === 'commander' ? (
+                            <span className="whitespace-pre-line font-semibold">{m.answer}</span>
+                          ) : (
+                            <MarkdownMessage content={m.answer} />
+                          )}
                         </div>
 
                         {/* Collapsible 4-Part Evidence Breakdown for AI messages */}

@@ -407,15 +407,15 @@ export default function HeroSection({
                       <i className="fa-solid fa-xmark text-xs"></i>
                     </button>
                   </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">
+                  <div className="text-xs text-slate-700 leading-relaxed">
                     {isCopilotLoading ? (
                       <span className="inline-flex items-center gap-1.5 text-slate-500 italic">
                         <i className="fa-solid fa-spinner fa-spin text-[#0699C6]"></i> AI reasoning over station telemetry &amp; constraints...
                       </span>
                     ) : (
-                      copilotResponse
+                      <MarkdownMessage content={copilotResponse} />
                     )}
-                  </p>
+                  </div>
                 </div>
               )}
             </div>
