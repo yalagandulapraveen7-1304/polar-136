@@ -39,11 +39,11 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
   }, [horizon, stationId]);
 
   const m = evalData?.metrics || {};
-  const diesel = m.diesel_fuel || {};
-  const ren = m.renewable_utilization || {};
-  const cost = m.operating_cost || {};
-  const co2 = m.co2_emissions || {};
-  const unserved = m.unserved_energy || {};
+  const diesel = m.diesel_fuel || m.fuel_consumption_liters || {};
+  const ren = m.renewable_utilization || m.renewable_penetration_pct || {};
+  const cost = m.operating_cost || m.operating_cost_usd || {};
+  const co2 = m.co2_emissions || m.co2_emissions_kg || {};
+  const unserved = m.unserved_energy || m.unserved_energy_kwh || {};
   const battViol = m.battery_reserve_violations || {};
 
   return (
@@ -350,7 +350,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
             <div className="flex justify-between text-xs font-bold mb-1">
               <span className="text-slate-700">Fuel Consumption Index</span>
               <span className="font-mono text-emerald-600">
-                {diesel.baseline ? Math.round((diesel.polarops / diesel.baseline) * 100) : 100}% of baseline (-{diesel.improvement_pct}%)
+                {diesel.baseline ? Math.round((diesel.polarops / diesel.baseline) * 100) : 100}% of baseline (-{diesel.improvement_pct || 0}%)
               </span>
             </div>
             <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex">
@@ -391,7 +391,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
             <div className="flex justify-between text-xs font-bold mb-1">
               <span className="text-slate-700">Operating Logistics Cost</span>
               <span className="font-mono text-[#127694]">
-                {cost.baseline ? Math.round((cost.polarops / cost.baseline) * 100) : 100}% of baseline (-{cost.improvement_pct}%)
+                {cost.baseline ? Math.round((cost.polarops / cost.baseline) * 100) : 100}% of baseline (-{cost.improvement_pct || 0}%)
               </span>
             </div>
             <div className="w-full h-3 rounded-full bg-slate-100 overflow-hidden flex">

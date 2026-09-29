@@ -69,47 +69,73 @@ export default function ReportsModal({
     return () => { isMounted = false; };
   }, [isOpen, reportPeriod, stationId]);
 
-  // Fallback metrics if backend is loading or unavailable
-  const metrics = evaluationData?.metrics || {
-    fuel_consumption_liters: {
-      baseline: reportPeriod === '30d' ? 38500 : reportPeriod === '7d' ? 9200 : 1380,
-      polarops: reportPeriod === '30d' ? 28400 : reportPeriod === '7d' ? 6750 : 1012,
-      saved_liters: reportPeriod === '30d' ? 10100 : reportPeriod === '7d' ? 2450 : 368,
-      improvement_pct: 26.6,
-      unit: 'Liters'
-    },
-    renewable_penetration_pct: {
-      baseline: 0.0,
-      polarops: 44.8,
-      improvement_pct: 44.8,
-      unit: '%'
-    },
-    operating_cost_usd: {
-      baseline: reportPeriod === '30d' ? 115500 : reportPeriod === '7d' ? 27600 : 4140,
-      polarops: reportPeriod === '30d' ? 85200 : reportPeriod === '7d' ? 20250 : 3036,
-      saved_usd: reportPeriod === '30d' ? 30300 : reportPeriod === '7d' ? 7350 : 1104,
-      improvement_pct: 26.6,
-      unit: 'USD'
-    },
-    co2_emissions_kg: {
-      baseline: reportPeriod === '30d' ? 103180 : reportPeriod === '7d' ? 24650 : 3698,
-      polarops: reportPeriod === '30d' ? 76110 : reportPeriod === '7d' ? 18090 : 2712,
-      saved_kg: reportPeriod === '30d' ? 27070 : reportPeriod === '7d' ? 6560 : 986,
-      improvement_pct: 26.6,
-      unit: 'kg CO₂'
-    },
-    unserved_energy_kwh: {
-      baseline: 0.0,
-      polarops: 0.0,
-      improvement_pct: 0.0,
-      unit: 'kWh (100% Uptime)'
-    },
-    battery_reserve_violations: {
-      baseline: 14,
-      polarops: 0,
-      improvement_pct: 100.0,
-      unit: 'Events'
-    }
+  // Normalize metrics whether from backend API (diesel_fuel, etc.) or local fallback
+  const rawMetrics = evaluationData?.metrics || {};
+
+  const fuelRaw = rawMetrics.diesel_fuel || rawMetrics.fuel_consumption_liters || {};
+  const fuelMetric = {
+    baseline: fuelRaw.baseline !== undefined ? fuelRaw.baseline : (reportPeriod === '30d' ? 38500 : reportPeriod === '7d' ? 9200 : 1380),
+    polarops: fuelRaw.polarops !== undefined ? fuelRaw.polarops : (reportPeriod === '30d' ? 28400 : reportPeriod === '7d' ? 6750 : 1012),
+    saved_liters: fuelRaw.saved_liters !== undefined ? fuelRaw.saved_liters : (fuelRaw.saved !== undefined ? fuelRaw.saved : (reportPeriod === '30d' ? 10100 : reportPeriod === '7d' ? 2450 : 368)),
+    improvement_pct: fuelRaw.improvement_pct !== undefined ? fuelRaw.improvement_pct : 26.6,
+    unit: fuelRaw.unit || 'Litres'
+  };
+
+  const renRaw = rawMetrics.renewable_utilization || rawMetrics.renewable_penetration_pct || {};
+  const renMetric = {
+    baseline: renRaw.baseline !== undefined ? renRaw.baseline : 0.0,
+    polarops: renRaw.polarops !== undefined ? renRaw.polarops : 44.8,
+    saved: renRaw.saved !== undefined ? renRaw.saved : 44.8,
+    improvement_pct: renRaw.improvement_pct !== undefined ? renRaw.improvement_pct : 44.8,
+    unit: renRaw.unit || '%'
+  };
+
+  const costRaw = rawMetrics.operating_cost || rawMetrics.operating_cost_usd || {};
+  const costMetric = {
+    baseline: costRaw.baseline !== undefined ? costRaw.baseline : (reportPeriod === '30d' ? 115500 : reportPeriod === '7d' ? 27600 : 4140),
+    polarops: costRaw.polarops !== undefined ? costRaw.polarops : (reportPeriod === '30d' ? 85200 : reportPeriod === '7d' ? 20250 : 3036),
+    saved_usd: costRaw.saved_usd !== undefined ? costRaw.saved_usd : (costRaw.saved !== undefined ? costRaw.saved : (reportPeriod === '30d' ? 30300 : reportPeriod === '7d' ? 7350 : 1104)),
+    improvement_pct: costRaw.improvement_pct !== undefined ? costRaw.improvement_pct : 26.6,
+    unit: costRaw.unit || 'USD'
+  };
+
+  const co2Raw = rawMetrics.co2_emissions || rawMetrics.co2_emissions_kg || {};
+  const co2Metric = {
+    baseline: co2Raw.baseline !== undefined ? co2Raw.baseline : (reportPeriod === '30d' ? 103180 : reportPeriod === '7d' ? 24650 : 3698),
+    polarops: co2Raw.polarops !== undefined ? co2Raw.polarops : (reportPeriod === '30d' ? 76110 : reportPeriod === '7d' ? 18090 : 2712),
+    saved_kg: co2Raw.saved_kg !== undefined ? co2Raw.saved_kg : (co2Raw.saved !== undefined ? co2Raw.saved : (reportPeriod === '30d' ? 27070 : reportPeriod === '7d' ? 6560 : 986)),
+    improvement_pct: co2Raw.improvement_pct !== undefined ? co2Raw.improvement_pct : 26.6,
+    unit: co2Raw.unit || 'kg CO₂'
+  };
+
+  const unservedRaw = rawMetrics.unserved_energy || rawMetrics.unserved_energy_kwh || {};
+  const unservedMetric = {
+    baseline: unservedRaw.baseline !== undefined ? unservedRaw.baseline : 0.0,
+    polarops: unservedRaw.polarops !== undefined ? unservedRaw.polarops : 0.0,
+    improvement_pct: unservedRaw.improvement_pct !== undefined ? unservedRaw.improvement_pct : 0.0,
+    unit: unservedRaw.unit || 'kWh (100% Uptime)'
+  };
+
+  const battRaw = rawMetrics.battery_reserve_violations || {};
+  const battViolMetric = {
+    baseline: battRaw.baseline !== undefined ? battRaw.baseline : 14,
+    polarops: battRaw.polarops !== undefined ? battRaw.polarops : 0,
+    improvement_pct: battRaw.improvement_pct !== undefined ? battRaw.improvement_pct : 100.0,
+    unit: battRaw.unit || 'Events'
+  };
+
+  const metrics = {
+    fuel_consumption_liters: fuelMetric,
+    diesel_fuel: fuelMetric,
+    renewable_penetration_pct: renMetric,
+    renewable_utilization: renMetric,
+    operating_cost_usd: costMetric,
+    operating_cost: costMetric,
+    co2_emissions_kg: co2Metric,
+    co2_emissions: co2Metric,
+    unserved_energy_kwh: unservedMetric,
+    unserved_energy: unservedMetric,
+    battery_reserve_violations: battViolMetric
   };
 
   // Helper for triggering file downloads in browser
@@ -349,18 +375,18 @@ export default function ReportsModal({
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Diesel Fuel Saved</span>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                      -{metrics.fuel_consumption_liters.improvement_pct}%
+                      -{metrics.fuel_consumption_liters?.improvement_pct || 0}%
                     </span>
                   </div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-emerald-600 font-mono">
-                      {(metrics.fuel_consumption_liters.saved_liters || 368).toLocaleString()}
+                      {(metrics.fuel_consumption_liters?.saved_liters || metrics.fuel_consumption_liters?.saved || 368).toLocaleString()}
                     </span>
                     <span className="text-xs font-bold text-slate-500">Liters</span>
                   </div>
                   <div className="pt-1 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
-                    <span>PolarOPS: <strong>{metrics.fuel_consumption_liters.polarops.toLocaleString()} L</strong></span>
-                    <span>Baseline: <strong>{metrics.fuel_consumption_liters.baseline.toLocaleString()} L</strong></span>
+                    <span>PolarOPS: <strong>{(metrics.fuel_consumption_liters?.polarops || 0).toLocaleString()} L</strong></span>
+                    <span>Baseline: <strong>{(metrics.fuel_consumption_liters?.baseline || 0).toLocaleString()} L</strong></span>
                   </div>
                 </div>
 
@@ -374,7 +400,7 @@ export default function ReportsModal({
                   </div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-[#127694] font-mono">
-                      ${(metrics.operating_cost_usd.saved_usd || 1104).toLocaleString()}
+                      ${(metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104).toLocaleString()}
                     </span>
                     <span className="text-xs font-bold text-slate-500">USD</span>
                   </div>
@@ -394,12 +420,12 @@ export default function ReportsModal({
                   </div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-sky-600 font-mono">
-                      {(metrics.co2_emissions_kg.saved_kg || 986).toLocaleString()}
+                      {(metrics.co2_emissions_kg?.saved_kg || metrics.co2_emissions_kg?.saved || 986).toLocaleString()}
                     </span>
                     <span className="text-xs font-bold text-slate-500">kg CO₂</span>
                   </div>
                   <div className="pt-1 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
-                    <span>Net reduction: <strong>-26.6%</strong></span>
+                    <span>Net reduction: <strong>-{metrics.co2_emissions_kg?.improvement_pct || 0}%</strong></span>
                     <span className="text-sky-700 font-bold">Zero Soot</span>
                   </div>
                 </div>
@@ -511,12 +537,12 @@ export default function ReportsModal({
                       {/* Fuel Consumption */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">Diesel Fuel Consumption</td>
-                        <td className="py-3 px-3 text-slate-600">{metrics.fuel_consumption_liters.baseline.toLocaleString()} L</td>
-                        <td className="py-3 px-3 font-bold text-emerald-700">{metrics.fuel_consumption_liters.polarops.toLocaleString()} L</td>
-                        <td className="py-3 px-3 text-emerald-600">-{metrics.fuel_consumption_liters.saved_liters.toLocaleString()} L</td>
+                        <td className="py-3 px-3 text-slate-600">{(metrics.fuel_consumption_liters?.baseline || 0).toLocaleString()} L</td>
+                        <td className="py-3 px-3 font-bold text-emerald-700">{(metrics.fuel_consumption_liters?.polarops || 0).toLocaleString()} L</td>
+                        <td className="py-3 px-3 text-emerald-600">-{(metrics.fuel_consumption_liters?.saved_liters || metrics.fuel_consumption_liters?.saved || 0).toLocaleString()} L</td>
                         <td className="py-3 px-3 font-sans font-bold text-emerald-700">
                           <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            +{metrics.fuel_consumption_liters.improvement_pct}%
+                            +{metrics.fuel_consumption_liters?.improvement_pct || 0}%
                           </span>
                         </td>
                       </tr>
@@ -524,12 +550,12 @@ export default function ReportsModal({
                       {/* Renewable Penetration */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">Renewable Energy Penetration</td>
-                        <td className="py-3 px-3 text-slate-600">{metrics.renewable_penetration_pct.baseline.toFixed(1)}%</td>
-                        <td className="py-3 px-3 font-bold text-[#127694]">{metrics.renewable_penetration_pct.polarops.toFixed(1)}%</td>
-                        <td className="py-3 px-3 text-[#127694]">+{metrics.renewable_penetration_pct.polarops.toFixed(1)}%</td>
+                        <td className="py-3 px-3 text-slate-600">{(metrics.renewable_penetration_pct?.baseline || 0).toFixed(1)}%</td>
+                        <td className="py-3 px-3 font-bold text-[#127694]">{(metrics.renewable_penetration_pct?.polarops || 0).toFixed(1)}%</td>
+                        <td className="py-3 px-3 text-[#127694]">+{((metrics.renewable_penetration_pct?.polarops || 0) - (metrics.renewable_penetration_pct?.baseline || 0)).toFixed(1)}%</td>
                         <td className="py-3 px-3 font-sans font-bold text-sky-700">
                           <span className="bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                            +{metrics.renewable_penetration_pct.improvement_pct.toFixed(1)}%
+                            +{(metrics.renewable_penetration_pct?.improvement_pct || 0).toFixed(1)}%
                           </span>
                         </td>
                       </tr>
@@ -537,12 +563,12 @@ export default function ReportsModal({
                       {/* Fuel & Operating Cost */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">Delivered Fuel &amp; Operating Cost</td>
-                        <td className="py-3 px-3 text-slate-600">${metrics.operating_cost_usd.baseline.toLocaleString()}</td>
-                        <td className="py-3 px-3 font-bold text-emerald-700">${metrics.operating_cost_usd.polarops.toLocaleString()}</td>
-                        <td className="py-3 px-3 text-emerald-600">-${metrics.operating_cost_usd.saved_usd.toLocaleString()}</td>
+                        <td className="py-3 px-3 text-slate-600">${(metrics.operating_cost_usd?.baseline || 0).toLocaleString()}</td>
+                        <td className="py-3 px-3 font-bold text-emerald-700">${(metrics.operating_cost_usd?.polarops || 0).toLocaleString()}</td>
+                        <td className="py-3 px-3 text-emerald-600">-${(metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 0).toLocaleString()}</td>
                         <td className="py-3 px-3 font-sans font-bold text-emerald-700">
                           <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            +{metrics.operating_cost_usd.improvement_pct}%
+                            +{metrics.operating_cost_usd?.improvement_pct || 0}%
                           </span>
                         </td>
                       </tr>
@@ -550,12 +576,12 @@ export default function ReportsModal({
                       {/* CO2 Emissions */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">CO₂ Exhaust Emissions</td>
-                        <td className="py-3 px-3 text-slate-600">{metrics.co2_emissions_kg.baseline.toLocaleString()} kg</td>
-                        <td className="py-3 px-3 font-bold text-slate-700">{metrics.co2_emissions_kg.polarops.toLocaleString()} kg</td>
-                        <td className="py-3 px-3 text-emerald-600">-{metrics.co2_emissions_kg.saved_kg.toLocaleString()} kg</td>
+                        <td className="py-3 px-3 text-slate-600">{(metrics.co2_emissions_kg?.baseline || 0).toLocaleString()} kg</td>
+                        <td className="py-3 px-3 font-bold text-slate-700">{(metrics.co2_emissions_kg?.polarops || 0).toLocaleString()} kg</td>
+                        <td className="py-3 px-3 text-emerald-600">-{(metrics.co2_emissions_kg?.saved_kg || metrics.co2_emissions_kg?.saved || 0).toLocaleString()} kg</td>
                         <td className="py-3 px-3 font-sans font-bold text-emerald-700">
                           <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                            +{metrics.co2_emissions_kg.improvement_pct}%
+                            +{metrics.co2_emissions_kg?.improvement_pct || 0}%
                           </span>
                         </td>
                       </tr>
@@ -563,8 +589,8 @@ export default function ReportsModal({
                       {/* Unserved Energy */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">Unserved Life-Support Energy</td>
-                        <td className="py-3 px-3 text-slate-600">{metrics.unserved_energy_kwh.baseline} kWh</td>
-                        <td className="py-3 px-3 font-bold text-emerald-700">{metrics.unserved_energy_kwh.polarops} kWh</td>
+                        <td className="py-3 px-3 text-slate-600">{metrics.unserved_energy_kwh?.baseline ?? 0} kWh</td>
+                        <td className="py-3 px-3 font-bold text-emerald-700">{metrics.unserved_energy_kwh?.polarops ?? 0} kWh</td>
                         <td className="py-3 px-3 text-slate-500">0.00 kWh</td>
                         <td className="py-3 px-3 font-sans font-bold text-emerald-700">
                           <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -576,9 +602,9 @@ export default function ReportsModal({
                       {/* Battery Reserve Violations */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">Battery Reserve (&lt;30% Buffer) Violations</td>
-                        <td className="py-3 px-3 text-rose-600 font-bold">{metrics.battery_reserve_violations.baseline} Violations</td>
-                        <td className="py-3 px-3 font-bold text-emerald-700">{metrics.battery_reserve_violations.polarops} (Protected)</td>
-                        <td className="py-3 px-3 text-emerald-600">-{metrics.battery_reserve_violations.baseline} Events</td>
+                        <td className="py-3 px-3 text-rose-600 font-bold">{metrics.battery_reserve_violations?.baseline ?? 0} Violations</td>
+                        <td className="py-3 px-3 font-bold text-emerald-700">{metrics.battery_reserve_violations?.polarops ?? 0} (Protected)</td>
+                        <td className="py-3 px-3 text-emerald-600">-{metrics.battery_reserve_violations?.baseline ?? 0} Events</td>
                         <td className="py-3 px-3 font-sans font-bold text-emerald-700">
                           <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                             100% Eliminated
