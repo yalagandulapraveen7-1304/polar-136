@@ -429,6 +429,8 @@ export default function App() {
         onResetOverrides={handleResetOverrides}
         auditLogs={auditLogs}
         initialLatestData={latestData}
+        isG2Dispatched={isG2Dispatched}
+        handleAcceptRecommendation={handleAcceptRecommendation}
       />
     </TelemetryProvider>
   );
@@ -449,7 +451,9 @@ function AppDashboard({
   onApplyOverrides,
   onResetOverrides,
   auditLogs,
-  initialLatestData
+  initialLatestData,
+  isG2Dispatched = false,
+  handleAcceptRecommendation
 }) {
   const {
     telemetryData,
