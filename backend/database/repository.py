@@ -547,10 +547,76 @@ class PolarDataRepository:
             "logs": rows
         }
 
-    def get_model_registry(self, station_id: Optional[str] = None) -> List[Dict[str, Any]]:
-        """Returns MLOps model registry records."""
-        query = "SELECT * FROM model_registry ORDER BY is_champion DESC, created_at DESC;"
-        return self.conn_manager.execute_query(query)
+    def save_forecast_records(
+        self,
+        station_id: str,
+        model_version: str,
+        target: str,
+        horizon: str,
+        timestamps: List[str],
+        p10: List[float],
+        p50: List[float],
+        p90: List[float]
+    ) -> int:
+        """Persists multi-step probabilistic quantile forecast records into forecast_records table."""
+        st_id = station_id.upper()
+        now_str = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        batch = []
+        base_ms = int(time.time() * 1000)
+        for i, ts in enumerate(timestamps):
+            p10_v = p10[i] if i < len(p10) else 0.0
+            p50_v = p50[i] if i < len(p50) else 0.0
+            p90_v = p90[i] if i < len(p90) else 0.0
+            f_id = f"FC-{st_id}-{target[:4].upper()}-{base_ms}-{i}"
+            batch.append((
+                f_id,
+                st_id,
+                model_version,
+                target,
+                ts,
+                now_str,
+                horizon,
+                float(p10_v),
+                float(p50_v),
+                float(p90_v),
+                None,
+                None,
+                "VALIDATED"
+            ))
+
+        sql = """
+        INSERT OR REPLACE INTO forecast_records (
+            forecast_id, station_id, model_version, target, forecast_timestamp,
+            generated_at, horizon, p10, p50, p90, actual_value, error, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
+        return self.conn_manager.execute_many(sql, batch)
+
+    def get_forecast_history(
+        self,
+        station_id: str = "MAITRI",
+        target: Optional[str] = None,
+        limit: int = 100
+    ) -> List[Dict[str, Any]]:
+        """Returns recent forecast records from forecast_records table."""
+        st_id = station_id.upper()
+        limit = min(max(1, limit), 500)
+        if target:
+            sql = """
+            SELECT * FROM forecast_records
+            WHERE station_id = ? AND target = ?
+            ORDER BY generated_at DESC, forecast_timestamp ASC
+            LIMIT ?;
+            """
+            return self.conn_manager.execute_query(sql, (st_id, target, limit))
+        else:
+            sql = """
+            SELECT * FROM forecast_records
+            WHERE station_id = ?
+            ORDER BY generated_at DESC, forecast_timestamp ASC
+            LIMIT ?;
+            """
+            return self.conn_manager.execute_query(sql, (st_id, limit))
 
     # ----------------- 7. Maintenance & Retention Pruning -----------------
     def cleanup_old_records(self, raw_telemetry_days: int = 7) -> Dict[str, Any]:

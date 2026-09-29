@@ -113,6 +113,24 @@ export default function App() {
         if (data && data.snapshot) setLatestData(data.snapshot);
       })
       .catch(() => {});
+
+    // Sync authoritative commander overrides from backend database/state
+    fetch('/api/commander/status')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && data.has_active_overrides && data.active_overrides && Object.keys(data.active_overrides).length > 0) {
+          setActiveOverrides(data.active_overrides);
+          try {
+            localStorage.setItem('polarops_overrides', JSON.stringify(data.active_overrides));
+          } catch (e) {}
+        } else if (data && !data.has_active_overrides) {
+          setActiveOverrides(null);
+          try {
+            localStorage.removeItem('polarops_overrides');
+          } catch (e) {}
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // 1. Live UTC Clock
@@ -166,6 +184,33 @@ export default function App() {
           try {
             const payload = JSON.parse(event.data);
             setLatestData(payload);
+
+            // Synchronize active_overrides if emitted from backend
+            if (payload.active_overrides !== undefined) {
+              if (payload.active_overrides && Object.keys(payload.active_overrides).length > 0) {
+                setActiveOverrides((prev) => {
+                  const sPrev = JSON.stringify(prev || {});
+                  const sNext = JSON.stringify(payload.active_overrides);
+                  if (sPrev !== sNext) {
+                    try {
+                      localStorage.setItem('polarops_overrides', sNext);
+                    } catch (e) {}
+                    return payload.active_overrides;
+                  }
+                  return prev;
+                });
+              } else if (payload.active_overrides && Object.keys(payload.active_overrides).length === 0) {
+                setActiveOverrides((prev) => {
+                  if (prev !== null) {
+                    try {
+                      localStorage.removeItem('polarops_overrides');
+                    } catch (e) {}
+                    return null;
+                  }
+                  return null;
+                });
+              }
+            }
 
             // Handle Guardrail Interventions
             const g = payload.guardrail || {};
@@ -252,6 +297,13 @@ export default function App() {
           if (res.ok) {
             const status = await res.json();
             setLatestData(status);
+            if (status.active_overrides !== undefined) {
+              if (status.active_overrides && Object.keys(status.active_overrides).length > 0) {
+                setActiveOverrides(status.active_overrides);
+              } else if (status.active_overrides && Object.keys(status.active_overrides).length === 0) {
+                setActiveOverrides(null);
+              }
+            }
           }
         } catch (e) {
           // quiet retry

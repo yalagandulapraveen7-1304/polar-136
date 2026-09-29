@@ -649,7 +649,24 @@ class PolarPredictiveEngine:
             "30D": ("LOW", 0.52, "Long-term climatic trend; non-deterministic boundary layer"),
             "12M": ("LOW", 0.45, "Seasonal astronomical baseline for logistics fuel sizing")
         }
-        conf_level, conf_score, conf_reason = confidence_map.get(h_norm, ("MEDIUM", 0.80, "Operational forecast horizon"))
+        conf_level, conf_score, conf_reason = confidence_map.get(
+            h_norm, ("MEDIUM", 0.75, "Standard operational forecast")
+        )
+        # Feature 24: Persist generated quantile forecasts to forecast_records table
+        try:
+            from backend.database.service import db_service
+            db_service.save_forecast_records(
+                station_id=self.station_id,
+                model_version=self.champion_version,
+                target=target,
+                horizon=h_norm,
+                timestamps=timestamps,
+                p10=p10_list,
+                p50=p50_list,
+                p90=p90_list
+            )
+        except Exception:
+            pass
 
         return {
             "target": target,

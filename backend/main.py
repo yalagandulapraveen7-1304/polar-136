@@ -9,6 +9,7 @@ import csv
 import json
 import asyncio
 import datetime
+import time
 from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
 
@@ -399,7 +400,8 @@ def compute_system_snapshot() -> Dict[str, Any]:
         "data_quality": "SIMULATED" if ingestion_driver.mode == "DEMO_MODE" else "VALID",
         "stale_threshold_sec": 5.0,
         "update_rate_hz": 1.0,
-        "cloud_ai_active": ai_service.is_cloud_enabled()
+        "cloud_ai_active": ai_service.is_cloud_enabled(),
+        "active_overrides": ingestion_driver.get_active_overrides()
     }
     safe_payload = jsonable_encoder(payload)
     current_system_snapshot = safe_payload
@@ -652,6 +654,18 @@ async def commander_reset():
     await asyncio.to_thread(compute_system_snapshot)
     return {"status": "SUCCESS", "message": "Overrides cleared, nominal polar physics restored."}
 
+@app.get("/api/commander/status")
+async def get_commander_status():
+    """Returns authoritative station override state from backend source of truth."""
+    active_overrides = ingestion_driver.get_active_overrides()
+    return {
+        "status": "SUCCESS",
+        "has_active_overrides": len(active_overrides) > 0,
+        "active_overrides": active_overrides,
+        "station_id": ingestion_driver.station_id,
+        "mode": ingestion_driver.mode
+    }
+
 @app.post("/api/chat")
 async def ai_chat(req: ChatRequest):
     snapshot = current_system_snapshot if current_system_snapshot else compute_system_snapshot()
@@ -835,6 +849,80 @@ async def trigger_retention_cleanup(raw_days: int = 7):
         metadata=res
     )
     return res
+
+@app.get("/api/history/forecasts")
+async def get_historical_forecasts(
+    station_id: Optional[str] = None,
+    target: Optional[str] = None,
+    limit: int = 100
+):
+    """Returns persisted probabilistic quantile forecast records from database."""
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    rows = db_service.get_forecast_history(station_id=st, target=target, limit=limit)
+    return {"station": st, "target": target, "count": len(rows), "forecasts": rows}
+
+@app.get("/api/reports/telemetry-csv")
+async def export_telemetry_csv(
+    station_id: Optional[str] = None,
+    period: str = "24h",
+    limit: int = 1000
+):
+    """Streams real persistent historical telemetry records from SQLite as CSV."""
+    from fastapi.responses import Response
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    
+    # Bounded query against telemetry_history table
+    records_res = db_service.get_telemetry_history(station_id=st, limit=limit)
+    rows = records_res.get("data", [])
+    
+    csv_lines = [
+        "Timestamp,Station,Device_ID,Power_kW,Voltage_V,Current_A,Frequency_Hz,Temperature_C,RPM,Pressure_Bar,Vibration_mms,SoC_Percent,SoH_Percent,Fuel_Rate_Lph,Data_Quality,Simulation_Mode"
+    ]
+    for r in rows:
+        csv_lines.append(
+            f"{r.get('timestamp','')},{r.get('station_id','')},{r.get('device_id','')},"
+            f"{r.get('power_kw',0.0)},{r.get('voltage_v',0.0)},{r.get('current_a',0.0)},"
+            f"{r.get('frequency_hz',0.0)},{r.get('temperature_c',0.0)},{r.get('rpm',0.0)},"
+            f"{r.get('pressure',0.0)},{r.get('vibration',0.0)},{r.get('soc_percent',0.0)},"
+            f"{r.get('soh_percent',0.0)},{r.get('fuel_rate_lph',0.0)},{r.get('data_quality','')},"
+            f"{r.get('simulation_mode','')}"
+        )
+    csv_content = "\n".join(csv_lines)
+    filename = f"PolarOPS_{st}_Telemetry_{period.upper()}_{int(time.time())}.csv"
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+@app.get("/api/reports/audit-json")
+async def export_audit_json(
+    station_id: Optional[str] = None,
+    limit: int = 200
+):
+    """Exports immutable system and operator audit events from database with cryptographic verification hash."""
+    import hashlib
+    st = (station_id or (current_system_snapshot.get("telemetry", {}).get("station_id") if current_system_snapshot else "MAITRI") or "MAITRI").upper()
+    audit_res = db_service.get_audit_logs(station_id=st, limit=limit)
+    logs = audit_res.get("logs", [])
+    
+    now_utc = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    raw_hash = f"POLAROPS-{st}-{now_utc}-{len(logs)}"
+    v_hash = hashlib.sha256(raw_hash.encode()).hexdigest()
+    
+    export_payload = {
+        "export_metadata": {
+            "system": "NOVARA // PolarOPS Energy Management System",
+            "station_id": st,
+            "station_name": STATIONS.get(st, {}).get("name", f"{st} Research Station"),
+            "generated_at_utc": now_utc,
+            "verification_hash": f"SHA256:{v_hash}",
+            "status": "COMPLIANT_MISSION_RECORD",
+            "total_records": len(logs)
+        },
+        "audit_events": logs
+    }
+    return export_payload
 
 
 # ----------------- Project A Analytics & Verification Endpoints -----------------

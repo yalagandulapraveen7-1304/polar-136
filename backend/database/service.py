@@ -104,6 +104,27 @@ class PolarDatabaseService:
     def get_model_registry(self, station_id: Optional[str] = None) -> List[Dict[str, Any]]:
         return self.repository.get_model_registry(station_id)
 
+    def save_forecast_records(
+        self,
+        station_id: str,
+        model_version: str,
+        target: str,
+        horizon: str,
+        timestamps: List[str],
+        p10: List[float],
+        p50: List[float],
+        p90: List[float]
+    ) -> int:
+        return self.repository.save_forecast_records(station_id, model_version, target, horizon, timestamps, p10, p50, p90)
+
+    def get_forecast_history(
+        self,
+        station_id: str = "MAITRI",
+        target: Optional[str] = None,
+        limit: int = 100
+    ) -> List[Dict[str, Any]]:
+        return self.repository.get_forecast_history(station_id, target, limit)
+
     # ----------------- Audit & Actions -----------------
     def record_audit(
         self,

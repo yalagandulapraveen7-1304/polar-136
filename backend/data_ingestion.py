@@ -171,6 +171,44 @@ class DataIngestionDriver:
         except Exception:
             pass
 
+    def get_active_overrides(self) -> Dict[str, Any]:
+        """Returns all currently active commander overrides and fault injections."""
+        overrides = {}
+        if self.override_temp_c is not None:
+            overrides["ambient_temp_c"] = self.override_temp_c
+        if self.override_wind_ms is not None:
+            overrides["wind_speed_ms"] = self.override_wind_ms
+        if self.override_solar_wm2 is not None:
+            overrides["solar_irradiance_wm2"] = self.override_solar_wm2
+        if self.override_load_mult != 1.0:
+            overrides["load_multiplier"] = self.override_load_mult
+        if self.fault_genset_1:
+            overrides["fault_genset_1"] = self.fault_genset_1
+        if self.fault_genset_2:
+            overrides["fault_genset_2"] = self.fault_genset_2
+        if self.fault_battery_heater:
+            overrides["fault_battery_heater"] = self.fault_battery_heater
+        if self.wind_trip:
+            overrides["wind_trip"] = self.wind_trip
+        if self.solar_trip:
+            overrides["solar_trip"] = self.solar_trip
+        if self.fuel_reserve_pct is not None:
+            overrides["fuel_reserve_pct"] = self.fuel_reserve_pct
+        if self.renewables_available_pct != 100.0:
+            overrides["renewables_available_pct"] = self.renewables_available_pct
+        if self.override_battery_soc is not None:
+            overrides["battery_soc_pct"] = self.override_battery_soc
+        if self.battery_reserve_pct != 20.0:
+            overrides["battery_reserve_pct"] = self.battery_reserve_pct
+        if self.battery_soh_pct != 98.0:
+            overrides["battery_soh_pct"] = self.battery_soh_pct
+        if self.microgrid_isolated:
+            overrides["microgrid_isolated"] = self.microgrid_isolated
+        return overrides
+
+    def has_active_overrides(self) -> bool:
+        return len(self.get_active_overrides()) > 0
+
     def _fetch_open_meteo_weather(self) -> Dict[str, float]:
         """Fetch real-time polar weather from Open-Meteo for Antarctica station coords"""
         station = STATIONS[self.station_id]

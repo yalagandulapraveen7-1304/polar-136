@@ -153,12 +153,21 @@ export default function ReportsModal({
     setTimeout(() => setExportNotice(null), 4000);
   };
 
-  // Export 1: Telemetry Timeseries CSV
-  const handleExportCSV = () => {
-    const timestamp = new Date().toISOString();
+  // Export 1: Telemetry Timeseries CSV from SQLite Database
+  const handleExportCSV = async () => {
+    try {
+      const res = await fetch(`/api/reports/telemetry-csv?station_id=${stationId}&period=${reportPeriod}`);
+      if (res.ok) {
+        const csvText = await res.text();
+        triggerDownload(`PolarOPS_${stationId}_Telemetry_${reportPeriod.toUpperCase()}_${Date.now()}.csv`, csvText, 'text/csv;charset=utf-8;');
+        return;
+      }
+    } catch (err) {
+      console.warn('Real database CSV export fallback:', err);
+    }
+
+    // Graceful offline fallback
     let csv = "Timestamp,Station,Frequency_Hz,Voltage_V,Station_Load_kW,Wind_kW,Solar_kW,Battery_SoC_Pct,Diesel_Gen_kW,Ambient_Temp_C\n";
-    
-    // Add current snapshot plus sample historical rows for period
     const rowsCount = reportPeriod === '24h' ? 24 : reportPeriod === '7d' ? 70 : 120;
     const baseLoad = t.station_load_kwe || 320;
     const baseWind = t.wind_generation_kw || 180;
@@ -180,8 +189,25 @@ export default function ReportsModal({
     triggerDownload(`PolarOPS_${stationId}_Telemetry_${reportPeriod.toUpperCase()}_${Date.now()}.csv`, csv, 'text/csv;charset=utf-8;');
   };
 
-  // Export 2: Optimization Audit JSON
-  const handleExportJSON = () => {
+  // Export 2: Optimization Audit JSON from SQLite Database
+  const handleExportJSON = async () => {
+    try {
+      const res = await fetch(`/api/reports/audit-json?station_id=${stationId}`);
+      if (res.ok) {
+        const json = await res.json();
+        json.evaluation_metrics = metrics;
+        json.current_telemetry = t;
+        triggerDownload(
+          `PolarOPS_${stationId}_Audit_${reportPeriod.toUpperCase()}_${Date.now()}.json`,
+          JSON.stringify(json, null, 2),
+          'application/json;charset=utf-8;'
+        );
+        return;
+      }
+    } catch (err) {
+      console.warn('Real database JSON audit export fallback:', err);
+    }
+
     const exportPayload = {
       export_metadata: {
         system: "NOVARA // PolarOPS Energy Management System",
