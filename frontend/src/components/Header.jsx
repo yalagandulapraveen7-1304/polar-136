@@ -65,18 +65,25 @@ export default function Header({
           ROW 1: TOP COMMAND UTILITY BAR
           Station + Status + Operating Mode [DEMO | SCADA] + [OVERRIDE] + Global Status
           ========================================================================= */}
-      <div className="flex items-center justify-between w-full flex-wrap gap-2.5">
+      <div className="flex items-center justify-between w-full gap-2 xl:gap-3 flex-nowrap overflow-x-auto lg:overflow-visible">
         
         {/* Left Section: Brand, Station Selector, Operating Mode & OVERRIDE */}
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 lg:gap-2.5 shrink-0 flex-nowrap">
           {/* Brand Identity & Polar System Tag */}
-          <div className="flex items-center gap-2.5">
+          <div
+            className="flex items-center gap-2.5 cursor-pointer"
+            onClick={() => {
+              onOpenModal(null);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            title="Click to view Operational Overview HUD"
+          >
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
               <i className="fa-solid fa-snowflake text-sm text-white"></i>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-extrabold tracking-tight text-lg text-[#127694] leading-none">POLAR EMS</span>
-              <span className="text-[10px] tracking-wider uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc] flex items-center gap-1.5 shadow-xs">
+              <span className="hidden 2xl:flex text-[10px] tracking-wider uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc] items-center gap-1.5 shadow-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 {currentStation.name.split(' ')[0]} · OPERATIONAL
               </span>
@@ -187,10 +194,10 @@ export default function Header({
         </div>
 
         {/* Right Section: System Operational Badge, UTC Clock, Telemetry Status, Operator Profile */}
-        <div className="flex items-center gap-2.5 flex-wrap justify-end">
+        <div className="flex items-center gap-2 lg:gap-2.5 shrink-0 justify-end flex-nowrap ml-auto">
           
           {/* System Status Pill: "● OPERATIONAL" */}
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs">
+          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
             <span>OPERATIONAL</span>
             <span className="hidden xl:inline text-[10px] text-emerald-600 font-semibold border-l border-emerald-300 pl-2">
@@ -202,7 +209,7 @@ export default function Header({
           <button
             type="button"
             onClick={() => onOpenModal('alerts')}
-            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold shadow-xs transition cursor-pointer ${
+            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold shadow-xs transition cursor-pointer shrink-0 ${
               telemetryMeta?.alertCount > 0
                 ? 'bg-rose-50 border-rose-300 text-rose-800'
                 : 'bg-[#edf9fd] border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe]'
@@ -219,7 +226,7 @@ export default function Header({
           </button>
 
           {/* Live Antarctic Time & Connection Diagnostic Pill */}
-          <div className="flex flex-col text-right">
+          <div className="flex flex-col text-right shrink-0">
             <span className="font-mono text-xs font-bold text-slate-800 tracking-tight leading-tight">
               {clockTime || 'ANTARCTIC UTC'}
             </span>
@@ -342,7 +349,7 @@ export default function Header({
           </div>
 
           {/* Operator Profile */}
-          <div className="flex items-center gap-2 pl-2.5 border-l border-[#bcecfc]">
+          <div className="flex items-center gap-2 pl-2 sm:pl-2.5 border-l border-[#bcecfc] shrink-0">
             <div className="w-8 h-8 rounded-full bg-slate-800 text-cyan-300 flex items-center justify-center font-bold text-xs ring-2 ring-[#0699C6]/40 shadow-xs" title="Cmdr. E. Vance · Station Lead">
               EV
             </div>
@@ -353,7 +360,7 @@ export default function Header({
           </div>
 
           {/* Mobile Navigation Drawer Trigger */}
-          <div className="lg:hidden relative" id="mobileNavContainer">
+          <div className="lg:hidden relative shrink-0" id="mobileNavContainer">
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
