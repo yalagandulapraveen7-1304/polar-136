@@ -3,6 +3,7 @@ import { STATIONS } from '../constants/stations';
 import EnergyFlowCanvas from './EnergyFlowCanvas';
 import RealTimePowerChart from './charts/RealTimePowerChart';
 import Lookahead24hChart from './charts/Lookahead24hChart';
+import MarkdownMessage from './MarkdownMessage';
 
 export default function HeroSection({
   stationId,
