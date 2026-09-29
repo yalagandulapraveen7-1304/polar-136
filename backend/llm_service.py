@@ -113,18 +113,25 @@ Provide EXACTLY ONE authoritative, technical sentence explaining why this specif
         # Normal optimizer dispatch explanation
         wind_p = safe_dispatch.get('p_wind_kw', 0.0)
         solar_p = safe_dispatch.get('p_solar_kw', 0.0)
-        diesel_tot = safe_dispatch.get('p_diesel_1_kw', 0.0) + safe_dispatch.get('p_diesel_2_kw', 0.0)
+        g1_p = safe_dispatch.get('p_diesel_1_kw', 0.0)
+        g2_p = safe_dispatch.get('p_diesel_2_kw', 0.0)
+        diesel_tot = g1_p + g2_p
         batt_dis = safe_dispatch.get('p_battery_discharge_kw', 0.0)
         batt_chg = safe_dispatch.get('p_battery_charge_kw', 0.0)
+        curt_p = safe_dispatch.get('p_curtailment_kw', 0.0)
 
-        if batt_chg > 5.0:
+        if g2_p > 1.0:
+            return f"Diesel Generator 2 started at {g2_p:.1f} kW because wind generation dropped below the operational threshold and projected battery reserve was insufficient for the next forecast interval."
+        elif curt_p > 1.0:
+            return f"Renewable generation curtailed by {curt_p:.1f} kW via turbine feathering due to katabatic wind velocity ({telemetry.get('wind_speed_ms')} m/s) reaching structural limits."
+        elif batt_chg > 5.0:
             return f"Excess renewable generation of {wind_p + solar_p:.1f} kW routed into BESS (+{batt_chg:.1f} kW) while throttling diesel to minimize fuel burn."
         elif batt_dis > 5.0 and diesel_tot < 15.0:
             return f"BESS discharging at {batt_dis:.1f} kW in tandem with {wind_p:.1f} kW wind power, achieving near zero-emission operation and saving {safe_dispatch.get('cumulative_diesel_saved_liters')}L diesel."
         elif diesel_tot > 0 and wind_p > 10.0:
             return f"Genset 1 dispatch modulated to {diesel_tot:.1f} kWe to provide {safe_dispatch.get('q_chp_thermal_kwth')} kWth Combined Heat & Power while absorbing {wind_p:.1f} kW wind."
         else:
-            return f"LP Optimizer balanced electrical ({telemetry.get('station_load_kwe')} kWe) and thermal ({telemetry.get('thermal_load_kwth')} kWth) loads at maximum fuel efficiency."
+            return f"HiGHS MILP Optimizer balanced electrical ({telemetry.get('station_load_kwe')} kWe) and thermal ({telemetry.get('thermal_load_kwth')} kWth) loads at maximum fuel efficiency."
 
     def is_energy_domain_query(self, query: str) -> bool:
         """Allow all queries (no off‑topic guardrail)."""

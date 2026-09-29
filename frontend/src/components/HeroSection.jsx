@@ -379,16 +379,47 @@ export default function HeroSection({
 
               {/* Quick Suggestion Prompt Chips */}
               <div className="flex flex-wrap items-center gap-1.5 mt-2 px-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Quick Prompts:</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase mr-1">Decision AI:</span>
+                <button
+                  type="button"
+                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-[#f0faff] border border-[#0699C6] text-[#127694] hover:bg-[#c2f0fe] transition font-bold"
+                  onClick={() => {
+                    setQuery('Explain the latest system decision and dispatch action.');
+                    handleAskCopilot('Explain the latest system decision and dispatch action.');
+                  }}
+                >
+                  <i className="fa-solid fa-brain text-[9px] mr-1 text-[#0699C6]"></i>
+                  Explain Decision
+                </button>
                 <button
                   type="button"
                   className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
                   onClick={() => {
-                    setQuery('Why did you choose this microgrid dispatch mix?');
-                    handleAskCopilot('Why did you choose this microgrid dispatch mix?');
+                    setQuery('Why did Diesel Generator 2 start or run?');
+                    handleAskCopilot('Why did Diesel Generator 2 start or run?');
                   }}
                 >
-                  Dispatch Reasoning
+                  G2 Start Reason
+                </button>
+                <button
+                  type="button"
+                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
+                  onClick={() => {
+                    setQuery('Why is the battery charging or discharging?');
+                    handleAskCopilot('Why is the battery charging or discharging?');
+                  }}
+                >
+                  Battery Flow Reason
+                </button>
+                <button
+                  type="button"
+                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
+                  onClick={() => {
+                    setQuery('Why are renewables curtailed or buffered into storage?');
+                    handleAskCopilot('Why are renewables curtailed or buffered into storage?');
+                  }}
+                >
+                  Renewable Curtailment
                 </button>
                 <button
                   type="button"
@@ -399,16 +430,6 @@ export default function HeroSection({
                   }}
                 >
                   Storm Autonomy
-                </button>
-                <button
-                  type="button"
-                  className="ai-chip text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-white border border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe] transition"
-                  onClick={() => {
-                    setQuery('Explain verified fuel and cost savings vs baseline.');
-                    handleAskCopilot('Explain verified fuel and cost savings vs baseline.');
-                  }}
-                >
-                  $356K Savings Benchmark
                 </button>
               </div>
 

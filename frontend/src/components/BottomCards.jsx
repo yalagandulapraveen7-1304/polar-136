@@ -1,5 +1,6 @@
 import React from 'react';
 import EvaluationSection from './EvaluationSection';
+import OptimizationStatusPanel from './OptimizationStatusPanel';
 
 const SCENARIOS = [
   {
@@ -120,61 +121,11 @@ export default function BottomCards({
       {/* ROW 1: TACTICAL OPERATIONS CARDS (DISPATCH, MAINTENANCE, SCENARIO ENGINE) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
 
-        {/* 1. DISPATCH CONTROLLER CARD */}
-        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-[#f0faff]">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0699C6] flex items-center justify-center font-bold text-xs">
-                  <i className="fa-solid fa-sliders"></i>
-                </div>
-                <span className="font-extrabold text-xs text-[#127694] uppercase tracking-tight">
-                  Dispatch Controller
-                </span>
-              </div>
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                3-Tier MILP Active
-              </span>
-            </div>
-            <p className="text-[10px] text-slate-400 mb-2.5">
-              L1 Annual Target → L2 24h Commitment → L3 Live 1s Receding Horizon.
-            </p>
-          </div>
-
-          {/* Generator Outputs & Burn Rate */}
-          <div className="space-y-2 my-1">
-            <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Genset Outputs</span>
-                <span className="text-xs font-black text-slate-800">
-                  G1: <strong className="text-[#0699C6]">{gen1Kw.toFixed(1)} kW</strong> · G2: <strong className="text-rose-600">{gen2Kw.toFixed(1)} kW</strong>
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-[10px] font-bold text-slate-400 uppercase block">Total Gen</span>
-                <span className="text-xs font-mono font-black text-slate-800">{totalGenKw.toFixed(1)} kW</span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-xs px-1 text-slate-600">
-              <span>Fuel Burn Rate:</span>
-              <strong className="font-mono text-[#0699C6]">{fuelBurnRate.toFixed(1)} L/h</strong>
-            </div>
-          </div>
-
-          {/* Action Button */}
-          <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[10px] text-slate-400 font-medium">Optimization Active</span>
-            <button
-              type="button"
-              onClick={() => onOpenModal('dispatch')}
-              className="px-3 py-1.5 rounded-xl bg-[#0699C6] hover:bg-[#05C5FF] text-white font-bold text-xs transition shadow-sm flex items-center gap-1.5"
-            >
-              <i className="fa-solid fa-code-fork text-xs"></i>
-              <span>OPTIMIZE DISPATCH</span>
-            </button>
-          </div>
-        </div>
+        {/* 1. COMPACT OPTIMIZATION STATUS & DISPATCH PANEL */}
+        <OptimizationStatusPanel
+          latestData={latestData}
+          onOpenModal={onOpenModal}
+        />
 
         {/* 2. MAINTENANCE & ASSET HEALTH CARD */}
         <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-[#f7fcfe]">

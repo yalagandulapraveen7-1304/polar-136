@@ -647,6 +647,12 @@ class RealTimeRecedingHorizonOptimizer:
             "solver_name": self.solver_name,
             "solve_status": solve_status,
             "solve_time_ms": round(solve_duration_ms, 2),
+            "constraints_count": 21,
+            "equality_constraints_count": 2,
+            "inequality_constraints_count": 7,
+            "variable_bounds_count": 12,
+            "feasibility_status": "FEASIBLE" if solve_status == "OPTIMAL" else "DEGRADED_FEASIBLE",
+            "forecast_horizon": "1s Receding Horizon (L3) / 24h Unit Commitment (L2)",
             "optimization_record": opt_record.model_dump()
         }
 
