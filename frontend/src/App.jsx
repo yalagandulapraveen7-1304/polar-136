@@ -19,6 +19,8 @@ import StationComparisonModal from './modals/StationComparisonModal';
 import AdvancedAnalyticsModal from './modals/AdvancedAnalyticsModal';
 import RecommendationsModal from './modals/RecommendationsModal';
 import DatabaseModal from './modals/DatabaseModal';
+import EnergyModal from './modals/EnergyModal';
+import EnvironmentModal from './modals/EnvironmentModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 
@@ -41,7 +43,13 @@ export default function App() {
   const [currentScenario, setCurrentScenario] = useState('normal');
   const [clockTime, setClockTime] = useState('');
   const [latestData, setLatestData] = useState(null);
-  const [activeModal, setActiveModal] = useState(null); // 'forecast' | 'dispatch' | 'copilot' | 'maintenance' | 'manual' | null
+  const [activeModal, setActiveModal] = useState(null);
+  const [modalInitialTab, setModalInitialTab] = useState(null);
+
+  const handleOpenModal = useCallback((modalName, tab = null) => {
+    setModalInitialTab(tab);
+    setActiveModal(modalName);
+  }, []);
   const [activeOverrides, setActiveOverrides] = useState(() => {
     try {
       const saved = localStorage.getItem('polarops_overrides');
@@ -427,7 +435,8 @@ function AppDashboard({
         onStationChange={handleStationSwitchWithStore}
         mode={mode}
         onModeChange={onModeChange}
-        onOpenModal={(modalName) => setActiveModal(modalName)}
+        onOpenModal={handleOpenModal}
+        activeModal={activeModal}
         clockTime={clockTime}
         telemetryMeta={{
           connectionState,
@@ -488,6 +497,25 @@ function AppDashboard({
         onClose={() => setActiveModal(null)}
         latestData={latestData}
         stationId={stationId}
+      />
+
+      {/* Unified Energy Workspace (Microgrid + Dispatch + Energy Flow) */}
+      <EnergyModal
+        isOpen={activeModal === 'energy'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+        initialTab={modalInitialTab || 'balance'}
+        auditLogs={auditLogs}
+      />
+
+      {/* Unified Environment Workspace (Weather + Forecast + Impacts) */}
+      <EnvironmentModal
+        isOpen={activeModal === 'environment'}
+        onClose={() => setActiveModal(null)}
+        latestData={latestData}
+        stationId={stationId}
+        initialTab={modalInitialTab || 'current'}
       />
 
       <MicrogridModal
