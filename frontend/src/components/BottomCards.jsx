@@ -1,8 +1,97 @@
 import React from 'react';
+import EvaluationSection from './EvaluationSection';
+
+const SCENARIOS = [
+  {
+    id: 'NORMAL',
+    name: 'Normal Operation',
+    tag: 'Nominal',
+    badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    icon: 'fa-check-circle',
+    color: 'emerald',
+    severity: 'NOMINAL',
+    cause: 'Nominal Antarctic conditions (-24°C, 11 m/s wind, 180 W/m² solar irradiance).',
+    effect: 'Standard MILP Tier-3 dispatch balancing wind, solar PV, BESS peak shaving, and G1 CHP heat recovery.',
+    subsystems: ['MILP Tier-3: Optimal', 'BESS: 20% Reserve Intact', 'G1: 72 kW Base', 'Zero Curtailed Wind']
+  },
+  {
+    id: 'EXTREME_COLD',
+    name: 'Extreme Cold (-45°C)',
+    tag: 'Thermal Surge',
+    badgeClass: 'bg-sky-100 text-sky-800 border-sky-300',
+    icon: 'fa-snowflake',
+    color: 'sky',
+    severity: 'CRITICAL',
+    cause: 'Polar vortex plunges ambient temperature to -45.0°C; habitat thermal deficit surges +48%.',
+    effect: 'BESS throughput derated to 80 kW. Thermal load surges to 145 kWth. G1 CHP maxed; G2 jacket pre-heaters engaged.',
+    subsystems: ['Thermal Load: +48%', 'BESS Inverter Derated 80kW', 'G1 CHP Recovery: 72 kWth', 'G2 Jacket Pre-Warm Active']
+  },
+  {
+    id: 'BLIZZARD_HIGH_WIND',
+    name: 'Blizzard / High Wind',
+    tag: 'Wind Cutout',
+    badgeClass: 'bg-rose-100 text-rose-800 border-rose-300',
+    icon: 'fa-wind',
+    color: 'rose',
+    severity: 'CRITICAL',
+    cause: 'Katabatic blizzard wind accelerates to 28.5 m/s, exceeding 25.0 m/s structural cutout threshold.',
+    effect: 'Turbines trigger aerodynamic feathering & emergency brakes (0.0 kW). BESS catches grid frequency; G2 dispatched at 85 kW.',
+    subsystems: ['Wind Output: 0.0 kW', 'Deficit: -36.0 kW', 'BESS Fast Discharge Active', 'G2 Fast Dispatch: 85 kW']
+  },
+  {
+    id: 'LOW_SOLAR',
+    name: 'Low Solar (Polar Night)',
+    tag: 'Solar 0 W/m²',
+    badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+    icon: 'fa-moon',
+    color: 'indigo',
+    severity: 'WARNING',
+    cause: 'Polar night and cloud cover reduce solar irradiance to 0.0 W/m².',
+    effect: 'Solar array produces 0.0 kW. Unit commitment redistributes baseload to wind and diesel with BESS diurnal buffering.',
+    subsystems: ['Solar PV: 0.0 kW', 'BESS Peak Shifting Active', 'Genset Baseload Shift', 'Renewable Share: 58%']
+  },
+  {
+    id: 'BATTERY_DEGRADATION',
+    name: 'Battery Degradation',
+    tag: 'SOH 62%',
+    badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+    icon: 'fa-battery-quarter',
+    color: 'amber',
+    severity: 'WARNING',
+    cause: 'Sub-zero cycling age drops LiFePO4 battery SOH to 62%, halving effective capacity to 200 kWh.',
+    effect: 'Available energy buffer halved. High dSoC/dt triggers conservative 30% reserve floor and elevated diesel run hours.',
+    subsystems: ['Effective BESS: 200 kWh', 'Reserve Floor: 30%', 'Health Score: 62% DEGRADED', 'Gen Minimum Up: +2h']
+  },
+  {
+    id: 'GENERATOR_FAILURE',
+    name: 'Generator Failure (G1)',
+    tag: 'N-1 Trip',
+    badgeClass: 'bg-red-100 text-red-800 border-red-300',
+    icon: 'fa-triangle-exclamation',
+    color: 'red',
+    severity: 'CRITICAL',
+    cause: 'Primary Generator G1 suffers mechanical trip (oil pressure loss) dropping from 72 kW to 0.0 kW instantly.',
+    effect: 'Grid-forming BESS injects power in 15 ms to halt frequency drop. Standby G2 auto-starts, synchronizes, and ramps to 120 kW.',
+    subsystems: ['G1 Output: 0.0 kW (FAULT)', 'BESS RoCoF Arrest: 15ms', 'G2 Auto-Sync Active', 'Tier-3 Shed Armed']
+  },
+  {
+    id: 'MICROGRID_ISOLATION',
+    name: 'Microgrid Isolation',
+    tag: 'Islanded',
+    badgeClass: 'bg-purple-100 text-purple-800 border-purple-300',
+    icon: 'fa-shield-halved',
+    color: 'purple',
+    severity: 'WARNING',
+    cause: 'Inter-tie breaker open; station microgrid isolated in autonomous self-sustaining islanded mode.',
+    effect: 'Grid-forming BESS establishes 50.0 Hz voltage reference. Spinning reserve target raised to 30% for contingency containment.',
+    subsystems: ['Mode: ISLANDED', 'Spinning Reserve: 30%', 'Grid-Forming Inverter: V-F Master', 'Frequency Lock: 50.0Hz']
+  }
+];
 
 export default function BottomCards({
+  stationId = 'MAITRI',
   latestData,
-  currentScenario,
+  currentScenario = 'NORMAL',
   onScenarioChange,
   onResetScenario,
   onOpenModal
@@ -19,10 +108,16 @@ export default function BottomCards({
   const g2Health = h.genset_2_health_pct !== undefined ? h.genset_2_health_pct : 82;
   const overallHealth = h.overall_score_pct !== undefined ? h.overall_score_pct : 84;
 
+  // Resolve currently active scenario
+  const normScenario = (currentScenario || 'NORMAL').toUpperCase().trim();
+  const activeScenario = SCENARIOS.find(
+    (s) => s.id === normScenario || normScenario.includes(s.id) || s.id.includes(normScenario)
+  ) || SCENARIOS[0];
+
   return (
     <div className="flex flex-col gap-3.5 sm:gap-4 w-full">
 
-      {/* ROW 1: TACTICAL OPERATIONS CARDS (DISPATCH, MAINTENANCE, MANUAL OVERRIDE) */}
+      {/* ROW 1: TACTICAL OPERATIONS CARDS (DISPATCH, MAINTENANCE, SCENARIO ENGINE) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
 
         {/* 1. DISPATCH CONTROLLER CARD */}
@@ -139,199 +234,110 @@ export default function BottomCards({
           </div>
         </div>
 
-        {/* 3. SAFETY MANUAL OVERRIDE & CONTINGENCY CARD */}
-        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-[#fffafb]">
+        {/* 3. EXTREME POLAR SCENARIO ENGINE */}
+        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-[#fffafb] border-2 border-slate-200 hover:border-[#bcecfc] transition">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs">
-                  <i className="fa-solid fa-hand"></i>
+                <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                  <i className="fa-solid fa-flask-vial"></i>
                 </div>
                 <span className="font-extrabold text-xs text-[#127694] uppercase tracking-tight">
-                  Safety Manual Override
+                  Extreme Polar Scenario Engine
                 </span>
               </div>
-              <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-                Auth: Cmdr L2
+              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border ${activeScenario.badgeClass}`}>
+                {activeScenario.severity} ● {activeScenario.name}
               </span>
             </div>
             <p className="text-[10px] text-slate-400 mb-2">
-              Simulate extreme polar contingencies or clamp physical setpoints.
+              Inject dynamic environmental &amp; physical contingencies to test automated dispatch resilience.
             </p>
           </div>
 
-          {/* 4 Quick Contingency Selector Buttons */}
-          <div className="grid grid-cols-2 gap-1.5 my-1">
-            <button
-              type="button"
-              onClick={() => onScenarioChange('blizzard')}
-              className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
-                currentScenario === 'blizzard'
-                  ? 'border-rose-400 bg-rose-50 font-bold text-rose-800'
-                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
-              }`}
-            >
-              <span className="text-[10px]">Cat-3 Blizzard</span>
-              <span className="text-[8px] bg-rose-100 text-rose-700 px-1 py-0.2 rounded font-bold">Storm</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onScenarioChange('trip')}
-              className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
-                currentScenario === 'trip'
-                  ? 'border-amber-400 bg-amber-50 font-bold text-amber-800'
-                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
-              }`}
-            >
-              <span className="text-[10px]">Gen-Set Trip</span>
-              <span className="text-[8px] bg-amber-100 text-amber-700 px-1 py-0.2 rounded font-bold">Trip</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onScenarioChange('night')}
-              className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
-                currentScenario === 'night'
-                  ? 'border-slate-400 bg-slate-100 font-bold text-slate-800'
-                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
-              }`}
-            >
-              <span className="text-[10px]">Polar Night</span>
-              <span className="text-[8px] bg-slate-200 text-slate-700 px-1 py-0.2 rounded font-bold">Winter</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onScenarioChange('dawn')}
-              className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between ${
-                currentScenario === 'dawn'
-                  ? 'border-emerald-400 bg-emerald-50 font-bold text-emerald-800'
-                  : 'border-[#bcecfc]/60 bg-white hover:bg-[#f0faff] text-slate-700'
-              }`}
-            >
-              <span className="text-[10px]">Spring Sunrise</span>
-              <span className="text-[8px] bg-emerald-100 text-emerald-700 px-1 py-0.2 rounded font-bold">PV High</span>
-            </button>
+          {/* 7 Canonical Polar Scenario Buttons */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 gap-1.5 my-1 max-h-[160px] overflow-y-auto pr-0.5">
+            {SCENARIOS.map((scen) => {
+              const isSelected = activeScenario.id === scen.id;
+              return (
+                <button
+                  key={scen.id}
+                  type="button"
+                  onClick={() => onScenarioChange(scen.id)}
+                  className={`p-1.5 rounded-lg border text-left transition flex items-center justify-between gap-1 text-[10px] ${
+                    isSelected
+                      ? 'border-[#0699C6] bg-[#f0faff] font-bold text-[#127694] shadow-xs ring-1 ring-[#0699C6]'
+                      : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
+                  }`}
+                  title={scen.cause}
+                >
+                  <span className="truncate flex items-center gap-1">
+                    <i className={`fa-solid ${scen.icon} text-[9px] ${isSelected ? 'text-[#0699C6]' : 'text-slate-400'}`}></i>
+                    <span>{scen.name}</span>
+                  </span>
+                  <span className={`text-[8px] px-1 py-0.2 rounded font-bold shrink-0 ${scen.badgeClass}`}>
+                    {scen.tag}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Action Trigger */}
-          <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between">
+          {/* Real Cause -> Effect Banner */}
+          <div className="my-1.5 p-2 rounded-xl bg-slate-50 border border-slate-200 text-[10px] space-y-1">
+            <div className="flex items-start gap-1.5 text-slate-700">
+              <span className="font-bold text-amber-700 uppercase tracking-tight shrink-0 flex items-center gap-1">
+                <i className="fa-solid fa-bolt text-[9px]"></i> Cause:
+              </span>
+              <span className="text-slate-600 line-clamp-1">{activeScenario.cause}</span>
+            </div>
+            <div className="flex items-start gap-1.5 text-slate-700">
+              <span className="font-bold text-[#0699C6] uppercase tracking-tight shrink-0 flex items-center gap-1">
+                <i className="fa-solid fa-arrow-right text-[9px]"></i> Effect:
+              </span>
+              <span className="text-slate-700 font-medium line-clamp-1">{activeScenario.effect}</span>
+            </div>
+            {/* Subsystem impact tags */}
+            <div className="flex flex-wrap gap-1 pt-1 border-t border-slate-200/60">
+              {activeScenario.subsystems.map((sub, idx) => (
+                <span
+                  key={idx}
+                  className="text-[8px] font-mono font-semibold px-1.5 py-0.5 rounded bg-white text-slate-600 border border-slate-200 shadow-2xs"
+                >
+                  {sub}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Triggers */}
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
             <button
               type="button"
               onClick={onResetScenario}
-              className="text-[10px] font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1"
+              className="text-[10px] font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition"
             >
               <i className="fa-solid fa-rotate-left text-[9px]"></i> Reset Nominal
             </button>
             <button
               type="button"
               onClick={() => onOpenModal('manual')}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5"
+              className="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-[10px] transition shadow-xs flex items-center gap-1.5"
             >
-              <i className="fa-solid fa-sliders text-xs"></i>
-              <span>MANUAL OVERRIDE</span>
+              <i className="fa-solid fa-sliders text-[10px]"></i>
+              <span>Fine Sliders</span>
             </button>
           </div>
         </div>
 
       </div>
 
-      {/* ROW 2: ANNUAL STRATEGIC IMPACT KPIS (PROJECT A DIGITAL TWIN BENCHMARKS) */}
-      <div className="novara-card p-4 sm:p-5 bg-gradient-to-r from-white via-[#f0faff] to-white border-2 border-[#bcecfc] shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#bcecfc]/60">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black text-[#127694] tracking-tight uppercase">
-                Annual Strategic Impact &amp; Logistics Benchmarks
-              </span>
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                Verified Digital Twin Model
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 mt-0.5">
-              Validated against Maitri &amp; Bharati research station annual load profiles vs naive baseline.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              type="button"
-              onClick={() => onOpenModal('analytics')}
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#0699C6] to-[#127694] hover:from-[#05C5FF] hover:to-[#0699C6] text-white font-extrabold text-xs transition shadow-sm flex items-center gap-1.5"
-            >
-              <i className="fa-solid fa-chart-column text-xs"></i>
-              <span>ADVANCED ANALYTICS CENTER</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenModal('monitoring')}
-              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#bcecfc] transition shadow-xs flex items-center gap-1.5"
-            >
-              <i className="fa-solid fa-chart-pie text-xs text-[#0699C6]"></i>
-              <span>3-Layer Energy Analytics</span>
-            </button>
-            <a
-              href="/api/analytics/report"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3.5 py-1.5 rounded-xl bg-[#127694] hover:bg-[#0699C6] text-white font-bold text-xs transition shadow-sm flex items-center gap-1.5"
-            >
-              <i className="fa-solid fa-file-lines text-xs"></i>
-              <span>Consolidated HTML Report</span>
-            </a>
-          </div>
-        </div>
-
-        {/* 4 High-Density Key Impact Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 text-center">
-
-          {/* KPI 1: Fuel & Water Saved */}
-          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-              Fuel &amp; Water Saved
-            </span>
-            <div className="text-2xl font-black text-emerald-600 my-0.5">118,994 L</div>
-            <span className="text-[10px] font-bold text-slate-600">
-              -25.2% vs always-on baseline
-            </span>
-          </div>
-
-          {/* KPI 2: Logistics Cost Saved */}
-          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-              Delivered Cost Saved
-            </span>
-            <div className="text-2xl font-black text-[#127694] my-0.5">$356,982</div>
-            <span className="text-[10px] font-bold text-slate-600">
-              $3.00/L delivered Antarctic cost
-            </span>
-          </div>
-
-          {/* KPI 3: Tank Reserve Margin */}
-          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-              Tank Reserve Margin
-            </span>
-            <div className="text-2xl font-black text-[#0699C6] my-0.5">+52,895 L</div>
-            <span className="text-[10px] font-bold text-rose-600">
-              Baseline dry (-66,098 L)
-            </span>
-          </div>
-
-          {/* KPI 4: Carbon Avoided & Renewable Fraction */}
-          <div className="p-3 rounded-2xl bg-white border border-[#bcecfc] shadow-xs">
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
-              Emissions Avoided
-            </span>
-            <div className="text-2xl font-black text-emerald-600 my-0.5">318.9 T</div>
-            <span className="text-[10px] font-bold text-slate-600">
-              68.2% annual renewable share
-            </span>
-          </div>
-
-        </div>
-      </div>
+      {/* ROW 2: DEDICATED BASELINE VS POLAROPS EVALUATION SECTION */}
+      <EvaluationSection
+        stationId={stationId}
+        latestData={latestData}
+        onOpenModal={onOpenModal}
+      />
 
     </div>
   );

@@ -441,9 +441,16 @@ class CommanderOverrideRequest(BaseModel):
     solar_irradiance_wm2: float | None = None
     load_multiplier: float | None = 1.0
     fault_genset_1: bool | None = False
+    fault_genset_2: bool | None = False
     fault_battery_heater: bool | None = False
     battery_reserve_pct: float | None = None
     battery_soc_pct: float | None = None
+    battery_soh_pct: float | None = None
+    wind_trip: bool | None = False
+    solar_trip: bool | None = False
+    renewables_available_pct: float | None = None
+    microgrid_isolated: bool | None = False
+    p_diesel_2_kw: float | None = None
 
 class ChatRequest(BaseModel):
     query: str
@@ -1502,6 +1509,22 @@ async def get_scenario_comparison():
 async def get_three_week_winter_outage_benchmark():
     """Returns Project A 21-day (504 hours) Genset 1 winter failure simulation proof"""
     return scenario_engine.simulate_21_day_winter_failure()
+
+@app.get("/api/evaluation/baseline-comparison")
+async def get_baseline_vs_polarops_evaluation(horizon: str = "24h", station_id: Optional[str] = None):
+    """
+    Evaluates real side-by-side simulation results comparing Conventional Baseline
+    against PolarOPS 3-Tier MILP Optimization across 6 core metrics:
+    - Diesel fuel consumption
+    - Renewable energy utilization
+    - Fuel/operating cost
+    - CO2 emissions
+    - Unserved energy
+    - Battery reserve violations
+    """
+    if station_id and station_id in STATIONS:
+        scenario_engine.set_station(station_id)
+    return scenario_engine.evaluate_baseline_vs_polarops(horizon=horizon)
 
 @app.get("/api/scenarios/presets")
 async def list_scenario_presets():

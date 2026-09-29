@@ -297,32 +297,67 @@ export default function App() {
 
   const handleScenarioChange = async (scenario) => {
     setCurrentScenario(scenario);
-    let overridePayload = {};
-    if (scenario === 'blizzard') {
-      overridePayload = { ambient_temp_c: -52.0, wind_speed_ms: 34.0, load_multiplier: 1.3 };
-    } else if (scenario === 'trip') {
-      overridePayload = { fault_genset_1: true };
-    } else if (scenario === 'night') {
-      overridePayload = { solar_irradiance_wm2: 0.0, ambient_temp_c: -35.0 };
-    } else if (scenario === 'dawn') {
-      overridePayload = { solar_irradiance_wm2: 520.0, wind_speed_ms: 12.0 };
+    if (!scenario || scenario.toUpperCase() === 'NORMAL') {
+      await handleResetScenario();
+      return;
     }
 
     try {
-      await fetch('/api/commander/override', {
+      // 1. Try modern scenario preset endpoint
+      const res = await fetch('/api/scenarios/preset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(overridePayload)
+        body: JSON.stringify({ preset_id: scenario })
       });
+
+      if (!res.ok) {
+        // Fallback to commander override for legacy strings
+        let overridePayload = {};
+        if (scenario === 'blizzard' || scenario === 'BLIZZARD_HIGH_WIND') {
+          overridePayload = { ambient_temp_c: -36.0, wind_speed_ms: 28.5, load_multiplier: 1.3, wind_trip: true };
+        } else if (scenario === 'trip' || scenario === 'GENERATOR_FAILURE') {
+          overridePayload = { fault_genset_1: true };
+        } else if (scenario === 'night' || scenario === 'LOW_SOLAR') {
+          overridePayload = { solar_irradiance_wm2: 0.0, ambient_temp_c: -28.0 };
+        } else if (scenario === 'EXTREME_COLD') {
+          overridePayload = { ambient_temp_c: -45.0, load_multiplier: 1.45 };
+        } else if (scenario === 'BATTERY_DEGRADATION') {
+          overridePayload = { battery_soh_pct: 62.0, battery_reserve_pct: 30.0 };
+        } else if (scenario === 'MICROGRID_ISOLATION') {
+          overridePayload = { microgrid_isolated: true, battery_reserve_pct: 30.0 };
+        }
+        await fetch('/api/commander/override', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(overridePayload)
+        });
+      }
+
+      // Re-fetch snapshot immediately so state, telemetry, and graphs update in real time
+      const statusRes = await fetch('/api/status');
+      if (statusRes.ok) {
+        const status = await statusRes.json();
+        setLatestData(status);
+      }
+      fetchAuditLogs();
     } catch (e) {
       console.warn('Scenario override error:', e);
     }
   };
 
   const handleResetScenario = async () => {
-    setCurrentScenario('normal');
+    setCurrentScenario('NORMAL');
+    try {
+      await fetch('/api/scenarios/reset', { method: 'POST' });
+    } catch (e) {}
     try {
       await fetch('/api/commander/reset', { method: 'POST' });
+      const statusRes = await fetch('/api/status');
+      if (statusRes.ok) {
+        const status = await statusRes.json();
+        setLatestData(status);
+      }
+      fetchAuditLogs();
     } catch (e) {
       console.warn('Reset scenario error:', e);
     }
@@ -481,8 +516,9 @@ function AppDashboard({
         onScenarioChange={onScenarioChange}
       />
 
-      {/* 4. Tactical Operations & Annual Strategic Impact KPIs */}
+      {/* 4. Tactical Operations & Baseline vs PolarOPS Evaluation */}
       <BottomCards
+        stationId={stationId}
         latestData={latestData}
         currentScenario={currentScenario}
         onScenarioChange={onScenarioChange}

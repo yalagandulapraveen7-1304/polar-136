@@ -52,6 +52,8 @@ class DataIngestionDriver:
         self.renewables_available_pct: float = 100.0
         self.override_battery_soc: Optional[float] = None
         self.battery_reserve_pct: float = 20.0
+        self.battery_soh_pct: float = 98.0
+        self.microgrid_isolated: bool = False
 
         # Initialize Polar Physics Simulator for Mode A canonical telemetry
         sim_mode = OperatingMode.SIMULATION if mode != "SCADA_MODE" else OperatingMode.LIVE
@@ -77,6 +79,8 @@ class DataIngestionDriver:
                 "renewables_available_pct": self.renewables_available_pct,
                 "battery_soc_pct": self.override_battery_soc,
                 "battery_reserve_pct": self.battery_reserve_pct,
+                "battery_soh_pct": self.battery_soh_pct,
+                "microgrid_isolated": self.microgrid_isolated,
             }
             with open(OVERRIDE_STORE_PATH, "w", encoding="utf-8") as f:
                 json.dump(data, f)
@@ -135,6 +139,10 @@ class DataIngestionDriver:
             self.fuel_reserve_pct = float(overrides["fuel_reserve_pct"])
         if "renewables_available_pct" in overrides and overrides["renewables_available_pct"] is not None:
             self.renewables_available_pct = float(overrides["renewables_available_pct"])
+        if "battery_soh_pct" in overrides and overrides["battery_soh_pct"] is not None:
+            self.battery_soh_pct = float(overrides["battery_soh_pct"])
+        if "microgrid_isolated" in overrides and overrides["microgrid_isolated"] is not None:
+            self.microgrid_isolated = bool(overrides["microgrid_isolated"])
 
         if persist:
             self._persist_overrides()
@@ -154,6 +162,8 @@ class DataIngestionDriver:
         self.override_battery_soc = None
         self.current_battery_soc = 76.5
         self.battery_reserve_pct = 20.0
+        self.battery_soh_pct = 98.0
+        self.microgrid_isolated = False
         self.simulator.reset_overrides()
         try:
             if OVERRIDE_STORE_PATH.exists():
@@ -377,6 +387,7 @@ class DataIngestionDriver:
             "load_thermal_kw": round(thermal_demand, 1),
             "battery_soc_pct": round(self.override_battery_soc if self.override_battery_soc is not None else self.current_battery_soc, 1),
             "battery_reserve_pct": round(self.battery_reserve_pct, 1),
+            "battery_soh_pct": round(self.battery_soh_pct, 1),
             "battery_temp_c": round(self.current_battery_temp, 1),
             "diesel_reserve_liters": round(self.current_diesel_reserve if self.fuel_reserve_pct is None else (station["diesel_fuel_reserve_liters"] * (self.fuel_reserve_pct / 100.0)), 1),
             "fuel_reserve_pct": round(self.fuel_reserve_pct if self.fuel_reserve_pct is not None else (self.current_diesel_reserve / station["diesel_fuel_reserve_liters"] * 100.0), 1),
@@ -386,6 +397,9 @@ class DataIngestionDriver:
             "wind_trip": self.wind_trip,
             "solar_trip": self.solar_trip,
             "renewables_available_pct": self.renewables_available_pct,
+            "microgrid_isolated": self.microgrid_isolated,
+            "microgrid_mode": "ISLANDED" if self.microgrid_isolated else "TIED_GRID",
+            "spinning_reserve_target_pct": 30.0 if self.microgrid_isolated else 15.0,
             "scada_diagnostics": scada_diag
         }
         return standard_payload
