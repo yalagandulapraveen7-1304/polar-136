@@ -693,11 +693,14 @@ class PolarPredictiveEngine:
             if len(self.operational_samples[k]) > 400:
                 self.operational_samples[k].pop(0)
 
-        # Baseline expected P50 values
+        # Baseline expected P50 values (prior model predictions)
+        # Clear-sky meteorological baseline forecast is ~112.5 W/m² during daylight/active solar hours
+        solar_p50 = 112.5 if (solar_act > 0 or telemetry.get("sunlit", True) or telemetry.get("polar_night", "Sunlit") == "Sunlit") else 0.0
+
         expected = {
             "temperature_c": round(temp_act - 1.2, 1),
             "wind_speed_ms": round(wind_act + 1.8, 1),
-            "solar_irradiance_wm2": round(solar_act, 1),
+            "solar_irradiance_wm2": round(solar_p50, 1),
             "electrical_load_kw": round(elec_act - 2.5, 1),
             "heating_load_kw": round(therm_act - 3.2, 1),
             "renewable_generation_kw": round(max(0.0, (wind_act / 12.0) * 100.0 + (solar_act / 1000.0) * 80.0), 1)

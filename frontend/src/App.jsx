@@ -615,6 +615,8 @@ function AppDashboard({
         onClose={() => setActiveModal(null)}
         stationId={stationId}
         onOpenModal={handleOpenModal}
+        latestData={latestData}
+        activeOverrides={activeOverrides}
       />
 
       <DispatchModal
