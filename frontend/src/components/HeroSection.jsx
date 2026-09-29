@@ -11,13 +11,16 @@ export default function HeroSection({
   onOpenModal,
   activeOverrides,
   currentScenario,
-  onScenarioChange
+  onScenarioChange,
+  isG2Dispatched: externalIsG2Dispatched,
+  onAcceptRecommendation: externalOnAcceptRecommendation
 }) {
   const [query, setQuery] = useState('');
   const [copilotResponse, setCopilotResponse] = useState('');
   const [isCopilotLoading, setIsCopilotLoading] = useState(false);
   const [isResponseVisible, setIsResponseVisible] = useState(false);
-  const [isG2Dispatched, setIsG2Dispatched] = useState(false);
+  const [localIsG2Dispatched, setLocalIsG2Dispatched] = useState(false);
+  const isG2Dispatched = externalIsG2Dispatched !== undefined ? externalIsG2Dispatched : localIsG2Dispatched;
   const [forecastHorizon, setForecastHorizon] = useState('6h');
   const [centerTab, setCenterTab] = useState('copilot'); // 'copilot' | 'flow'
 
@@ -39,8 +42,8 @@ export default function HeroSection({
   const isEmergency = g.is_overridden || isCutoutActive || soc < 30 || currentScenario === 'blizzard' || currentScenario === 'trip';
 
   // Copilot Action Handlers
-  const handleAcceptRecommendation = async () => {
-    setIsG2Dispatched(true);
+  const handleAcceptRecommendation = externalOnAcceptRecommendation || (async () => {
+    setLocalIsG2Dispatched(true);
     try {
       await fetch('/api/commander/override', {
         method: 'POST',
@@ -50,7 +53,7 @@ export default function HeroSection({
     } catch (e) {
       console.warn('G2 dispatch override error:', e);
     }
-  };
+  });
 
   const handleAskCopilot = async (promptQuery) => {
     const q = promptQuery || query;
@@ -129,64 +132,16 @@ export default function HeroSection({
   return (
     <div className="novara-card p-4 sm:p-5 flex flex-col gap-4 overflow-hidden bg-gradient-to-b from-white via-[#f7fcfe] to-[#edf8fc] relative">
 
-      {/* 1. CRITICAL ALERT / SYSTEM STABILITY BANNER */}
-      {isEmergency && !isG2Dispatched ? (
-        <div className="w-full p-3 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 border-2 border-rose-300 flex flex-wrap items-center justify-between gap-3 shadow-sm animate-pulse">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-sm shrink-0">
-              <i className="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div>
-              <div className="text-xs font-black text-rose-900 tracking-tight flex items-center gap-2">
-                <span>⚠ CRITICAL RENEWABLE DEFICIT PREDICTED (-36 kW at 18:40 UTC)</span>
-                <span className="text-[9px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full font-bold uppercase">
-                  Action Required
-                </span>
-              </div>
-              <p className="text-[11px] text-rose-700 font-medium">
-                Blizzard gale velocity &gt; 25.0 m/s triggered turbine braking. Reserve floor risk in 3.2 hours.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleAcceptRecommendation}
-              className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs transition shadow flex items-center gap-1.5"
-            >
-              <i className="fa-solid fa-bolt"></i>
-              <span>Auto-Dispatch G2 (85 kW)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => onOpenModal('copilot', 'Why is a critical renewable deficit predicted at 18:40 UTC, and why must Generator G2 be dispatched at 85 kW?')}
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs border border-rose-200 transition"
-            >
-              Inspect Why
-            </button>
-          </div>
-        </div>
-      ) : isG2Dispatched ? (
-        <div className="w-full p-2.5 rounded-2xl bg-emerald-50 border border-emerald-300 flex items-center justify-between text-xs text-emerald-900 font-bold shadow-sm">
-          <span className="flex items-center gap-2">
-            <i className="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-            <span>RECOMMENDATION APPLIED: Generator G2 dispatched at 85 kW. Renewable deficit neutralized · 0.00 kW residual.</span>
-          </span>
-          <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-            20% Reserve Protected ✓
-          </span>
-        </div>
-      ) : (
-        <div className="w-full p-2.5 rounded-2xl bg-[#e5f6fd] border border-[#bcecfc] flex items-center justify-between text-xs text-[#127694] font-bold shadow-sm">
-          <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>ENERGY BALANCE STABLE · 0.00 kW residual · AI LP Optimizer active · 68.2% Green Share</span>
-          </span>
-          <span className="text-[10px] font-mono bg-white text-[#0699C6] px-2.5 py-0.5 rounded-full border border-[#bcecfc]">
-            Grid Frequency: 50.02 Hz Synced
-          </span>
-        </div>
-      )}
+      {/* 1. POLAR ENERGY DISPATCH STATUS STRIP */}
+      <div className="w-full p-2.5 rounded-2xl bg-[#e5f6fd] border border-[#bcecfc] flex items-center justify-between text-xs text-[#127694] font-bold shadow-sm">
+        <span className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>POLAR ENERGY DISPATCH · 0.00 kW residual · AI LP Optimizer active · 68.2% Green Share</span>
+        </span>
+        <span className="text-[10px] font-mono bg-white text-[#0699C6] px-2.5 py-0.5 rounded-full border border-[#bcecfc]">
+          Grid Frequency: 50.02 Hz Synced
+        </span>
+      </div>
 
       {/* 2. SUB-HEADER: TABS (COPILOT & SCHEMATIC vs PREDICTIVE HORIZON) */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#bcecfc]/40 pb-2">

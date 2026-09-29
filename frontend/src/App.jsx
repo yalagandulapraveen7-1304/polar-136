@@ -4,6 +4,7 @@ import HeroSection from './components/HeroSection';
 import MetricCards from './components/MetricCards';
 import PowerBalanceBanner from './components/PowerBalanceBanner';
 import BottomCards from './components/BottomCards';
+import CriticalAlertBanner from './components/CriticalAlertBanner';
 import ForecastFullModal from './modals/ForecastFullModal';
 import DispatchModal from './modals/DispatchModal';
 import CopilotModal from './modals/CopilotModal';
@@ -55,6 +56,21 @@ export default function App() {
       return null;
     }
   });
+
+  const [isG2Dispatched, setIsG2Dispatched] = useState(false);
+
+  const handleAcceptRecommendation = useCallback(async () => {
+    setIsG2Dispatched(true);
+    try {
+      await fetch('/api/commander/override', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_diesel_2_kw: 85.0 })
+      });
+    } catch (e) {
+      console.warn('G2 dispatch override error:', e);
+    }
+  }, []);
 
   const [auditLogs, setAuditLogs] = useState([
     {
@@ -495,6 +511,17 @@ function AppDashboard({
         }}
       />
 
+      {/* 1.5. Critical Renewable Deficit Alert Notification (Positioned at top right after Navbar) */}
+      <CriticalAlertBanner
+        stationId={stationId}
+        latestData={latestData}
+        activeOverrides={activeOverrides}
+        currentScenario={currentScenario}
+        onOpenModal={handleOpenModal}
+        isG2Dispatched={isG2Dispatched}
+        onAcceptRecommendation={handleAcceptRecommendation}
+      />
+
       {/* 2. Real-Time Operations Gauges (4 Live HUD Cards: Battery, Load, Renewables, Environment) */}
       <MetricCards
         stationId={stationId}
@@ -509,7 +536,7 @@ function AppDashboard({
         onOpenMonitoring={() => setActiveModal('monitoring')}
       />
 
-      {/* 3. Hero Section (Alert Banner + Central POLAR AI COPILOT + 6H/12H/24H Forecast + Energy Flow Matrix) */}
+      {/* 3. Hero Section (Central POLAR AI COPILOT + 6H/12H/24H Forecast + Energy Flow Matrix) */}
       <HeroSection
         stationId={stationId}
         latestData={latestData}
@@ -517,6 +544,8 @@ function AppDashboard({
         activeOverrides={activeOverrides}
         currentScenario={currentScenario}
         onScenarioChange={onScenarioChange}
+        isG2Dispatched={isG2Dispatched}
+        onAcceptRecommendation={handleAcceptRecommendation}
       />
 
       {/* 4. Tactical Operations & Baseline vs PolarOPS Evaluation */}
