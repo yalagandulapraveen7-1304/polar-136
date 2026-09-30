@@ -54,6 +54,7 @@ class DataIngestionDriver:
         self.battery_reserve_pct: float = 20.0
         self.battery_soh_pct: float = 98.0
         self.microgrid_isolated: bool = False
+        self.override_diesel_2_kw: Optional[float] = None
 
         # Initialize Polar Physics Simulator for Mode A canonical telemetry
         sim_mode = OperatingMode.SIMULATION if mode != "SCADA_MODE" else OperatingMode.LIVE
@@ -81,6 +82,7 @@ class DataIngestionDriver:
                 "battery_reserve_pct": self.battery_reserve_pct,
                 "battery_soh_pct": self.battery_soh_pct,
                 "microgrid_isolated": self.microgrid_isolated,
+                "p_diesel_2_kw": self.override_diesel_2_kw,
             }
             with open(OVERRIDE_STORE_PATH, "w", encoding="utf-8") as f:
                 json.dump(data, f)
@@ -143,6 +145,9 @@ class DataIngestionDriver:
             self.battery_soh_pct = float(overrides["battery_soh_pct"])
         if "microgrid_isolated" in overrides and overrides["microgrid_isolated"] is not None:
             self.microgrid_isolated = bool(overrides["microgrid_isolated"])
+        if "p_diesel_2_kw" in overrides and overrides["p_diesel_2_kw"] is not None:
+            self.override_diesel_2_kw = float(overrides["p_diesel_2_kw"])
+            self.genset_2_status = "RUNNING" if self.override_diesel_2_kw > 0 else "STANDBY"
 
         if persist:
             self._persist_overrides()
@@ -164,6 +169,8 @@ class DataIngestionDriver:
         self.battery_reserve_pct = 20.0
         self.battery_soh_pct = 98.0
         self.microgrid_isolated = False
+        self.override_diesel_2_kw = None
+        self.genset_2_status = "STANDBY"
         self.simulator.reset_overrides()
         try:
             if OVERRIDE_STORE_PATH.exists():
@@ -204,6 +211,8 @@ class DataIngestionDriver:
             overrides["battery_soh_pct"] = self.battery_soh_pct
         if self.microgrid_isolated:
             overrides["microgrid_isolated"] = self.microgrid_isolated
+        if self.override_diesel_2_kw is not None:
+            overrides["p_diesel_2_kw"] = self.override_diesel_2_kw
         return overrides
 
     def has_active_overrides(self) -> bool:

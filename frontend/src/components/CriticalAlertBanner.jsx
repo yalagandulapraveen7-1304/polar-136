@@ -16,6 +16,26 @@ export default function CriticalAlertBanner({
     return null;
   }
 
+  const fd = latestData?.forecast_deviation || {};
+  const t = latestData?.telemetry || {};
+  const currentStation = STATIONS[stationId] || STATIONS.MAITRI;
+  const stationShortName = currentStation?.name?.split(' ')[0] || stationId || 'Maitri';
+
+  // Dynamic Deficit Calculation from live forecast deviation or telemetry
+  const deficitKw = Math.abs(fd.net_renewable_deficit_kw ?? 36.0);
+  const hoursToFloor = fd.battery_consequence?.estimated_hours_to_floor ?? 3.2;
+
+  // Compute Projected Deficit UTC Time (Current time + hoursToFloor)
+  const projectedTimeStr = (() => {
+    try {
+      const baseDate = latestData?.timestamp ? new Date(latestData.timestamp) : new Date();
+      const projDate = new Date(baseDate.getTime() + (hoursToFloor * 60 * 60 * 1000));
+      return `${projDate.getUTCHours().toString().padStart(2, '0')}:${projDate.getUTCMinutes().toString().padStart(2, '0')} UTC`;
+    } catch (e) {
+      return '18:40 UTC';
+    }
+  })();
+
   return (
     <div className="w-full animate-fadeIn transition-all duration-300">
       {!isG2Dispatched ? (
@@ -26,13 +46,13 @@ export default function CriticalAlertBanner({
             </div>
             <div>
               <div className="text-xs sm:text-sm font-black text-rose-900 tracking-tight flex items-center gap-2 flex-wrap">
-                <span>⚠ CRITICAL RENEWABLE DEFICIT PREDICTED (-36 kW at 18:40 UTC)</span>
+                <span>⚠ CRITICAL RENEWABLE DEFICIT PREDICTED (-{deficitKw.toFixed(0)} kW at {projectedTimeStr})</span>
                 <span className="text-[9px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full font-extrabold uppercase border border-rose-300">
                   Action Required
                 </span>
               </div>
               <p className="text-xs text-rose-700 font-medium mt-0.5">
-                Blizzard gale velocity &gt; 25.0 m/s triggered turbine braking. Reserve floor risk in 3.2 hours.
+                {stationShortName} blizzard gale velocity &gt; 25.0 m/s triggered turbine braking. Reserve floor risk in {hoursToFloor} hours.
               </p>
             </div>
           </div>
@@ -47,7 +67,7 @@ export default function CriticalAlertBanner({
             </button>
             <button
               type="button"
-              onClick={() => onOpenModal && onOpenModal('copilot', 'Why is a critical renewable deficit predicted at 18:40 UTC, and why must Generator G2 be dispatched at 85 kW?')}
+              onClick={() => onOpenModal && onOpenModal('copilot', `Why is a critical renewable deficit predicted for ${stationShortName} at ${projectedTimeStr}, and why must Generator G2 be dispatched at 85 kW?`)}
               className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-rose-200 transition shadow-xs cursor-pointer"
             >
               Inspect Why
@@ -66,7 +86,7 @@ export default function CriticalAlertBanner({
         <div className="w-full p-2.5 sm:p-3 rounded-2xl bg-emerald-50 border border-emerald-300 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-900 font-bold shadow-xs">
           <span className="flex items-center gap-2">
             <i className="fa-solid fa-circle-check text-emerald-600 text-base"></i>
-            <span>RECOMMENDATION APPLIED: Generator G2 dispatched at 85 kW. Renewable deficit neutralized · 0.00 kW residual.</span>
+            <span>RECOMMENDATION APPLIED: Generator G2 dispatched at 85 kW. {stationShortName} deficit neutralized · 0.00 kW residual.</span>
           </span>
           <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300">
             20% Reserve Protected ✓

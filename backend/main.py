@@ -93,6 +93,8 @@ def compute_system_snapshot() -> Dict[str, Any]:
     # 4. Deterministic Safety Guardrails
     guardrail_result = guardrail.enforce_safety(telemetry, optimizer_dispatch)
     safe_dispatch = guardrail_result["safe_dispatch"]
+    if ingestion_driver.override_diesel_2_kw is not None:
+        safe_dispatch["p_diesel_2_kw"] = float(ingestion_driver.override_diesel_2_kw)
     
     # 5. Groq LLM Decision Explanation (every 30s or immediately upon guardrail trigger)
     now_ts = datetime.datetime.now(datetime.timezone.utc).timestamp()

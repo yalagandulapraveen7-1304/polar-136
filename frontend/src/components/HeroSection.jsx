@@ -84,45 +84,61 @@ export default function HeroSection({
     handleAskCopilot(query);
   };
 
-  // Forecast Horizon Configs
+  // Forecast Horizon Configs (Scaled dynamically for active station & live forecast deviation)
+  const fd = latestData?.forecast_deviation || {};
+  const deficitKw = Math.abs(fd.net_renewable_deficit_kw ?? 36.0);
+  const hoursToFloor = fd.battery_consequence?.estimated_hours_to_floor ?? 3.2;
+  const isBharati = (stationId || '').toUpperCase() === 'BHARATI';
+  const scale = isBharati ? 0.58 : 1.0;
+
+  const projectedTimeStr = (() => {
+    try {
+      const baseDate = latestData?.timestamp ? new Date(latestData.timestamp) : new Date();
+      const projDate = new Date(baseDate.getTime() + (hoursToFloor * 60 * 60 * 1000));
+      return `${projDate.getUTCHours().toString().padStart(2, '0')}:${projDate.getUTCMinutes().toString().padStart(2, '0')} UTC`;
+    } catch (e) {
+      return '18:40 UTC';
+    }
+  })();
+
   const forecastConfigs = {
     '6h': {
-      peak: '457 kW',
-      shortfall: '36 kW deficit at 18:40 UTC',
+      peak: `${Math.round(457 * scale)} kW`,
+      shortfall: `${Math.round(deficitKw * scale)} kW deficit at ${projectedTimeStr}`,
       bessEnd: '64% SoC',
-      fuelProj: '48 L',
+      fuelProj: `${Math.round(48 * scale)} L`,
       timeline: [
-        { time: '14:00', load: '412 kW', ren: '286 kW', soc: '77%', status: 'Normal' },
-        { time: '15:30', load: '428 kW', ren: '270 kW', soc: '75%', status: 'Stable' },
-        { time: '17:00', load: '445 kW', ren: '190 kW', soc: '71%', status: 'Katabatic Fade' },
-        { time: '18:40', load: '457 kW', ren: '95 kW', soc: '64%', status: 'Deficit Shortfall (-36 kW)', isWarning: true },
-        { time: '20:00', load: '430 kW', ren: '180 kW', soc: '68%', status: 'G2 Online · Stable' }
+        { time: '+1.5h', load: `${Math.round(412 * scale)} kW`, ren: `${Math.round(286 * scale)} kW`, soc: '77%', status: 'Normal' },
+        { time: '+3.0h', load: `${Math.round(428 * scale)} kW`, ren: `${Math.round(270 * scale)} kW`, soc: '75%', status: 'Stable' },
+        { time: '+4.0h', load: `${Math.round(445 * scale)} kW`, ren: `${Math.round(190 * scale)} kW`, soc: '71%', status: 'Katabatic Fade' },
+        { time: projectedTimeStr.split(' ')[0], load: `${Math.round(457 * scale)} kW`, ren: `${Math.round(95 * scale)} kW`, soc: '64%', status: `Deficit Shortfall (-${Math.round(deficitKw * scale)} kW)`, isWarning: true },
+        { time: '+6.0h', load: `${Math.round(430 * scale)} kW`, ren: `${Math.round(180 * scale)} kW`, soc: '68%', status: 'G2 Online · Stable' }
       ]
     },
     '12h': {
-      peak: '475 kW',
-      shortfall: '52 kW deficit in night window',
+      peak: `${Math.round(475 * scale)} kW`,
+      shortfall: `${Math.round(52 * scale)} kW deficit in night window`,
       bessEnd: '58% SoC',
-      fuelProj: '124 L',
+      fuelProj: `${Math.round(124 * scale)} L`,
       timeline: [
-        { time: '+2h', load: '425 kW', ren: '280 kW', soc: '76%', status: 'Normal' },
-        { time: '+4h', load: '440 kW', ren: '210 kW', soc: '72%', status: 'Katabatic Fade' },
-        { time: '+6h', load: '462 kW', ren: '90 kW', soc: '62%', status: 'Deficit Shortfall', isWarning: true },
-        { time: '+8h', load: '450 kW', ren: '110 kW', soc: '59%', status: 'G2 Auxiliary Active' },
-        { time: '+12h', load: '415 kW', ren: '240 kW', soc: '68%', status: 'Sunrise Recovery' }
+        { time: '+2h', load: `${Math.round(425 * scale)} kW`, ren: `${Math.round(280 * scale)} kW`, soc: '76%', status: 'Normal' },
+        { time: '+4h', load: `${Math.round(440 * scale)} kW`, ren: `${Math.round(210 * scale)} kW`, soc: '72%', status: 'Katabatic Fade' },
+        { time: '+6h', load: `${Math.round(462 * scale)} kW`, ren: `${Math.round(90 * scale)} kW`, soc: '62%', status: 'Deficit Shortfall', isWarning: true },
+        { time: '+8h', load: `${Math.round(450 * scale)} kW`, ren: `${Math.round(110 * scale)} kW`, soc: '59%', status: 'G2 Auxiliary Active' },
+        { time: '+12h', load: `${Math.round(415 * scale)} kW`, ren: `${Math.round(240 * scale)} kW`, soc: '68%', status: 'Sunrise Recovery' }
       ]
     },
     '24h': {
-      peak: '492 kW',
+      peak: `${Math.round(492 * scale)} kW`,
       shortfall: 'Periodic storm deficit windows',
       bessEnd: '69% SoC',
-      fuelProj: '298 L',
+      fuelProj: `${Math.round(298 * scale)} L`,
       timeline: [
-        { time: '00:00', load: '390 kW', ren: '180 kW', soc: '70%', status: 'Night Load' },
-        { time: '06:00', load: '430 kW', ren: '290 kW', soc: '76%', status: 'Sunrise Recharging' },
-        { time: '12:00', load: '460 kW', ren: '310 kW', soc: '82%', status: 'Peak Solar Harvest' },
-        { time: '18:00', load: '475 kW', ren: '120 kW', soc: '65%', status: 'Evening Storm Peak', isWarning: true },
-        { time: '23:00', load: '410 kW', ren: '160 kW', soc: '69%', status: 'Nominal Operations' }
+        { time: '00:00', load: `${Math.round(390 * scale)} kW`, ren: `${Math.round(180 * scale)} kW`, soc: '70%', status: 'Night Load' },
+        { time: '06:00', load: `${Math.round(430 * scale)} kW`, ren: `${Math.round(290 * scale)} kW`, soc: '76%', status: 'Sunrise Recharging' },
+        { time: '12:00', load: `${Math.round(460 * scale)} kW`, ren: `${Math.round(310 * scale)} kW`, soc: '82%', status: 'Peak Solar Harvest' },
+        { time: '18:00', load: `${Math.round(475 * scale)} kW`, ren: `${Math.round(120 * scale)} kW`, soc: '65%', status: 'Evening Storm Peak', isWarning: true },
+        { time: '23:00', load: `${Math.round(410 * scale)} kW`, ren: `${Math.round(160 * scale)} kW`, soc: '69%', status: 'Nominal Operations' }
       ]
     }
   };
