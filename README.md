@@ -1,5 +1,5 @@
 # ❄️ NOVARA // AI Polar Energy Management System (PolarOPS)
-### Autonomous Microgrid Dispatch, Digital Twin & SCADA Gateway for Indian Antarctic Research Stations (Bharati & Maitri)
+### Autonomous Microgrid Dispatch & Digital-Twin Demonstrator for Indian Antarctic Research Stations (Bharati & Maitri)
 **Ministry of Earth Sciences (MoES) / National Centre for Polar and Ocean Research (NCPOR) — Problem Statement ID `26061`**
 
 [![Live Demo on Vercel](https://img.shields.io/badge/Live%20Demo-polar--136.vercel.app-05c5ff?style=for-the-badge&logo=vercel)](https://polar-136.vercel.app/)
@@ -7,6 +7,10 @@
 [![Test Suite](https://img.shields.io/badge/Test%20Harness-9%2F9%20Suites%20Passed%20(100%25)-blue?style=for-the-badge)](tests/run_all_v1_tests.py)
 [![Substation Protocol](https://img.shields.io/badge/SCADA-IEC--61850%20%7C%20Modbus--TCP-cyan?style=for-the-badge)](#)
 [![Solver](https://img.shields.io/badge/Optimizer-HiGHS%20MILP%20(<40ms)-indigo?style=for-the-badge)](#)
+
+> [!NOTE]
+> **Project Maturity Classification:**  
+> **NOVARA (`PolarOPS`)** is a **full-stack operational prototype and digital-twin demonstrator with a production-oriented architecture**. It is engineered to validate polar microgrid dispatch, thermal co-generation thermodynamics, and SCADA fieldbus telemetry in high fidelity as an operational proof-of-concept ahead of on-site physical hardware commissioning at Bharati and Maitri.
 
 ---
 
@@ -33,7 +37,7 @@ Operating autonomous microgrids in Antarctica is fundamentally distinct from tem
 - **Severe Sub-Zero Thermal Loss ($-55^\circ\text{C}$):** Habitat hydronic heating loops freeze without continuous thermal recovery, and battery internal resistance spikes.
 - **Extreme Maritime & Airlift Logistics:** Polar diesel delivered via the Antarctic Treaty charter vessel *MV Vasiliy Golovnin* costs **₹195 / Liter**, making unoptimized fuel burn financially and ecologically unsustainable.
 
-**NOVARA (`PolarOPS`)** is a mission-critical, full-stack Energy Management System (EMS) and Digital Twin providing:
+**NOVARA (`PolarOPS`)** is a **full-stack operational prototype and digital-twin demonstrator with a production-oriented architecture**, providing:
 1. **Three-Tier Hierarchical HiGHS Mixed-Integer Linear Programming (MILP)** solving rolling 24-hour schedules in $< 40\text{ ms}$.
 2. **Combined Heat & Power (CHP) Co-Generation Modeling:** Captures $1.20\text{ kW}_{\text{th}}$ per $\text{kW}_{\text{e}}$ of engine jacket/exhaust heat to warm living modules.
 3. **Substation IEC-61850 & Modbus-TCP Telemetry:** Live 120ms fieldbus heartbeat emulation.
