@@ -82,7 +82,14 @@ export default function Header({
               <i className="fa-solid fa-snowflake text-sm text-white"></i>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold tracking-tight text-lg text-[#127694] leading-none">POLAR EMS</span>
+              <div className="flex flex-col justify-center">
+                <span className="font-black tracking-tight text-base sm:text-lg text-[#127694] leading-none">
+                  Novara
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase text-[#0699C6] leading-none mt-0.5">
+                  Polar EMS
+                </span>
+              </div>
               <span className="hidden 2xl:flex text-[10px] tracking-wider uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc] items-center gap-1.5 shadow-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 {currentStation.name.split(' ')[0]} · OPERATIONAL
