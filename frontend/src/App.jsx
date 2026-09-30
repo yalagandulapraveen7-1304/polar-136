@@ -58,6 +58,30 @@ export default function App() {
   });
 
   const [isG2Dispatched, setIsG2Dispatched] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('polarops_theme');
+      return saved === 'dark';
+    } catch (e) {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('polarops_theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('polarops_theme', 'light');
+      }
+    } catch (e) {}
+  }, [isDarkMode]);
+
+  const handleToggleDarkMode = useCallback(() => {
+    setIsDarkMode(prev => !prev);
+  }, []);
 
   const handleAcceptRecommendation = useCallback(async () => {
     setIsG2Dispatched(true);
@@ -553,6 +577,8 @@ function AppDashboard({
         onOpenModal={handleOpenModal}
         activeModal={activeModal}
         clockTime={clockTime}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={handleToggleDarkMode}
         telemetryMeta={{
           connectionState,
           latencyMs,

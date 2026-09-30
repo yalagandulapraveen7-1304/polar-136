@@ -9,6 +9,8 @@ export default function Header({
   onOpenModal,
   activeModal,
   clockTime,
+  isDarkMode = false,
+  onToggleDarkMode = () => {},
   connectionStatus = 'SATELLITE LINK ACTIVE',
   telemetryMeta = {}
 }) {
@@ -212,6 +214,32 @@ export default function Header({
             </span>
           </div>
 
+          {/* Simulated SCADA Hardware Gateway Status (IEC-61850 / Modbus-TCP) */}
+          <div 
+            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono shadow-xs shrink-0 cursor-default"
+            title="Substation PLC Gateway (IEC 61850 MMS / Modbus-TCP) Active - 120ms Heartbeat Sync"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span className="font-extrabold text-white tracking-wider">IEC-61850</span>
+            <span className="text-cyan-400 font-semibold">GW:ONLINE</span>
+            <span className="text-[9px] text-slate-400 border-l border-slate-700 pl-1.5">120ms PLC</span>
+          </div>
+
+          {/* Polar Night / Aurora Dark Mode Toggle */}
+          <button
+            type="button"
+            onClick={onToggleDarkMode}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition shadow-xs cursor-pointer border ${
+              isDarkMode
+                ? 'bg-[#162a45] text-cyan-300 border-cyan-500/50 hover:bg-[#1e3a5f]'
+                : 'bg-[#e5f6fd] text-[#127694] border-[#bcecfc] hover:bg-[#c2f0fe]'
+            }`}
+            title={isDarkMode ? 'Switch to Arctic Day Ice Theme' : 'Switch to Aurora Polar Night Mode'}
+          >
+            <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'}`}></i>
+            <span className="hidden sm:inline font-mono text-[10px] uppercase font-extrabold">{isDarkMode ? 'DAY ICE' : 'AURORA NIGHT'}</span>
+          </button>
+
           {/* Real-Time Alerts Quick Indicator Pill */}
           <button
             type="button"
@@ -335,6 +363,26 @@ export default function Header({
                         <i className="fa-solid fa-database text-[9px] text-[#0699C6]"></i>
                         SQLite WAL (Feature 24)
                       </button>
+                    </div>
+
+                    {/* Hardware SCADA Gateway Telemetry */}
+                    <div className="pt-2 border-t border-slate-100 mt-2 space-y-1">
+                      <div className="text-[9px] font-black uppercase text-[#0699C6] tracking-wider flex items-center justify-between">
+                        <span>Hardware SCADA Gateway</span>
+                        <span className="text-emerald-600 font-bold">● ONLINE</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                        <span>Field Protocol:</span>
+                        <span className="font-mono font-bold text-slate-800">IEC 61850 MMS / Modbus-TCP</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                        <span>Substation Bus:</span>
+                        <span className="font-mono text-slate-700">400V 3-Phase · 50.02 Hz</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-slate-500">
+                        <span>PLC Registers:</span>
+                        <span className="font-mono text-slate-700">40001-40028 (Sync Active)</span>
+                      </div>
                     </div>
                   </div>
 

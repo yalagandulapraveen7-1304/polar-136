@@ -26,19 +26,83 @@
   --polar-emergency: #991b1b;
   
   --turbine-speed: 3s;
-  color-scheme: light !important;
+  color-scheme: light;
 }
 
-/* Enforce Permanent Light Mode Even Under System Dark Theme */
-@media (prefers-color-scheme: dark) {
-  :root, html, body {
-    color-scheme: light !important;
-    background-color: #EDF9FD !important;
-    color: #1e293b !important;
-  }
+/* -------------------------------------------------------------
+   Aurora Polar Night Dark Mode Theme Tokens
+   ------------------------------------------------------------- */
+html.dark {
+  color-scheme: dark !important;
+  --polar-bg: #070d17;
+  --polar-card: #0d1524;
+  --polar-cyan-primary: #00e5ff;
+  --polar-cyan-secondary: #06b6d4;
+  --polar-teal-dark: #38bdf8;
+  --polar-ice-light: #0b1320;
+  --polar-ice-badge: #162a45;
+  --polar-ice-border: #1e3a5f;
 }
 
-html {
+html.dark body {
+  background-color: #070d17 !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .novara-card {
+  background: #0d1524 !important;
+  border-color: #1e3a5f !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 229, 255, 0.05);
+}
+
+html.dark .floating-nav {
+  background: rgba(13, 21, 36, 0.95) !important;
+  border-color: #1e3a5f !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6);
+}
+
+html.dark .modal-content {
+  background: #0d1524 !important;
+  border-color: #1e3a5f !important;
+  color: #e2e8f0 !important;
+}
+
+html.dark .station-pill {
+  color: #38bdf8 !important;
+}
+
+html.dark .station-pill:hover:not(.active) {
+  background: #162a45 !important;
+  color: #00e5ff !important;
+}
+
+html.dark .nav-pill {
+  color: #94a3b8 !important;
+}
+
+html.dark .nav-pill:hover:not(.active) {
+  color: #00e5ff !important;
+  background: #162a45 !important;
+}
+
+html.dark .nav-pill.active {
+  background: #162a45 !important;
+  color: #38bdf8 !important;
+  border-color: #00e5ff !important;
+}
+
+html.dark .btn-polar-light {
+  background-color: #162a45 !important;
+  color: #38bdf8 !important;
+  border-color: #1e3a5f !important;
+}
+
+html.dark .btn-polar-light:hover {
+  background-color: #1e3a5f !important;
+}
+
+html:not(.dark) {
   color-scheme: light !important;
 }
 
