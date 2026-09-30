@@ -689,6 +689,8 @@ function AppDashboard({
         latestData={latestData}
         onOpenModal={handleOpenModal}
         initialQuery={copilotInitialQuery}
+        onAcceptRecommendation={handleAcceptRecommendation}
+        updateTelemetrySnapshot={updateTelemetrySnapshot}
       />
 
       <MaintenanceModal

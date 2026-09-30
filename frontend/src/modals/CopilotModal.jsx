@@ -1,8 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
 import MarkdownMessage from '../components/MarkdownMessage';
 import { generateCopilotResponse, getFallbackIntelligenceState, getFallbackSimulation } from '../utils/copilotEngine';
+import { executeCopilotAction, isActionExecuted } from '../utils/actionExecution';
 
-export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', latestData, onOpenModal, initialQuery }) {
+export default function CopilotModal({
+  isOpen,
+  onClose,
+  stationId = 'MAITRI',
+  latestData,
+  onOpenModal,
+  initialQuery,
+  onAcceptRecommendation,
+  updateTelemetrySnapshot
+}) {
   const [activeTab, setActiveTab] = useState('chat'); // 'chat' | 'anomalies' | 'digital_twin' | 'counterfactual' | 'mlops' | 'audit'
 
   // Copilot Controls
@@ -56,6 +66,7 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
   const [simulationResult, setSimulationResult] = useState(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [actionNotice, setActionNotice] = useState(null);
+  const [actionStates, setActionStates] = useState({});
   const [expandedCards, setExpandedCards] = useState({});
 
   const SCENARIOS = [
@@ -263,41 +274,62 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
       }
     }
 
-    if (actionType === 'DISPATCH_G2') {
-      try {
-        await fetch('/api/commander/override', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ p_diesel_2_kw: 85.0 })
-        });
-        setActionNotice('Generator 2 Auto-Dispatched at 85 kW. Critical Deficit Neutralized!');
-        setTimeout(() => setActionNotice(null), 5000);
-        return;
-      } catch (e) {
-        console.warn('G2 auto-dispatch error:', e);
-      }
+    const actionKey = actionCard.action_id || actionCard.action_type || 'G2_ACTION';
+    if (actionStates[actionKey]?.state === 'EXECUTING') return;
+
+    // Parse requested value if present in label (e.g. "85 kW" or "AUTO-DISPATCH G2 (85 kW)")
+    let reqVal = actionCard.requested_value ?? null;
+    if (reqVal === null && actionCard.button_label) {
+      const match = actionCard.button_label.match(/(\d+(?:\.\d+)?)\s*kW/i);
+      if (match) reqVal = parseFloat(match[1]);
+    }
+    if (reqVal === null && actionCard.action) {
+      const match = actionCard.action.match(/(\d+(?:\.\d+)?)\s*kW/i);
+      if (match) reqVal = parseFloat(match[1]);
+    }
+    if (reqVal === null && (actionCard.action_type === 'DISPATCH_G2' || actionCard.action_type === 'AUTO_DISPATCH_G2')) {
+      reqVal = 85.0;
     }
 
-    try {
-      const res = await fetch('/api/copilot/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action_type: actionType || 'ACK_ALERT',
-          role: userRole
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setActionNotice(`Action Approved: ${data.message}`);
-      } else {
-        setActionNotice(`Action Denied: ${data.message}`);
+    await executeCopilotAction({
+      actionId: actionCard.action_id || `ACT-${Date.now()}`,
+      actionType: actionCard.action_type || 'DISPATCH_G2',
+      stationId: stationId,
+      targetAsset: actionCard.target_asset || (actionCard.action_type === 'DISPATCH_G2' ? 'GENERATOR_2' : 'DISPATCH_CONTROLLER'),
+      requestedValue: reqVal,
+      unit: actionCard.unit || 'kW',
+      source: 'AI_COPILOT',
+      recommendationId: actionCard.recommendation_id || null,
+      reason: actionCard.reason || actionCard.action || 'Operational action recommended by AI Copilot',
+      role: userRole,
+      onStateChange: (state, message) => {
+        setActionStates(prev => ({
+          ...prev,
+          [actionKey]: { state, message }
+        }));
+        if (state === 'VALIDATING' || state === 'EXECUTING') {
+          setActionNotice(message);
+        } else if (state === 'SUCCESS') {
+          setActionNotice(`✓ ${message}`);
+          setTimeout(() => setActionNotice(null), 5000);
+        } else if (state === 'FAILED') {
+          setActionNotice(`⚠ Action Blocked: ${message}`);
+          setTimeout(() => setActionNotice(null), 6000);
+        }
+      },
+      onSuccess: (data) => {
+        if (typeof onAcceptRecommendation === 'function' && (actionCard.action_type === 'DISPATCH_G2' || actionCard.action_type === 'AUTO_DISPATCH_G2')) {
+          onAcceptRecommendation();
+        }
+        if (typeof updateTelemetrySnapshot === 'function' && data?.snapshot) {
+          updateTelemetrySnapshot(data.snapshot);
+        }
+        fetchCopilotMetadata();
+      },
+      onError: (err) => {
+        console.warn('[CopilotModal] Action execution failed:', err.message);
       }
-      setTimeout(() => setActionNotice(null), 5000);
-      fetchCopilotMetadata();
-    } catch (e) {
-      console.error('Error executing action:', e);
-    }
+    });
   };
 
     const handleRunCounterfactual = async (scId) => {
@@ -675,24 +707,72 @@ export default function CopilotModal({ isOpen, onClose, stationId = 'MAITRI', la
                             )}
 
                             {/* Action Card */}
-                            {m.action_card && (
-                              <div className="mt-2 p-2.5 rounded-xl bg-[#e5f6fd]/40 border border-sky-500/40 flex items-center justify-between gap-3">
-                                <div>
-                                  <span className="text-[10px] font-black text-[#127694] uppercase tracking-wider block">
-                                    Recommended Action
-                                  </span>
-                                  <span className="text-xs font-bold text-slate-700">{m.action_card.action}</span>
-                                  <span className="text-[10px] text-slate-400 block">{m.action_card.reason}</span>
+                            {m.action_card && (() => {
+                              const cardKey = m.action_card.action_id || m.action_card.action_type || `act-${idx}`;
+                              const currState = actionStates[cardKey]?.state || (isActionExecuted(cardKey) ? 'SUCCESS' : 'IDLE');
+                              const isExecuting = currState === 'VALIDATING' || currState === 'EXECUTING';
+                              const isExecuted = currState === 'SUCCESS';
+                              const isBlocked = currState === 'FAILED';
+
+                              return (
+                                <div className={`mt-2.5 p-3 rounded-xl border transition-all ${
+                                  isExecuted 
+                                    ? 'bg-emerald-500/10 border-emerald-500/30' 
+                                    : isBlocked
+                                      ? 'bg-rose-500/10 border-rose-500/30'
+                                      : 'bg-[#e5f6fd]/50 border-sky-500/40'
+                                } flex items-center justify-between gap-3`}>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                      <span className="text-[10px] font-black text-[#127694] uppercase tracking-wider block">
+                                        Recommended Action
+                                      </span>
+                                      {isExecuted && (
+                                        <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300">
+                                          COMMITTED TO DIGITAL TWIN
+                                        </span>
+                                      )}
+                                      {isBlocked && (
+                                        <span className="text-[9px] font-bold text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded border border-rose-300">
+                                          SAFETY INTERLOCK TRIPPED
+                                        </span>
+                                      )}
+                                    </div>
+                                    <span className="text-xs font-bold text-slate-800 block truncate">{m.action_card.action}</span>
+                                    <span className="text-[10px] text-slate-500 block truncate">
+                                      {actionStates[cardKey]?.message || m.action_card.reason}
+                                    </span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    disabled={isExecuting || isExecuted}
+                                    onClick={() => handleExecuteAction(m.action_card)}
+                                    className={`px-3.5 py-2 rounded-lg font-black text-xs transition shadow-sm shrink-0 flex items-center gap-1.5 ${
+                                      isExecuting
+                                        ? 'bg-amber-400 text-slate-950 cursor-wait animate-pulse'
+                                        : isExecuted
+                                          ? 'bg-emerald-600 text-white cursor-default'
+                                          : isBlocked
+                                            ? 'bg-rose-600 hover:bg-rose-500 text-white cursor-pointer'
+                                            : 'bg-gradient-to-r from-sky-500 to-[#0699C6] hover:from-sky-400 hover:to-[#05C5FF] text-white cursor-pointer'
+                                    }`}
+                                  >
+                                    {isExecuting && <i className="fa-solid fa-spinner fa-spin text-[10px]"></i>}
+                                    {isExecuted && <i className="fa-solid fa-check text-[10px]"></i>}
+                                    {isBlocked && <i className="fa-solid fa-rotate-right text-[10px]"></i>}
+                                    <span>
+                                      {isExecuting
+                                        ? 'Executing...'
+                                        : isExecuted
+                                          ? 'Executed ✓'
+                                          : isBlocked
+                                            ? 'Retry Action'
+                                            : (m.action_card.button_label || 'EXECUTE ACTION')}
+                                    </span>
+                                  </button>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleExecuteAction(m.action_card)}
-                                  className="px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-black text-xs transition shadow shrink-0"
-                                >
-                                  {m.action_card.button_label || 'EXECUTE'}
-                                </button>
-                              </div>
-                            )}
+                              );
+                            })()}
                           </div>
                         )}
                       </div>

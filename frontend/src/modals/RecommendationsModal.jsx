@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MarkdownMessage from '../components/MarkdownMessage';
+import { executeCopilotAction } from '../utils/actionExecution';
 
 export default function RecommendationsModal({ isOpen, onClose, latestData, stationId = 'MAITRI' }) {
   const [activeTab, setActiveTab] = useState('recommendations'); // 'recommendations' | 'evidence' | 'engineering' | 'resilience' | 'history'
@@ -91,24 +92,39 @@ export default function RecommendationsModal({ isOpen, onClose, latestData, stat
 
   const handleApply = async (rec) => {
     setIsProcessing(true);
-    try {
-      const res = await fetch(`/api/recommendations/${rec.id}/apply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ operator: 'Cmdr. Vance', authorized: true })
-      });
-      if (res.ok) {
-        setActionFeedback({
-          type: 'success',
-          message: `Action '${rec.action_label}' applied successfully via authorized control workflow.`
-        });
+    await executeCopilotAction({
+      actionId: `REC-ACT-${rec.id}`,
+      actionType: rec.action_type || 'APPLY_RECOMMENDED_DISPATCH',
+      stationId: stationId,
+      targetAsset: 'RECOMMENDATION_SYSTEM',
+      requestedValue: null,
+      unit: '',
+      source: 'AI_RECOMMENDATION',
+      recommendationId: rec.id,
+      reason: rec.reason || rec.recommendation || 'Authorized recommendation applied',
+      role: 'Commander',
+      onStateChange: (state, message) => {
+        if (state === 'VALIDATING' || state === 'EXECUTING') {
+          setActionFeedback({ type: 'info', message });
+        } else if (state === 'SUCCESS') {
+          setActionFeedback({
+            type: 'success',
+            message: `Action '${rec.action_label}' applied successfully via authorized control workflow.`
+          });
+        } else if (state === 'FAILED') {
+          setActionFeedback({ type: 'error', message: `Execution blocked: ${message}` });
+        }
+      },
+      onSuccess: () => {
+        setIsProcessing(false);
+        setTimeout(() => setActionFeedback(null), 5000);
+      },
+      onError: (e) => {
+        setIsProcessing(false);
+        setActionFeedback({ type: 'error', message: e.message || 'Failed to apply advisory action.' });
+        setTimeout(() => setActionFeedback(null), 5000);
       }
-    } catch (e) {
-      setActionFeedback({ type: 'error', message: 'Failed to apply advisory action.' });
-    } finally {
-      setIsProcessing(false);
-      setTimeout(() => setActionFeedback(null), 5000);
-    }
+    });
   };
 
   // Severity style helper
