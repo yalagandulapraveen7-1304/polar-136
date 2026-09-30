@@ -857,24 +857,28 @@ export default function AlertsModal({
                     </h3>
                   </div>
                   <div className="text-xs font-mono font-bold text-rose-400 bg-rose-50/60 px-3 py-1.5 rounded-xl border border-rose-800/60">
-                    HARDWARE DEFICIT: -36.0 kW
+                    HARDWARE DEFICIT: {((currentStation.genset_1_max_kw || 300) + (currentStation.genset_2_max_kw || 200) + (currentStation.inverter_rating_kw || 80) - (stationId === 'BHARATI' ? 325.0 : 616.0)).toFixed(1)} kW
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                   <div className="p-3.5 rounded-xl bg-[#f0faff] border border-slate-200 space-y-1">
                     <div className="text-[10px] font-bold uppercase text-slate-400">Sustainable Generation Capacity</div>
-                    <div className="text-xl font-mono font-black text-[#127694]">580.0 kW</div>
+                    <div className="text-xl font-mono font-black text-[#127694]">
+                      {((currentStation.genset_1_max_kw || 300) + (currentStation.genset_2_max_kw || 200) + (currentStation.inverter_rating_kw || 80)).toFixed(1)} kW
+                    </div>
                     <p className="text-[11px] text-slate-400">
-                      Genset 1 (300 kW) + Genset 2 (200 kW) + Battery Cold-Derated Discharge Limit (80 kW).
+                      Genset 1 ({currentStation.genset_1_max_kw || 300} kW) + Genset 2 ({currentStation.genset_2_max_kw || 200} kW) + Battery Cold-Derated Limit ({currentStation.inverter_rating_kw || 80} kW).
                     </p>
                   </div>
 
                   <div className="p-3.5 rounded-xl bg-[#f0faff] border border-slate-200 space-y-1">
                     <div className="text-[10px] font-bold uppercase text-slate-400">Peak Polar Blast Demand</div>
-                    <div className="text-xl font-mono font-black text-rose-700">616.0 kW</div>
+                    <div className="text-xl font-mono font-black text-rose-700">
+                      {stationId === 'BHARATI' ? '325.0 kW' : '616.0 kW'}
+                    </div>
                     <p className="text-[11px] text-slate-400">
-                      At -47.57°C ambient temperature and 50.6 m/s wind storm, total electrical and thermal heating load hits 616 kW.
+                      At -47.57°C ambient temperature and 50.6 m/s wind storm, total electrical and thermal heating load hits {stationId === 'BHARATI' ? '325 kW' : '616 kW'}.
                     </p>
                   </div>
 
@@ -882,7 +886,7 @@ export default function AlertsModal({
                     <div className="text-[10px] font-bold uppercase text-slate-400">Automated Defense Execution</div>
                     <div className="text-xl font-mono font-black text-emerald-400">TIER 2 & 3 SHED</div>
                     <p className="text-[11px] text-slate-400">
-                      Automated shedding of Tier 3 scientific loads (25 kW) and Tier 2 flexible heating (11 kW) covers the 36 kW gap. Tier 1 life support remains 100% powered.
+                      Automated shedding of Tier 3 scientific loads and Tier 2 flexible heating covers the {Math.abs((currentStation.genset_1_max_kw || 300) + (currentStation.genset_2_max_kw || 200) + (currentStation.inverter_rating_kw || 80) - (stationId === 'BHARATI' ? 325.0 : 616.0)).toFixed(0)} kW gap. Tier 1 life support remains 100% powered.
                     </p>
                   </div>
                 </div>
