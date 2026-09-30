@@ -30,7 +30,10 @@
 }
 
 /* -------------------------------------------------------------
-   Aurora Polar Night Dark Mode Theme Tokens
+   Aurora Polar Night Dark Mode Theme Tokens & Text Palette
+   Primary text: Crisp White (#ffffff / #f8fafc)
+   Secondary/Subtext: Soft Ice Blue (#bae6fd / #e0f2fe)
+   Accents: Arctic Cyan (#00e5ff / #38bdf8)
    ------------------------------------------------------------- */
 html.dark {
   color-scheme: dark !important;
@@ -46,14 +49,67 @@ html.dark {
 
 html.dark body {
   background-color: #070d17 !important;
-  color: #e2e8f0 !important;
+  color: #f8fafc !important;
 }
 
+/* Headings in Aurora Night: Crisp White & Ice Blue */
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: #ffffff !important;
+}
+
+/* Text overrides: all dark-slate texts switch to White & Ice Blue */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700,
+html.dark strong {
+  color: #ffffff !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #bae6fd !important; /* Soft Ice Blue */
+}
+
+html.dark .text-slate-400 {
+  color: #7dd3fc !important; /* Muted Ice Blue */
+}
+
+html.dark [class*="text-[#127694]"] {
+  color: #38bdf8 !important; /* Bright Arctic Ice Blue */
+}
+
+html.dark [class*="text-[#0699C6]"] {
+  color: #00e5ff !important; /* Luminescent Cyan */
+}
+
+/* Surface backgrounds: Cards, Panels, Modals */
 html.dark .novara-card {
   background: #0d1524 !important;
   border-color: #1e3a5f !important;
-  color: #e2e8f0 !important;
+  color: #f8fafc !important;
   box-shadow: 0 4px 20px -2px rgba(0, 229, 255, 0.05);
+}
+
+html.dark .bg-white,
+html.dark [class*="bg-white"] {
+  background-color: #0d1524 !important;
+  border-color: #1e3a5f !important;
+  color: #f8fafc !important;
+}
+
+html.dark [class*="bg-[#edf9fd]"],
+html.dark [class*="bg-[#f8fcfe]"],
+html.dark [class*="bg-[#f0faff]"],
+html.dark [class*="bg-[#e5f6fd]"],
+html.dark [class*="bg-[#fafdfe]"] {
+  background-color: #111d32 !important;
+  border-color: #1e3a5f !important;
+  color: #e0f2fe !important;
 }
 
 html.dark .floating-nav {
@@ -65,7 +121,13 @@ html.dark .floating-nav {
 html.dark .modal-content {
   background: #0d1524 !important;
   border-color: #1e3a5f !important;
-  color: #e2e8f0 !important;
+  color: #f8fafc !important;
+}
+
+html.dark [class*="border-[#bcecfc]"],
+html.dark .border-slate-100,
+html.dark .border-slate-200 {
+  border-color: #1e3a5f !important;
 }
 
 html.dark .station-pill {
@@ -100,6 +162,12 @@ html.dark .btn-polar-light {
 
 html.dark .btn-polar-light:hover {
   background-color: #1e3a5f !important;
+}
+
+html.dark [class*="bg-[#c2f0fe]"] {
+  background-color: #162a45 !important;
+  color: #38bdf8 !important;
+  border-color: #1e3a5f !important;
 }
 
 html:not(.dark) {
