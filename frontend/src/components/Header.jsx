@@ -225,41 +225,6 @@ export default function Header({
             <span className="text-[9px] text-slate-400 border-l border-slate-700 pl-1.5">120ms PLC</span>
           </div>
 
-          {/* Polar Night / Aurora Dark Mode Toggle */}
-          <button
-            type="button"
-            onClick={onToggleDarkMode}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition shadow-xs cursor-pointer border ${
-              isDarkMode
-                ? 'bg-[#162a45] text-cyan-300 border-cyan-500/50 hover:bg-[#1e3a5f]'
-                : 'bg-[#e5f6fd] text-[#127694] border-[#bcecfc] hover:bg-[#c2f0fe]'
-            }`}
-            title={isDarkMode ? 'Switch to Arctic Day Ice Theme' : 'Switch to Aurora Polar Night Mode'}
-          >
-            <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'}`}></i>
-            <span className="hidden sm:inline font-mono text-[10px] uppercase font-extrabold">{isDarkMode ? 'DAY ICE' : 'AURORA NIGHT'}</span>
-          </button>
-
-          {/* Real-Time Alerts Quick Indicator Pill */}
-          <button
-            type="button"
-            onClick={() => onOpenModal('alerts')}
-            className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold shadow-xs transition cursor-pointer shrink-0 ${
-              telemetryMeta?.alertCount > 0
-                ? 'bg-rose-50 border-rose-300 text-rose-800'
-                : 'bg-[#edf9fd] border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe]'
-            }`}
-            title="SCADA Alarms & Real-Time Operational Alerts"
-          >
-            <i className={`fa-solid fa-triangle-exclamation text-xs ${telemetryMeta?.alertCount > 0 ? 'text-rose-600' : 'text-[#0699C6]'}`}></i>
-            <span>ALERTS</span>
-            {telemetryMeta?.alertCount > 0 && (
-              <span className="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full">
-                {telemetryMeta.alertCount}
-              </span>
-            )}
-          </button>
-
           {/* Live Antarctic Time & Connection Diagnostic Pill */}
           <div className="flex flex-col text-right shrink-0">
             <span className="font-mono text-xs font-bold text-slate-800 tracking-tight leading-tight">
@@ -403,16 +368,20 @@ export default function Header({
             </div>
           </div>
 
-          {/* Operator Profile */}
-          <div className="flex items-center gap-2 pl-2 sm:pl-2.5 border-l border-[#bcecfc] shrink-0">
-            <div className="w-8 h-8 rounded-full bg-slate-800 text-cyan-300 flex items-center justify-center font-bold text-xs ring-2 ring-[#0699C6]/40 shadow-xs" title="Cmdr. E. Vance · Station Lead">
-              EV
-            </div>
-            <div className="hidden sm:flex flex-col text-left leading-tight">
-              <span className="text-xs font-bold text-slate-800">Cmdr. Vance</span>
-              <span className="text-[9px] font-semibold text-slate-400">Station Lead Op</span>
-            </div>
-          </div>
+          {/* Polar Night / Aurora Dark Mode Toggle */}
+          <button
+            type="button"
+            onClick={onToggleDarkMode}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition shadow-xs cursor-pointer border ${
+              isDarkMode
+                ? 'bg-[#162a45] text-cyan-300 border-cyan-500/50 hover:bg-[#1e3a5f]'
+                : 'bg-[#e5f6fd] text-[#127694] border-[#bcecfc] hover:bg-[#c2f0fe]'
+            }`}
+            title={isDarkMode ? 'Switch to Arctic Day Ice Theme' : 'Switch to Aurora Polar Night Mode'}
+          >
+            <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'}`}></i>
+            <span className="hidden sm:inline font-mono text-[10px] uppercase font-extrabold">{isDarkMode ? 'DAY ICE' : 'AURORA NIGHT'}</span>
+          </button>
 
           {/* Mobile Navigation Drawer Trigger */}
           <div className="lg:hidden relative shrink-0" id="mobileNavContainer">
@@ -434,7 +403,31 @@ export default function Header({
           1. LOAD FORECAST  2. DIGITAL TWIN  3. ENERGY MATRIX  4. COPILOT  5. EXPORT REPORTS
           ========================================================================= */}
       <div className="w-full pt-1.5 border-t border-[#bcecfc]/50">
-        <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 justify-center py-0.5">
+        <div className="hidden lg:flex items-center justify-between gap-3 py-0.5">
+          {/* Under Logo on Left: Real-Time Alerts Quick Action */}
+          <div className="shrink-0 flex items-center">
+            <button
+              type="button"
+              onClick={() => onOpenModal('alerts')}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold shadow-xs transition cursor-pointer ${
+                telemetryMeta?.alertCount > 0
+                  ? 'bg-rose-50 border-rose-300 text-rose-800 hover:bg-rose-100 animate-pulse'
+                  : 'bg-[#edf9fd] border-[#bcecfc] text-[#127694] hover:bg-[#c2f0fe]'
+              }`}
+              title="SCADA Alarms & Real-Time Operational Alerts"
+            >
+              <i className={`fa-solid fa-triangle-exclamation text-xs ${telemetryMeta?.alertCount > 0 ? 'text-rose-600' : 'text-[#0699C6]'}`}></i>
+              <span className="font-extrabold uppercase">ALERTS</span>
+              {telemetryMeta?.alertCount > 0 && (
+                <span className="bg-rose-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full">
+                  {telemetryMeta.alertCount}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Center: Navigation Pills */}
+          <nav className="flex items-center gap-1.5 xl:gap-2 justify-center flex-1">
           
           {/* Overview HUD Tab */}
           <button
@@ -511,6 +504,10 @@ export default function Header({
           </button>
 
         </nav>
+
+        {/* Right: Balancer spacer to keep center nav pills aligned */}
+        <div className="shrink-0 w-[95px] hidden xl:block"></div>
+      </div>
 
         {/* Mobile / Tablet Responsive Drawer Navigation Menu */}
         {isMobileMenuOpen && (
