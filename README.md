@@ -1,6 +1,6 @@
 # ❄️ NOVARA // AI Polar Energy Management System (PolarOPS)
 ### Autonomous Microgrid Dispatch, Digital Twin & SCADA Gateway for Indian Antarctic Research Stations (Bharati & Maitri)
-**Ministry of Earth Sciences (MoES) / National Centre for Polar and Ocean Research (NCPOR) — SIH PS ID `26061`**
+**Ministry of Earth Sciences (MoES) / National Centre for Polar and Ocean Research (NCPOR) — Problem Statement ID `26061`**
 
 [![Live Demo on Vercel](https://img.shields.io/badge/Live%20Demo-polar--136.vercel.app-05c5ff?style=for-the-badge&logo=vercel)](https://polar-136.vercel.app/)
 [![Build Status](https://img.shields.io/badge/Build-Passing%20(Vite%205)-emerald?style=for-the-badge)](https://polar-136.vercel.app/)
@@ -15,13 +15,13 @@
 2. [Dual Antarctic Station Hardware Profiles](#-dual-antarctic-station-hardware-profiles)
 3. [System Architecture & 3-Tier Optimization Hierarchy](#-system-architecture)
 4. [Key Scientific & Engineering Highlights](#-key-scientific--engineering-highlights)
-5. [1-Click Jury Emergency Simulator](#-1-click-jury-emergency-simulator)
+5. [Polar Emergency Response & Operational Stress-Test Bench](#-polar-emergency-response--operational-stress-test-bench)
 6. [NCPOR Expedition Fiscal ROI & Rupee Ledger](#-ncpor-expedition-fiscal-roi--rupee-ledger)
 7. [12-Phase Verification & Master Test Suite](#-12-phase-verification--master-test-suite)
 8. [Substation Standards & Hardware Telemetry (IEC-61850)](#-substation-standards--hardware-telemetry)
 9. [Repository Architecture](#-repository-architecture)
 10. [Local Development & Deployment Guide](#-local-development--deployment-guide)
-11. [Live Pitch Walkthrough (60-Second Jury Script)](#-live-pitch-walkthrough-60-second-jury-script)
+11. [Operational Demonstration & Verification Workflow](#-operational-demonstration--verification-workflow)
 
 ---
 
@@ -79,7 +79,7 @@ flowchart TD
 
     subgraph UI["4. Command HUD (React 18 + Vite)"]
         WS --> HUD[Aurora Polar Night HUD]
-        HUD --> CRISIS[1-Click Jury Emergency Simulator]
+        HUD --> CRISIS[Polar Emergency Stress-Test Bench]
         HUD --> ROI[NCPOR Expedition Rupee Ledger]
         HUD --> SLD[Interactive Single-Line Diagram]
         HUD --> VEC[Zero-Bandwidth Vector SVG Exports]
@@ -106,9 +106,9 @@ Diverts engine jacket coolant and exhaust gas heat to habitat glycol hydronic lo
 
 ---
 
-## 🚨 1-Click Jury Emergency Simulator
+## 🚨 Polar Emergency Response & Operational Stress-Test Bench
 
-Located directly on **Row 2 of the Command Header (`CRISIS SIM [JURY]`)**, evaluators can test mission-critical edge cases with 1 click:
+Located directly on **Row 2 of the Command Header (`CRISIS SIM`)**, station engineers and operators can verify automated protective responses under mission-critical conditions:
 
 1. **🌪️ Katabatic Blizzard (48 m/s / 93 knots):**  
    Automatically triggers high-wind feathering ($90^\circ$ pitch) on wind turbines, injects 65 kW BESS transient support within 18 ms, spools up standby generators, and sheds non-essential core drill heaters.
@@ -225,10 +225,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## ⏱️ Live Pitch Walkthrough (60-Second Jury Script)
+## ⏱️ Operational Demonstration & Verification Workflow
 
 1. **Open Live App:** Navigate to [https://polar-136.vercel.app/](https://polar-136.vercel.app/).
 2. **Demonstrate Aurora Polar Night Ergonomics:** Toggle the theme on the top right to showcase high-contrast Antarctic circadian lighting.
-3. **Trigger Crisis Simulation:** Click **`CRISIS SIM [JURY]`** in the header. Select **"Katabatic Blizzard (48 m/s)"** $\rightarrow$ Show the jury how the wind turbine automatically feathers blades, BESS injects sub-second synthetic inertia, and life support is preserved.
-4. **Present the NCPOR Fiscal Ledger:** Switch to the **"NCPOR EXPEDITION ROI"** tab to highlight the **₹1.46 Crores/year** savings and 42,600 liters saved on *MV Vasiliy Golovnin*.
-5. **Inspect SCADA Hardware Registers:** Show the live **IEC-61850 GW: ONLINE** indicator with sub-second PLC register polling.
+3. **Trigger Crisis Simulation:** Click **`CRISIS SIM`** in the header. Select **"Katabatic Blizzard (48 m/s)"** $\rightarrow$ Observe how the wind turbine automatically feathers blades, BESS injects sub-second synthetic inertia, and life support is preserved.
+4. **Present the NCPOR Fiscal Ledger:** Switch to the **"NCPOR EXPEDITION ROI"** tab to inspect the **₹1.46 Crores/year** savings and 42,600 liters saved on *MV Vasiliy Golovnin*.
+5. **Inspect SCADA Hardware Registers:** View the live **IEC-61850 GW: ONLINE** indicator with sub-second PLC register polling.
