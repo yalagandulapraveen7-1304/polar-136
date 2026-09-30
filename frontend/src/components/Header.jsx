@@ -104,6 +104,8 @@ export default function Header({
             <button
               type="button"
               onClick={() => setIsStationMenuOpen(!isStationMenuOpen)}
+              aria-label="Select Antarctic Station"
+              aria-expanded={isStationMenuOpen}
               className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#bcecfc] transition text-[#127694] font-bold text-xs shadow-xs cursor-pointer"
             >
               <i className="fa-solid fa-location-dot text-[#0699C6]"></i>
@@ -372,6 +374,7 @@ export default function Header({
           <button
             type="button"
             onClick={onToggleDarkMode}
+            aria-label={isDarkMode ? 'Switch to Arctic Day Ice Theme' : 'Switch to Aurora Polar Night Mode'}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition shadow-xs cursor-pointer border ${
               isDarkMode
                 ? 'bg-[#162a45] text-cyan-300 border-cyan-500/50 hover:bg-[#1e3a5f]'
@@ -379,7 +382,7 @@ export default function Header({
             }`}
             title={isDarkMode ? 'Switch to Arctic Day Ice Theme' : 'Switch to Aurora Polar Night Mode'}
           >
-            <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'}`}></i>
+            <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'}`} aria-hidden="true"></i>
             <span className="hidden sm:inline font-mono text-[10px] uppercase font-extrabold">{isDarkMode ? 'DAY ICE' : 'AURORA NIGHT'}</span>
           </button>
 
@@ -388,6 +391,8 @@ export default function Header({
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle Navigation Menu"
+              aria-expanded={isMobileMenuOpen}
               className="w-8 h-8 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] border border-[#bcecfc] flex items-center justify-center transition cursor-pointer"
               title="Open Navigation Menu"
             >

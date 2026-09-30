@@ -288,18 +288,18 @@ export default function CrisisSimulatorModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/60 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/60 backdrop-blur-md animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="crisis-dialog-title">
       <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-white dark:bg-[#0d1524] border border-[#bcecfc] dark:border-[#1e3a5f] shadow-2xl shadow-cyan-950/60 text-slate-800 dark:text-slate-100 overflow-hidden font-sans">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#bcecfc]/60 dark:border-[#1e3a5f] bg-gradient-to-r from-rose-50/80 via-white to-amber-50/80 dark:from-[#0f172a] dark:via-[#0d1524] dark:to-[#0f172a] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-600 via-amber-600 to-rose-700 text-white flex items-center justify-center shadow-lg shadow-rose-900/40 shrink-0">
-              <i className="fa-solid fa-bolt-lightning text-lg animate-pulse"></i>
+              <i className="fa-solid fa-bolt-lightning text-lg animate-pulse" aria-hidden="true"></i>
             </div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white uppercase">
+                <h2 id="crisis-dialog-title" className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white uppercase">
                   Polar Emergency Response & Stress-Test Bench
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500 text-white shadow-xs">
@@ -320,6 +320,7 @@ export default function CrisisSimulatorModal({
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
+              aria-label={soundEnabled ? "Mute operational sounds" : "Enable operational sounds"}
               className={`p-2 rounded-xl text-xs border transition ${
                 soundEnabled
                   ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-700'
@@ -327,16 +328,17 @@ export default function CrisisSimulatorModal({
               }`}
               title={soundEnabled ? 'Mute Alert Sound Effects' : 'Enable Operational Sound Effects'}
             >
-              <i className={`fa-solid ${soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'}`}></i>
+              <i className={`fa-solid ${soundEnabled ? 'fa-volume-high' : 'fa-volume-xmark'}`} aria-hidden="true"></i>
             </button>
 
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center transition border border-slate-200 dark:border-slate-700"
+              aria-label="Close Emergency Stress-Test Simulator"
+              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center transition border border-slate-200 dark:border-slate-700 cursor-pointer"
               title="Close Simulator"
             >
-              <i className="fa-solid fa-xmark text-sm"></i>
+              <i className="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
             </button>
           </div>
         </div>

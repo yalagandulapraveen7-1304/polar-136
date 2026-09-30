@@ -169,6 +169,17 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Global Accessibility: Dismiss open modals on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setActiveModal(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // 2. Fetch history / audit logs periodically
   const fetchAuditLogs = useCallback(async () => {
     try {
