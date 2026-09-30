@@ -24,6 +24,7 @@ import EnergyModal from './modals/EnergyModal';
 import EnvironmentModal from './modals/EnvironmentModal';
 import DigitalTwinModal from './modals/DigitalTwinModal';
 import ReportsModal from './modals/ReportsModal';
+import CrisisSimulatorModal from './modals/CrisisSimulatorModal';
 import { TelemetryProvider, useTelemetry } from './context/TelemetryContext';
 import { STATIONS } from './constants/stations';
 import { getWsUrl } from './constants/api';
@@ -800,6 +801,18 @@ function AppDashboard({
         stationId={stationId}
         latestData={latestData}
         auditLogs={auditLogs}
+      />
+
+      {/* 1-Click Live Jury Polar Crisis Simulation & NCPOR Fiscal Ledger */}
+      <CrisisSimulatorModal
+        isOpen={activeModal === 'crisis'}
+        onClose={() => setActiveModal(null)}
+        stationId={stationId}
+        latestData={latestData}
+        onApplyOverrides={onApplyOverrides}
+        onResetOverrides={onResetOverrides}
+        onScenarioChange={onScenarioChange}
+        onResetScenario={onResetScenario}
       />
     </div>
   );

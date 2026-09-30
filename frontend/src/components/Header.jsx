@@ -505,8 +505,25 @@ export default function Header({
 
         </nav>
 
-        {/* Right: Balancer spacer to keep center nav pills aligned */}
-        <div className="shrink-0 w-[95px] hidden xl:block"></div>
+        {/* Right: 1-Click Polar Crisis Simulator & NCPOR Fiscal Ledger (Live Jury Demo Bench) */}
+        <div className="shrink-0">
+          <button
+            type="button"
+            onClick={() => onOpenModal('crisis')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold transition shadow-xs cursor-pointer border ${
+              activeModal === 'crisis'
+                ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white border-rose-500 shadow-md ring-2 ring-rose-400/40'
+                : 'bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 dark:from-rose-950/40 dark:via-amber-950/30 dark:to-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800/80 hover:border-rose-400'
+            }`}
+            title="Open 1-Click Polar Emergency Stress-Test & NCPOR Fiscal ROI Ledger (Live Jury Demo Bench)"
+          >
+            <i className="fa-solid fa-bolt-lightning text-amber-500 text-xs animate-pulse"></i>
+            <span className="font-black uppercase tracking-tight">CRISIS SIM</span>
+            <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-rose-600 text-white shadow-xs">
+              JURY
+            </span>
+          </button>
+        </div>
       </div>
 
         {/* Mobile / Tablet Responsive Drawer Navigation Menu */}
@@ -643,6 +660,28 @@ export default function Header({
                   <span>5. EXPORT REPORTS</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-normal">Savings &amp; Evidence</span>
+              </button>
+
+              {/* 6. CRISIS SIMULATOR (JURY BENCH) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('crisis');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'crisis'
+                    ? 'bg-rose-50 text-rose-700 border border-rose-300'
+                    : 'bg-gradient-to-r from-rose-50 to-amber-50 hover:from-rose-100 hover:to-amber-100 text-rose-800 border border-rose-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-bolt-lightning text-amber-500"></i>
+                  <span>CRISIS SIMULATOR</span>
+                </div>
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-rose-600 text-white">
+                  JURY BENCH
+                </span>
               </button>
             </div>
 

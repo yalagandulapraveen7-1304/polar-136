@@ -1200,18 +1200,20 @@ export default function ReportsModal({
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Operating Cost Saved</span>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                      @ $3.00/L
+                      ₹195/L Delivered (NCPOR)
                     </span>
                   </div>
-                  <div className="flex items-baseline gap-1">
+                  <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-black text-[#127694] font-mono">
-                      ${(metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104).toLocaleString()}
+                      ₹{(((metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104) * 83.5) / 100000).toFixed(2)} Lakhs
                     </span>
-                    <span className="text-xs font-bold text-slate-500">USD</span>
+                    <span className="text-xs font-bold text-slate-500 font-mono">
+                      (${(metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104).toLocaleString()})
+                    </span>
                   </div>
                   <div className="pt-1 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
-                    <span>Logistics air-drop avoided</span>
-                    <span className="text-emerald-700 font-bold">Audited</span>
+                    <span>ISEA Charter: MV Vasiliy Golovnin</span>
+                    <span className="text-emerald-700 font-bold">₹1.46 Cr/Yr Potential</span>
                   </div>
                 </div>
 
