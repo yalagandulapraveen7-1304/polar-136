@@ -507,6 +507,8 @@ export default function App() {
         initialLatestData={latestData}
         isG2Dispatched={isG2Dispatched}
         handleAcceptRecommendation={handleAcceptRecommendation}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={handleToggleDarkMode}
       />
     </TelemetryProvider>
   );
@@ -529,7 +531,9 @@ function AppDashboard({
   auditLogs,
   initialLatestData,
   isG2Dispatched = false,
-  handleAcceptRecommendation
+  handleAcceptRecommendation,
+  isDarkMode = false,
+  onToggleDarkMode = () => {}
 }) {
   const {
     telemetryData,
@@ -578,7 +582,7 @@ function AppDashboard({
         activeModal={activeModal}
         clockTime={clockTime}
         isDarkMode={isDarkMode}
-        onToggleDarkMode={handleToggleDarkMode}
+        onToggleDarkMode={onToggleDarkMode}
         telemetryMeta={{
           connectionState,
           latencyMs,
