@@ -9,6 +9,8 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
 
   const h = latestData?.hardware_health || {};
   const healthScore = h.overall_score_pct !== undefined ? h.overall_score_pct : 84;
+  const g1Health = h.genset_1_health_pct !== undefined ? h.genset_1_health_pct : 94;
+  const g2Health = h.genset_2_health_pct !== undefined ? h.genset_2_health_pct : 82;
   const degradationRate = h.degradation_rate_pct_h !== undefined ? h.degradation_rate_pct_h : -0.03;
   const etaWarning = h.eta_warning_hours !== undefined ? h.eta_warning_hours : 724.3;
 
@@ -155,11 +157,26 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                     <i className="fa-solid fa-gas-pump text-xs text-[#0699C6]"></i>
                     Diesel Genset Units (G1 &amp; G2)
                   </span>
-                  <span className="text-[9px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">G2 Notice: 82%</span>
+                  <div className="flex items-center gap-1">
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${g1Health <= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-50 text-emerald-700'}`}>
+                      G1: {g1Health}%
+                    </span>
+                    <span className="text-[9px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+                      G2: {g2Health}%
+                    </span>
+                  </div>
                 </div>
                 <div className="space-y-1.5 text-xs text-slate-600">
-                  <div className="flex justify-between"><span>Genset 1 (Active):</span> <strong className="text-slate-800">Oil: 4.2 bar · Coolant: 82°C</strong></div>
-                  <div className="flex justify-between"><span>Genset 2 (Standby):</span> <strong className="text-amber-700">Pre-Heater ON · Service in 36h</strong></div>
+                  <div className="flex justify-between">
+                    <span>Genset 1 (Base):</span> 
+                    <strong className="text-slate-800">
+                      {g1Health > 0 ? `Oil 4.2 bar · Coolant 82°C (${g1Health}% Nominal)` : 'OFFLINE / MECHANICAL TRIP (0%)'}
+                    </strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Genset 2 (Standby):</span> 
+                    <strong className="text-amber-700">Pre-Heater ON · Service in 36h ({g2Health}%)</strong>
+                  </div>
                   <div className="flex justify-between"><span>Anti-Wet-Stacking:</span> <strong className="text-emerald-600">60-Min Clamping Enforced</strong></div>
                 </div>
               </div>

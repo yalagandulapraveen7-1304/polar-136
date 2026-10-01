@@ -106,6 +106,7 @@ export default function BottomCards({
   const totalGenKw = gen1Kw + gen2Kw;
   const fuelBurnRate = t.fuel_burn_rate_lh !== undefined ? t.fuel_burn_rate_lh : (totalGenKw * 0.26);
 
+  const g1Health = h.genset_1_health_pct !== undefined ? h.genset_1_health_pct : 94;
   const g2Health = h.genset_2_health_pct !== undefined ? h.genset_2_health_pct : 82;
   const overallHealth = h.overall_score_pct !== undefined ? h.overall_score_pct : 84;
 
@@ -143,25 +144,66 @@ export default function BottomCards({
                 ● {overallHealth}% Stable
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 mb-2.5">
+            <p className="text-[10px] text-slate-400 mb-2">
               Predictive asset telemetry, degradation trends, and sub-zero stress.
             </p>
           </div>
 
-          {/* Specific Asset Health Notice */}
+          {/* Specific Asset Health Notices: G1 Base & G2 Standby */}
           <div className="my-1 space-y-2">
-            <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs">
-              <div className="flex items-center justify-between text-amber-900 font-bold mb-0.5">
+            {/* Generator G1 Health (Base Runner) */}
+            <div className={`p-2 rounded-xl border text-xs ${
+              g1Health <= 0
+                ? 'bg-rose-50/90 border-rose-200 text-rose-950'
+                : g1Health < 80
+                ? 'bg-amber-50/80 border-amber-200 text-amber-950'
+                : 'bg-emerald-50/50 border-emerald-200 text-emerald-950'
+            }`}>
+              <div className="flex items-center justify-between font-bold mb-0.5">
                 <span className="flex items-center gap-1.5">
-                  <i className="fa-solid fa-circle-exclamation text-amber-600"></i>
+                  <i className={`fa-solid ${g1Health <= 0 ? 'fa-triangle-exclamation text-rose-600' : 'fa-gas-pump text-[#0699C6]'}`}></i>
+                  Generator G1 Health: {g1Health}%
+                </span>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                  g1Health <= 0
+                    ? 'bg-rose-200 text-rose-800'
+                    : g1Health < 80
+                    ? 'bg-amber-200 text-amber-800'
+                    : 'bg-emerald-100 text-emerald-800'
+                }`}>
+                  {g1Health <= 0 ? 'Fault / Offline' : g1Health >= 85 ? 'Nominal Base' : 'Service Due'}
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-600 leading-tight">
+                {g1Health <= 0
+                  ? 'G1 mechanical trip detected. Standby G2 auto-synchronized.'
+                  : 'Primary continuous runner · Oil pressure & cooling loops nominal.'}
+              </p>
+            </div>
+
+            {/* Generator G2 Health (Standby / Peaking) */}
+            <div className={`p-2 rounded-xl border text-xs ${
+              g2Health < 85
+                ? 'bg-amber-50/80 border-amber-200 text-amber-950'
+                : 'bg-slate-50 border-slate-200 text-slate-900'
+            }`}>
+              <div className="flex items-center justify-between font-bold mb-0.5">
+                <span className="flex items-center gap-1.5">
+                  <i className={`fa-solid ${g2Health < 85 ? 'fa-circle-exclamation text-amber-600' : 'fa-circle-check text-emerald-600'}`}></i>
                   Generator G2 Health: {g2Health}%
                 </span>
-                <span className="text-[9px] bg-amber-200/80 text-amber-800 px-1.5 py-0.5 rounded font-bold">
-                  Recommended
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                  g2Health < 85
+                    ? 'bg-amber-200/80 text-amber-800'
+                    : 'bg-emerald-100 text-emerald-800'
+                }`}>
+                  {g2Health < 85 ? 'Recommended' : 'Standby Ready'}
                 </span>
               </div>
               <p className="text-[10px] text-amber-800 leading-tight">
-                Recommended service window in <strong>36h</strong> before polar storm surge.
+                {g2Health < 85
+                  ? <>Recommended service window in <strong>36h</strong> before polar storm surge.</>
+                  : 'Standby generator synced · Pre-heaters active.'}
               </p>
             </div>
 
