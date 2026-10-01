@@ -56,12 +56,12 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
             <span className="text-xs sm:text-sm font-black text-[#127694] tracking-tight uppercase">
               Baseline vs PolarOPS Impact Evaluation
             </span>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Real Simulation Results
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-300">
+              Calibrated Physics Benchmark
             </span>
           </div>
           <p className="text-[11px] text-slate-500 mt-0.5">
-            Strict empirical comparison: Unmanaged Conventional Baseline vs PolarOPS 3-Tier HiGHS MILP Optimizer.
+            Comparative analysis based on calibrated Antarctic physics models &amp; NCPOR expedition logistics. (Simulation benchmark, not physical hardware telemetry).
           </p>
         </div>
 
@@ -269,8 +269,12 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
                 <i className="fa-solid fa-triangle-exclamation text-rose-500"></i>
                 Unserved Energy
               </span>
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
-                100% UPTIME
+              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${
+                (unserved.polarops || 0) > 0
+                  ? 'bg-rose-100 text-rose-800 border-rose-300'
+                  : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+              }`}>
+                {(unserved.polarops || 0) > 0 ? `SHEDDING: ${(unserved.polarops || 0).toFixed(1)} kWh` : '100% UPTIME'}
               </span>
             </div>
             <div className="flex items-baseline justify-between mt-1">
@@ -281,14 +285,22 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[9px] text-emerald-600 block font-bold">PolarOPS Zero Deficit</span>
-                <span className="text-xl font-mono font-black text-emerald-600">0.0 kWh</span>
+                <span className="text-[9px] text-slate-500 block font-bold">PolarOPS Optimized</span>
+                <span className={`text-xl font-mono font-black ${
+                  (unserved.polarops || 0) > 0 ? 'text-rose-600' : 'text-emerald-600'
+                }`}>
+                  {(unserved.polarops || 0).toFixed(1)} kWh
+                </span>
               </div>
             </div>
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-600 flex justify-between">
             <span>Life-Support Guarantee:</span>
-            <strong className="text-emerald-700 font-mono">0.00 unserved energy</strong>
+            <strong className={`font-mono ${
+              (unserved.polarops || 0) > 0 ? 'text-rose-600' : 'text-emerald-700'
+            }`}>
+              {(unserved.polarops || 0) > 0 ? `${(unserved.polarops || 0).toFixed(1)} kWh deficit` : 'Zero unserved energy'}
+            </strong>
           </div>
         </div>
 
@@ -300,8 +312,12 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
                 <i className="fa-solid fa-battery-half text-[#0699C6]"></i>
                 Reserve Floor Violations
               </span>
-              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                ≥20% HELD
+              <span className={`text-[10px] font-black px-2 py-0.5 rounded border ${
+                (battViol.polarops || 0) > 0
+                  ? 'bg-rose-100 text-rose-800 border-rose-300'
+                  : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+              }`}>
+                {(battViol.polarops || 0) > 0 ? `${(battViol.polarops || 0).toFixed(0)}h BREACH` : '≥20% HELD'}
               </span>
             </div>
             <div className="flex items-baseline justify-between mt-1">
@@ -312,14 +328,22 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
                 </span>
               </div>
               <div className="text-right">
-                <span className="text-[9px] text-emerald-600 block font-bold">PolarOPS Reserve Floor</span>
-                <span className="text-xl font-mono font-black text-emerald-600">0 Hours</span>
+                <span className="text-[9px] text-slate-500 block font-bold">PolarOPS Reserve Floor</span>
+                <span className={`text-xl font-mono font-black ${
+                  (battViol.polarops || 0) > 0 ? 'text-rose-600' : 'text-emerald-600'
+                }`}>
+                  {(battViol.polarops || 0).toFixed(0)} Hours
+                </span>
               </div>
             </div>
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-600 flex justify-between">
             <span>Reserve Floor Status:</span>
-            <strong className="text-emerald-700 font-mono">Strictly ≥ 20.0% protected</strong>
+            <strong className={`font-mono ${
+              (battViol.polarops || 0) > 0 ? 'text-rose-600' : 'text-emerald-700'
+            }`}>
+              {(battViol.polarops || 0) > 0 ? `${(battViol.polarops || 0).toFixed(0)}h below 20% reserve` : 'Strictly ≥ 20.0% protected'}
+            </strong>
           </div>
         </div>
       </div>

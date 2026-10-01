@@ -648,3 +648,7 @@ class PolarMicrogridManager:
                 }
             }
         }
+
+
+# Ergonomic class alias
+MicrogridManager = PolarMicrogridManager

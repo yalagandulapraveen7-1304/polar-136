@@ -108,6 +108,7 @@ export function calculateBaselineComparison(stationId = 'MAITRI', horizon = '24h
     const polarDeficit = Math.max(0.0, polarLoadKw - renPotentialKw);
     let polarGenKw = 0.0;
 
+    let unmetPolar = 0.0;
     if (polarDeficit > 0) {
       const availBess = Math.max(0.0, ((polarSoc - 20.0) / 100.0) * bessCapKwh);
       const polarBessDis = Math.min(polarDeficit, Math.min(bessPowerKw, availBess));
@@ -115,7 +116,9 @@ export function calculateBaselineComparison(stationId = 'MAITRI', horizon = '24h
       const genNeeded = polarDeficit - polarBessDis;
       if (genNeeded > 0) {
         polarGenKw = Math.min(g1Cap, Math.max(genNeeded, g1Cap * 0.35));
+        unmetPolar = Math.max(0.0, genNeeded - polarGenKw);
       }
+      polarUnservedKwh += unmetPolar;
     } else {
       const surplus = renPotentialKw - polarLoadKw;
       const chargeKw = Math.min(surplus, Math.min(bessPowerKw, ((95.0 - polarSoc) / 100.0) * bessCapKwh));
@@ -141,7 +144,8 @@ export function calculateBaselineComparison(stationId = 'MAITRI', horizon = '24h
         polaropsFuelL: Math.round(polarFuelStep * 10) / 10,
         baselineSocPct: Math.round(baseSoc * 10) / 10,
         polaropsSocPct: Math.round(polarSoc * 10) / 10,
-        baselineUnservedKw: Math.round(unmet * 10) / 10
+        baselineUnservedKw: Math.round(unmet * 10) / 10,
+        polaropsUnservedKw: Math.round(unmetPolar * 10) / 10
       });
     }
   }
@@ -233,20 +237,20 @@ export function calculateBaselineComparison(stationId = 'MAITRI', horizon = '24h
         unit: 'kWh',
         baseline: Math.round(baseUnservedKwh * 10) / 10,
         polarops: Math.round(polarUnservedKwh * 10) / 10,
-        saved: Math.round(baseUnservedKwh * 10) / 10,
-        improvement_pct: baseUnservedKwh > 0 ? 100.0 : 0.0,
-        uptime_pct: 100.0,
-        interpretation: `0.00 kWh unserved load under PolarOPS vs ${baseUnservedKwh.toFixed(1)} kWh under baseline`
+        saved: Math.round(Math.max(0.0, baseUnservedKwh - polarUnservedKwh) * 10) / 10,
+        improvement_pct: baseUnservedKwh > 0 ? Math.round(((baseUnservedKwh - polarUnservedKwh) / baseUnservedKwh) * 1000) / 10 : 0.0,
+        uptime_pct: Math.round(Math.max(0.0, 1.0 - (polarUnservedKwh / Math.max(1.0, hours * (station.baseLoad || 180.0)))) * 10000) / 100,
+        interpretation: `${polarUnservedKwh.toFixed(1)} kWh unserved load under PolarOPS vs ${baseUnservedKwh.toFixed(1)} kWh under baseline`
       },
       battery_reserve_violations: {
         metric_name: 'Battery Reserve Violations',
         unit: 'Hours < 20% SoC',
         baseline: Math.round(baseViolHours * 10) / 10,
         polarops: Math.round(polarViolHours * 10) / 10,
-        saved: Math.round(baseViolHours * 10) / 10,
-        improvement_pct: baseViolHours > 0 ? 100.0 : 0.0,
+        saved: Math.round(Math.max(0.0, baseViolHours - polarViolHours) * 10) / 10,
+        improvement_pct: baseViolHours > 0 ? Math.round(((baseViolHours - polarViolHours) / baseViolHours) * 1000) / 10 : 0.0,
         reserve_floor: '20.0% protected',
-        interpretation: `PolarOPS maintained 0.0 reserve breaches vs ${baseViolHours.toFixed(0)} violation hours under baseline`
+        interpretation: `PolarOPS maintained ${polarViolHours.toFixed(1)} reserve breach hours vs ${baseViolHours.toFixed(0)} violation hours under baseline`
       }
     },
     hourly_timeline: hourlySeries.slice(0, 24)

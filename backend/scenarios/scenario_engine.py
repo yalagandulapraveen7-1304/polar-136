@@ -596,6 +596,26 @@ class PolarScenarioControlEngine:
             "scenario_id": self.active_scenario_id or "CUSTOM_MANUAL_INPUT",
             "is_override_active": len(self.active_params) > 0,
             "metrics": metrics_table,
+            "metrics_table": metrics_table,
+            "scenario_realized": {
+                "load_kw": scen_load_kw,
+                "ren_kw": scen_ren_kw,
+                "diesel_gen_kw": scen_diesel_gen_kw,
+                "bess_discharge_kw": scen_bess_discharge_kw,
+                "fuel_burn_lph": scen_fuel_burn_lph,
+                "reserve_margin_kw": scen_reserve_margin_kw,
+                "unmet_load_kw": scen_unmet_load_kw,
+                "curtailment_kw": scen_curtailment_kw
+            },
+            "nominal_baseline": {
+                "load_kw": base_load_kw,
+                "ren_kw": base_ren_kw,
+                "diesel_gen_kw": base_diesel_gen_kw,
+                "bess_discharge_kw": base_bess_discharge_kw,
+                "fuel_burn_lph": base_fuel_burn_lph,
+                "reserve_margin_kw": base_reserve_margin_kw,
+                "unmet_load_kw": base_unmet_load_kw
+            },
             "summary_card": {
                 "headline": "System Impact Assessment",
                 "overall_health": "EMERGENCY" if scen_unmet_load_kw > 0 else ("CRITICAL" if fault_g1 else ("WARNING" if fuel_pct > 25 or scen_t < -35 else "NOMINAL")),
@@ -855,22 +875,25 @@ class PolarScenarioControlEngine:
                 # Unit commitment with 35% anti-wet-stacking floor
                 if gen_needed > 0:
                     polar_gen_kw = min(g1_cap, max(gen_needed, g1_cap * 0.35))
+                    unmet_polar = max(0.0, gen_needed - polar_gen_kw)
                 else:
                     polar_gen_kw = 0.0
+                    unmet_polar = 0.0
             else:
                 surplus = ren_potential_kw - polar_load_kw
                 charge_kw = min(surplus, min(bess_power_kw, (95.0 - polar_soc) / 100.0 * bess_cap_kwh))
                 polar_soc = min(95.0, polar_soc + (charge_kw / bess_cap_kwh) * 100.0)
                 # Keep generator offline or at minimal floor only if battery needs charge
                 polar_gen_kw = (g1_cap * 0.35) if polar_soc < 45.0 else 0.0
+                unmet_polar = 0.0
                 
             polar_fuel_step = polar_gen_kw * 0.26 # High-efficiency optimized operating point (0.26 L/kWh)
             polar_fuel_total_l += polar_fuel_step
             if polar_gen_kw > 10.0:
                 polar_engine_hours += 1.0
                 
-            # PolarOPS guarantees 0 unserved load and 0 reserve floor breaches
-            polar_unserved_kwh += 0.0
+            # PolarOPS unserved load and reserve floor breach tracking
+            polar_unserved_kwh += unmet_polar
             if polar_soc < 20.0:
                 polar_viol_hours += 1.0
                 
@@ -887,7 +910,8 @@ class PolarScenarioControlEngine:
                     "polarops_fuel_l": round(polar_fuel_step, 1),
                     "baseline_soc_pct": round(base_soc, 1),
                     "polarops_soc_pct": round(polar_soc, 1),
-                    "baseline_unserved_kw": round(unmet, 1)
+                    "baseline_unserved_kw": round(unmet, 1),
+                    "polarops_unserved_kw": round(unmet_polar, 1)
                 })
 
         # Calculate Costs ($)
@@ -980,20 +1004,20 @@ class PolarScenarioControlEngine:
                     "unit": "kWh",
                     "baseline": round(base_unserved_kwh, 2),
                     "polarops": round(polar_unserved_kwh, 2),
-                    "saved": round(base_unserved_kwh, 2),
-                    "improvement_pct": 100.0 if base_unserved_kwh > 0 else 0.0,
-                    "uptime_pct": 100.0,
-                    "interpretation": f"0.00 kWh unserved load under PolarOPS vs {base_unserved_kwh:.1f} kWh under baseline"
+                    "saved": round(max(0.0, base_unserved_kwh - polar_unserved_kwh), 2),
+                    "improvement_pct": round(((base_unserved_kwh - polar_unserved_kwh) / base_unserved_kwh) * 100.0, 1) if base_unserved_kwh > 0 else 0.0,
+                    "uptime_pct": round(max(0.0, (1.0 - (polar_unserved_kwh / max(1.0, sum(s["polarops_load_kw"] for s in hourly_series))))) * 100.0, 2),
+                    "interpretation": f"{polar_unserved_kwh:.2f} kWh unserved load under PolarOPS vs {base_unserved_kwh:.1f} kWh under baseline"
                 },
                 "battery_reserve_violations": {
                     "metric_name": "Battery Reserve Violations",
                     "unit": "Hours < 20% SoC",
                     "baseline": round(base_viol_hours, 1),
                     "polarops": round(polar_viol_hours, 1),
-                    "saved": round(base_viol_hours, 1),
-                    "improvement_pct": 100.0 if base_viol_hours > 0 else 0.0,
+                    "saved": round(max(0.0, base_viol_hours - polar_viol_hours), 1),
+                    "improvement_pct": round(((base_viol_hours - polar_viol_hours) / base_viol_hours) * 100.0, 1) if base_viol_hours > 0 else 0.0,
                     "reserve_floor": "20.0% protected",
-                    "interpretation": f"PolarOPS maintained 0.0 reserve breaches vs {base_viol_hours:.0f} violation hours under baseline"
+                    "interpretation": f"PolarOPS maintained {polar_viol_hours:.1f} reserve breach hours vs {base_viol_hours:.0f} violation hours under baseline"
                 }
             },
             "hourly_timeline": hourly_series[:24]
@@ -1028,3 +1052,7 @@ class PolarScenarioControlEngine:
             return 0.0
         albedo_factor = 1.15
         return round(min(capacity_kw * 1.15, (solar_wm2 / 1000.0) * capacity_kw * albedo_factor), 1)
+
+
+# Ergonomic class alias
+ScenarioEngine = PolarScenarioControlEngine

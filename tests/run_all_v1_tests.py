@@ -17,6 +17,7 @@ import subprocess
 import time
 
 test_files = [
+    ("Phase 0: Core Physics & Invariants Check", "tests/verify_core_invariants.py"),
     ("Phase 1: Canonical Schema & Simulation", "tests/test_phase1_canonical_and_simulation.py"),
     ("Phase 2: Validation & Feature Engineering", "tests/test_phase2_validation_and_features.py"),
     ("Phase 3: Quantile Forecasting Engine", "tests/test_phase3_quantile_forecasting.py"),

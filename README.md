@@ -211,7 +211,10 @@ source venv/bin/activate
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Run complete 12-phase test harness
+# Fast Core Invariants Check (< 0.1s - Power balance, wind cut-out, diesel min load, battery bounds)
+python tests/verify_core_invariants.py
+
+# Full 10-Suite Verification Harness (Includes LightGBM quantile forecasting & HiGHS MILP)
 python tests/run_all_v1_tests.py
 
 # Start FastAPI backend
@@ -229,10 +232,44 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## ⏱️ Operational Demonstration & Verification Workflow
+## 🔬 Scientific Modeling Assumptions & Simulation Disclosures
 
-1. **Open Live App:** Navigate to [https://polar-136.vercel.app/](https://polar-136.vercel.app/).
-2. **Demonstrate Aurora Polar Night Ergonomics:** Toggle the theme on the top right to showcase high-contrast Antarctic circadian lighting.
-3. **Trigger Crisis Simulation:** Click **`CRISIS SIM`** in the header. Select **"Katabatic Blizzard (48 m/s)"** $\rightarrow$ Observe how the wind turbine automatically feathers blades, BESS injects sub-second synthetic inertia, and life support is preserved.
-4. **Present the NCPOR Fiscal Ledger:** Switch to the **"NCPOR EXPEDITION ROI"** tab to inspect the **₹1.46 Crores/year** savings and 42,600 liters saved on *MV Vasiliy Golovnin*.
-5. **Inspect SCADA Hardware Registers:** View the live **IEC-61850 GW: ONLINE** indicator with sub-second PLC register polling.
+> [!IMPORTANT]
+> **Transparency Disclosure for Hackathon Evaluators:**  
+> All telemetry, weather profiles, and dispatch curves presented in PolarOPS are produced by **calibrated physics and thermodynamic digital-twin models**, benchmarked against published NCPOR expedition logistics and Antarctic environmental datasets. They are **not** live physical hardware satellite telemetry feeds from the Antarctic continent.
+
+### Stated Engineering Assumptions:
+1. **Specific Fuel Oil Consumption (SFOC):**
+   - **PolarOPS Optimized Operating Point:** $0.26\text{ L/kWh}$ (optimal governor curve, turbocharger sweet spot).
+   - **Conventional Fixed Baseline:** $0.33\text{ L/kWh}$ (unoptimized fixed-speed droop governor).
+2. **Anti-Wet-Stacking Constraint:** Diesel generators are strictly clamped to $\ge 35\%$ of rated nameplate capacity when committed, preventing unburned fuel accumulation, exhaust soot fouling, and bore glazing.
+3. **Combined Heat & Power (CHP):** Models engine jacket water and exhaust gas heat exchangers recovering $1.20\text{ kW}_{\text{th}}$ per $\text{kW}_{\text{e}}$ of mechanical output, eliminating electrical space-heating resistance draw during generator operation.
+4. **Battery Energy Storage System (BESS):**
+   - Operating Window: $20.0\% \le \text{SoC} \le 95.0\%$. The $20\%$ reserve floor is protected by deterministic guardrails for emergency life-support.
+   - Thermal Derating: When ambient cell/enclosure temperature drops below $-30^\circ\text{C}$ or heater loop faults occur, inverter discharge capacity is derated by $35\%$.
+5. **Wind Turbine Aerodynamics:** Cut-in velocity $v_{\text{in}} = 3.0\text{ m/s}$; rated velocity $v_{\text{rated}} = 12.0\text{ m/s}$; storm cut-out brake engages at $v_{\text{cut}} = 25.0\text{ m/s}$ ($90\text{ km/h}$) to prevent rotor mechanical destruction.
+6. **Logistics Economics:** Delivered Antarctic polar diesel fuel is modeled at **₹195 / Liter** ($\$3.00\text{ / L}$ USD equivalent), accounting for sea ice charter transit on *MV Vasiliy Golovnin*. Carbon dioxide emission factor is $2.68\text{ kg CO}_2\text{ / L}$.
+
+---
+
+## ⏱️ 3-Minute Hackathon Demonstration Guide (Judge Flow)
+
+Follow this 3-step script during live evaluation to showcase full engineering depth in 180 seconds:
+
+### Step 1: The Polar Problem & Mission HUD (Minute 1)
+1. **Station Switching:** Show the top navigation bar. Switch between **Maitri** (inland nunatak, $-55^\circ\text{C}$, $400\text{ kWh}$ BESS) and **Bharati** (coastal Larsemann Hills, $120\text{ kW}$ wind).
+2. **Explain the Logistics Constraint:** Highlight the ₹195/L fuel cost and the life-support heating load. Point out the live telemetry stream (1 Hz WebSocket) and the active power balance HUD.
+
+### Step 2: Stress Testing & Engineering Invariants (Minute 2)
+1. **Trigger Contingency Preset:** Open **`OVERRIDE`** (or select a scenario preset). Select **"Katabatic Blizzard"** ($v > 25\text{ m/s}$).
+2. **Observe Deterministic Protection:**
+   - Wind generation immediately drops to $0.0\text{ kW}$ (aerodynamic cut-out brake engages).
+   - BESS and dual diesel generators coordinate seamlessly to prevent bus voltage collapse.
+   - Notice the unserved energy is explicitly tracked—if generation capacity is exceeded, unmet load is clearly reported rather than hidden.
+3. **Cold Snap & Heating:** Select **"Severe Cold Snap"** ($-45^\circ\text{C}$). Watch CHP heat recovery eliminate auxiliary electric heating load, saving thousands of liters of fuel.
+
+### Step 3: Optimization Proof & Instant Verification (Minute 3)
+1. **Baseline vs PolarOPS Evaluation:** Scroll to the **"Baseline vs PolarOPS Impact Evaluation"** section. Toggle between **24h Lookahead**, **7-Day Cold Snap**, and the **21-Day Winter Benchmark**.
+   - Show the 6 verified KPIs: Fuel Saved, Higher Renewable Capture, Operating Cost Reduction, Carbon Avoided, and Zero Unserved Energy under nominal conditions.
+2. **Execute Fast Invariant Check:** Run `python tests/verify_core_invariants.py` in the terminal to prove to the judges that all 8 core physics invariants pass in $< 0.05$ seconds.
+3. **Conclude with Fiscal Ledger:** Open the **"NCPOR EXPEDITION ROI"** ledger showing ₹1.46 Crores in annual logistics savings for the Ministry of Earth Sciences.
