@@ -10,7 +10,7 @@
 
 > [!NOTE]
 > **Project Maturity Classification:**  
-> **NOVARA (`PolarOPS`)** is a **full-stack operational prototype and digital-twin demonstrator with a production-oriented architecture**. It is engineered to validate polar microgrid dispatch, thermal co-generation thermodynamics, and SCADA fieldbus telemetry in high fidelity as an operational proof-of-concept ahead of on-site physical hardware commissioning at Bharati and Maitri.
+> **NOVARA (`PolarOPS`)** is a **full-stack polar energy management system and digital-twin demonstrator with a production-oriented architecture**. It is engineered to validate polar microgrid dispatch, thermal co-generation thermodynamics, and SCADA fieldbus telemetry in high fidelity as an operational proof-of-concept ahead of on-site physical hardware commissioning at Bharati and Maitri.
 
 ---
 
@@ -37,7 +37,7 @@ Operating autonomous microgrids in Antarctica is fundamentally distinct from tem
 - **Severe Sub-Zero Thermal Loss ($-55^\circ\text{C}$):** Habitat hydronic heating loops freeze without continuous thermal recovery, and battery internal resistance spikes.
 - **Extreme Maritime & Airlift Logistics:** Polar diesel delivered via the Antarctic Treaty charter vessel *MV Vasiliy Golovnin* costs **₹195 / Liter**, making unoptimized fuel burn financially and ecologically unsustainable.
 
-**NOVARA (`PolarOPS`)** is a **full-stack operational prototype and digital-twin demonstrator with a production-oriented architecture**, providing:
+**NOVARA (`PolarOPS`)** is a **full-stack polar energy management system and digital-twin demonstrator with a production-oriented architecture**, providing:
 1. **Three-Tier Hierarchical HiGHS Mixed-Integer Linear Programming (MILP)** solving rolling 24-hour schedules in $< 40\text{ ms}$.
 2. **Combined Heat & Power (CHP) Co-Generation Modeling:** Captures $1.20\text{ kW}_{\text{th}}$ per $\text{kW}_{\text{e}}$ of engine jacket/exhaust heat to warm living modules.
 3. **Substation IEC-61850 & Modbus-TCP Telemetry:** Live 120ms fieldbus heartbeat emulation.
@@ -235,7 +235,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 ## 🔬 Scientific Modeling Assumptions & Simulation Disclosures
 
 > [!IMPORTANT]
-> **Transparency Disclosure for Hackathon Evaluators:**  
+> **Transparency Disclosure & Operational Boundaries:**  
 > All telemetry, weather profiles, and dispatch curves presented in PolarOPS are produced by **calibrated physics and thermodynamic digital-twin models**, benchmarked against published NCPOR expedition logistics and Antarctic environmental datasets. They are **not** live physical hardware satellite telemetry feeds from the Antarctic continent.
 
 ### Stated Engineering Assumptions:
@@ -252,7 +252,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## ⏱️ 3-Minute Hackathon Demonstration Guide (Judge Flow)
+## ⏱️ 3-Minute Technical Demonstration Guide (Evaluation Flow)
 
 Follow this 3-step script during live evaluation to showcase full engineering depth in 180 seconds:
 
@@ -271,5 +271,5 @@ Follow this 3-step script during live evaluation to showcase full engineering de
 ### Step 3: Optimization Proof & Instant Verification (Minute 3)
 1. **Baseline vs PolarOPS Evaluation:** Scroll to the **"Baseline vs PolarOPS Impact Evaluation"** section. Toggle between **24h Lookahead**, **7-Day Cold Snap**, and the **21-Day Winter Benchmark**.
    - Show the 6 verified KPIs: Fuel Saved, Higher Renewable Capture, Operating Cost Reduction, Carbon Avoided, and Zero Unserved Energy under nominal conditions.
-2. **Execute Fast Invariant Check:** Run `python tests/verify_core_invariants.py` in the terminal to prove to the judges that all 8 core physics invariants pass in $< 0.05$ seconds.
+2. **Execute Fast Invariant Check:** Run `python tests/verify_core_invariants.py` in the terminal to prove that all 8 core physics invariants pass in $< 0.05$ seconds.
 3. **Conclude with Fiscal Ledger:** Open the **"NCPOR EXPEDITION ROI"** ledger showing ₹1.46 Crores in annual logistics savings for the Ministry of Earth Sciences.

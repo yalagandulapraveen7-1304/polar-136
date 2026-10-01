@@ -1,6 +1,6 @@
 """
 Fast Core Invariants and Physics Verification Harness for PolarEMS / NOVARA PolarOPS.
-Designed for rapid (<3s) validation during Hackathon / SIH judging sessions.
+Designed for rapid (<3s) validation of polar microgrid physics and operational accounting.
 
 Verifies:
 1. Wind Aerodynamic Cut-Out (>25 m/s and <3 m/s)

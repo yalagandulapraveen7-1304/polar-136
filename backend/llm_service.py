@@ -1,7 +1,7 @@
 """
 PolarOPS - Groq AI Service
 Provides natural language 1-sentence decision explanations and interactive Commander chat.
-Uses Groq's high-speed Llama-3 models with a robust local fallback for offline hackathon demos.
+Uses Groq's high-speed Llama-3 models with a robust local fallback for offline operational resilience.
 """
 import os
 import json
