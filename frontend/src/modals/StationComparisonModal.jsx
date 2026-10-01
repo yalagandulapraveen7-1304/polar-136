@@ -132,7 +132,7 @@ export default function StationComparisonModal({
               <div className="flex items-start justify-between pb-3 border-b border-slate-100">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">🇦🇶</span>
+                    <i className="fa-solid fa-location-dot text-[#0699C6]"></i>
                     <h3 className="font-extrabold text-sm sm:text-base text-[#127694]">Maitri Research Station</h3>
                   </div>
                   <div className="text-[11px] text-slate-500 mt-0.5">
@@ -253,7 +253,7 @@ export default function StationComparisonModal({
               <div className="flex items-start justify-between pb-3 border-b border-slate-100">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">🇦🇶</span>
+                    <i className="fa-solid fa-location-dot text-[#0699C6]"></i>
                     <h3 className="font-extrabold text-sm sm:text-base text-[#127694]">Bharati Research Station</h3>
                   </div>
                   <div className="text-[11px] text-slate-500 mt-0.5">
@@ -441,7 +441,7 @@ export default function StationComparisonModal({
           {/* Operational Insights */}
           <div className="bg-[#f0faff] rounded-2xl border border-[#bcecfc] p-4 text-xs space-y-2">
             <div className="text-xs font-bold text-[#127694] uppercase flex items-center gap-1.5">
-              <i className="fa-solid fa-lightbulb text-[#0699C6]"></i> Operational Findings &amp; Architecture Insights
+              <i className="fa-solid fa-circle-info text-[#0699C6]"></i> Operational Findings &amp; Architecture Insights
             </div>
             <ul className="list-disc pl-5 text-slate-700 space-y-1">
               {(comparisonData?.comparison_insights || [

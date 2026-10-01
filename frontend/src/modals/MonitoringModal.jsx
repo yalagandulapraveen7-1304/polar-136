@@ -448,8 +448,8 @@ export default function MonitoringModal({
                     <span className="text-xs font-black text-[#127694] uppercase tracking-tight">
                       Microgrid Power Balance Equations
                     </span>
-                    <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full">
-                      ✓ STABLE
+                    <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">
+                      ● STABLE
                     </span>
                   </div>
                   <div className="space-y-2.5 my-3">

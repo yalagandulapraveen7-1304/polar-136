@@ -209,7 +209,7 @@ export default function Header({
           
           {/* System Status Pill: "● OPERATIONAL" */}
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs shrink-0">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+            <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
             <span>OPERATIONAL</span>
             <span className="hidden xl:inline text-[10px] text-emerald-600 font-semibold border-l border-emerald-300 pl-2">
               Balance: 0.00 kW residual
@@ -221,7 +221,7 @@ export default function Header({
             className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono shadow-xs shrink-0 cursor-default"
             title="Substation PLC Gateway (IEC 61850 MMS / Modbus-TCP) Active - 120ms Heartbeat Sync"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
             <span className="font-extrabold text-white tracking-wider">IEC-61850</span>
             <span className="text-cyan-400 font-semibold">GW:ONLINE</span>
             <span className="text-[9px] text-slate-400 border-l border-slate-700 pl-1.5">120ms PLC</span>
@@ -240,7 +240,7 @@ export default function Header({
                 onClick={() => setIsDiagOpen(!isDiagOpen)}
                 className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border transition flex items-center gap-1.5 justify-end shadow-xs cursor-pointer ${
                   telemetryMeta.connectionState === 'RECONNECTING'
-                    ? 'bg-sky-50 text-sky-800 border-sky-300 animate-pulse'
+                    ? 'bg-sky-50 text-sky-800 border-sky-300'
                     : telemetryMeta.isStale
                     ? 'bg-rose-50 text-rose-800 border-rose-300'
                     : mode === 'SCADA_MODE'
@@ -251,16 +251,16 @@ export default function Header({
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${
                   telemetryMeta.connectionState === 'RECONNECTING'
-                    ? 'bg-sky-500 animate-ping'
+                    ? 'bg-sky-500'
                     : telemetryMeta.isStale
                     ? 'bg-rose-500'
                     : mode === 'SCADA_MODE'
-                    ? 'bg-emerald-500 animate-pulse'
-                    : 'bg-[#05C5FF] animate-pulse'
+                    ? 'bg-emerald-500'
+                    : 'bg-[#05C5FF]'
                 }`}></span>
                 <span>
                   {telemetryMeta.connectionState === 'RECONNECTING'
-                    ? `↻ RECONNECTING (${telemetryMeta.retryCount || 1}/5)`
+                    ? `RECONNECTING (${telemetryMeta.retryCount || 1}/5)`
                     : telemetryMeta.isStale
                     ? `● DATA STALE (${telemetryMeta.staleSeconds}s ago)`
                     : mode === 'SCADA_MODE'
@@ -455,7 +455,7 @@ export default function Header({
             onClick={() => onOpenModal('forecast')}
             title="Feature 1: Probabilistic Load & Renewable Predictions (P10/P50/P90), Multi-Horizon & Weather Inputs"
           >
-            <i className="fa-solid fa-chart-line text-xs text-sky-500"></i>
+            <i className="fa-solid fa-chart-line text-xs text-[#0699C6]"></i>
             <span>LOAD FORECAST</span>
           </button>
 
@@ -477,7 +477,7 @@ export default function Header({
             onClick={() => onOpenModal('energy')}
             title="Feature 3: 3-Tier HiGHS MILP Optimizer, Power Balance Flow, Storage Coordination & Safety Constraints"
           >
-            <i className="fa-solid fa-bolt text-xs text-amber-500"></i>
+            <i className="fa-solid fa-bolt text-xs text-[#0699C6]"></i>
             <span>ENERGY MATRIX</span>
           </button>
 
@@ -488,10 +488,10 @@ export default function Header({
             onClick={() => onOpenModal('copilot')}
             title="Feature 4: Autonomous Polar Operational Assistant & Grounded 6-Part Decision Explanations"
           >
-            <i className="fa-solid fa-robot text-xs text-indigo-500"></i>
+            <i className="fa-solid fa-microchip text-xs text-[#0699C6]"></i>
             <span>COPILOT</span>
             {telemetryMeta?.recommendationsCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-black shadow-xs">
+              <span className="ml-1 px-1.5 py-0.2 rounded-full bg-[#0699C6] text-white text-[9px] font-black shadow-xs">
                 {telemetryMeta.recommendationsCount}
               </span>
             )}
@@ -504,7 +504,7 @@ export default function Header({
             onClick={() => onOpenModal('reports')}
             title="Feature 5: Logistics Savings Evidence, Baseline vs PolarOPS Evaluation, Printable HTML & CSV/JSON Data Exports"
           >
-            <i className="fa-solid fa-file-invoice text-xs text-emerald-600"></i>
+            <i className="fa-solid fa-file-invoice text-xs text-[#0699C6]"></i>
             <span>EXPORT REPORTS</span>
           </button>
 
@@ -621,7 +621,7 @@ export default function Header({
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-bolt text-amber-500"></i>
+                  <i className="fa-solid fa-bolt text-[#0699C6]"></i>
                   <span>3. ENERGY MATRIX</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-normal">HiGHS Dispatch &amp; Flow</span>
@@ -641,7 +641,7 @@ export default function Header({
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-robot text-indigo-500"></i>
+                  <i className="fa-solid fa-microchip text-[#0699C6]"></i>
                   <span>4. COPILOT</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-normal">Decision Explanations</span>
@@ -661,7 +661,7 @@ export default function Header({
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-file-invoice text-emerald-600"></i>
+                  <i className="fa-solid fa-file-invoice text-[#0699C6]"></i>
                   <span>5. EXPORT REPORTS</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-normal">Savings &amp; Evidence</span>

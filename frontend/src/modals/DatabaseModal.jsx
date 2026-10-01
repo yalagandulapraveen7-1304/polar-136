@@ -877,7 +877,7 @@ export default function DatabaseModal({ isOpen, onClose, stationId = 'MAITRI', l
               <div className="bg-white rounded-2xl border border-[#bcecfc] p-4 shadow-xs">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2">
-                    <i className="fa-solid fa-brain text-[#0699C6]"></i>
+                    <i className="fa-solid fa-microchip text-[#0699C6]"></i>
                     <h3 className="text-xs font-black text-[#127694] uppercase tracking-wider">
                       MLOps Model Registry &amp; Champion Governance
                     </h3>

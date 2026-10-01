@@ -63,9 +63,9 @@ export default function StressTestBreakingPointChart() {
               afterBody: (items) => {
                 const idx = items[0].dataIndex;
                 if (idx === 2) {
-                  return '\n⚠️ DEFICIT: -36.4 kW shortfall! Automated load-shedding of tier-3 auxiliary heaters required.';
+                  return '\n[DEFICIT] -36.4 kW shortfall: Automated load-shedding of tier-3 auxiliary heaters required.';
                 }
-                return '\n✓ FEASIBLE: Microgrid operating within reserve limits.';
+                return '\n[FEASIBLE] Microgrid operating within reserve limits.';
               }
             }
           }

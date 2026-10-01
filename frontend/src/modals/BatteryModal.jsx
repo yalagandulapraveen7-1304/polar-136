@@ -295,7 +295,7 @@ export default function BatteryModal({
                   : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
-              <i className="fa-solid fa-brain text-xs"></i>
+              <i className="fa-solid fa-microchip text-xs"></i>
               <span>5. AI Storage Advisory</span>
             </button>
           </div>
@@ -347,15 +347,15 @@ export default function BatteryModal({
 
               {/* Freezing Lockout Warning Banner (Section 4.B) */}
               {isLockedOut && (
-                <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-950 flex flex-wrap items-center justify-between gap-3 shadow-md animate-pulse">
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-300 text-rose-950 flex flex-wrap items-center justify-between gap-3 shadow-xs">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-sm shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
                       <i className="fa-solid fa-snowflake"></i>
                     </div>
                     <div>
-                      <div className="text-xs font-black tracking-tight flex items-center gap-2">
-                        <span>⚠ BATTERY PROTECTION ACTIVE (FREEZE LOCKOUT)</span>
-                        <span className="text-[9px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full uppercase">
+                      <div className="text-xs font-bold tracking-tight flex items-center gap-2">
+                        <span>BATTERY PROTECTION ACTIVE (FREEZE LOCKOUT)</span>
+                        <span className="text-[9px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded uppercase font-bold">
                           Temp: {tempC}°C ≤ -35°C
                         </span>
                       </div>
@@ -580,10 +580,10 @@ export default function BatteryModal({
           {activeTab === 'sizing' && (
             <div className="flex flex-col gap-4 animate-fadeIn">
               {/* Engineering Insight Banner */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#e5f6fd] via-white to-[#e5f6fd] border border-[#bcecfc] shadow-xs">
+              <div className="p-4 rounded-xl bg-[#e5f6fd]/50 border border-[#bcecfc] shadow-xs">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-[#0699C6] text-white flex items-center justify-center font-black text-sm shrink-0">
-                    <i className="fa-solid fa-lightbulb"></i>
+                  <div className="w-8 h-8 rounded-lg bg-[#0699C6] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                    <i className="fa-solid fa-circle-info"></i>
                   </div>
                   <div>
                     <span className="text-xs font-black text-[#127694] uppercase tracking-tight block">

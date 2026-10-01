@@ -151,9 +151,9 @@ export default function PowerBalanceBanner({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>✓ Verified Thermodynamic Equilibrium (±0.0 kW)</span>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+            <span>Verified Thermodynamic Equilibrium (±0.0 kW)</span>
           </span>
           <span className="text-[10px] text-slate-400 hidden xl:inline font-mono">
             P_gen + P_bat_dis = P_load + P_bat_chg + P_curt

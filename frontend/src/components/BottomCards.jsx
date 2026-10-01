@@ -7,9 +7,9 @@ const SCENARIOS = [
     id: 'NORMAL',
     name: 'Normal Operation',
     tag: 'Nominal',
-    badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
     icon: 'fa-check-circle',
-    color: 'emerald',
+    color: 'slate',
     severity: 'NOMINAL',
     cause: 'Nominal Antarctic conditions (-24°C, 11 m/s wind, 180 W/m² solar irradiance).',
     effect: 'Standard MILP Tier-3 dispatch balancing wind, solar PV, BESS peak shaving, and G1 CHP heat recovery.',
@@ -19,9 +19,9 @@ const SCENARIOS = [
     id: 'EXTREME_COLD',
     name: 'Extreme Cold (-45°C)',
     tag: 'Thermal Surge',
-    badgeClass: 'bg-sky-100 text-sky-800 border-sky-300',
+    badgeClass: 'bg-rose-50 text-rose-800 border-rose-300',
     icon: 'fa-snowflake',
-    color: 'sky',
+    color: 'rose',
     severity: 'CRITICAL',
     cause: 'Polar vortex plunges ambient temperature to -45.0°C; habitat thermal deficit surges +48%.',
     effect: 'BESS throughput derated to 80 kW. Thermal load surges to 145 kWth. G1 CHP maxed; G2 jacket pre-heaters engaged.',
@@ -31,7 +31,7 @@ const SCENARIOS = [
     id: 'BLIZZARD_HIGH_WIND',
     name: 'Blizzard / High Wind',
     tag: 'Wind Cutout',
-    badgeClass: 'bg-rose-100 text-rose-800 border-rose-300',
+    badgeClass: 'bg-rose-50 text-rose-800 border-rose-300',
     icon: 'fa-wind',
     color: 'rose',
     severity: 'CRITICAL',
@@ -43,9 +43,9 @@ const SCENARIOS = [
     id: 'LOW_SOLAR',
     name: 'Low Solar (Polar Night)',
     tag: 'Solar 0 W/m²',
-    badgeClass: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+    badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
     icon: 'fa-moon',
-    color: 'indigo',
+    color: 'amber',
     severity: 'WARNING',
     cause: 'Polar night and cloud cover reduce solar irradiance to 0.0 W/m².',
     effect: 'Solar array produces 0.0 kW. Unit commitment redistributes baseload to wind and diesel with BESS diurnal buffering.',
@@ -55,7 +55,7 @@ const SCENARIOS = [
     id: 'BATTERY_DEGRADATION',
     name: 'Battery Degradation',
     tag: 'SOH 62%',
-    badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
+    badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
     icon: 'fa-battery-quarter',
     color: 'amber',
     severity: 'WARNING',
@@ -67,9 +67,9 @@ const SCENARIOS = [
     id: 'GENERATOR_FAILURE',
     name: 'Generator Failure (G1)',
     tag: 'N-1 Trip',
-    badgeClass: 'bg-red-100 text-red-800 border-red-300',
+    badgeClass: 'bg-rose-50 text-rose-800 border-rose-300',
     icon: 'fa-triangle-exclamation',
-    color: 'red',
+    color: 'rose',
     severity: 'CRITICAL',
     cause: 'Primary Generator G1 suffers mechanical trip (oil pressure loss) dropping from 72 kW to 0.0 kW instantly.',
     effect: 'Grid-forming BESS injects power in 15 ms to halt frequency drop. Standby G2 auto-starts, synchronizes, and ramps to 120 kW.',
@@ -79,9 +79,9 @@ const SCENARIOS = [
     id: 'MICROGRID_ISOLATION',
     name: 'Microgrid Isolation',
     tag: 'Islanded',
-    badgeClass: 'bg-purple-100 text-purple-800 border-purple-300',
+    badgeClass: 'bg-amber-50 text-amber-800 border-amber-300',
     icon: 'fa-shield-halved',
-    color: 'purple',
+    color: 'amber',
     severity: 'WARNING',
     cause: 'Inter-tie breaker open; station microgrid isolated in autonomous self-sustaining islanded mode.',
     effect: 'Grid-forming BESS establishes 50.0 Hz voltage reference. Spinning reserve target raised to 30% for contingency containment.',
@@ -128,7 +128,7 @@ export default function BottomCards({
         />
 
         {/* 2. MAINTENANCE & ASSET HEALTH CARD */}
-        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-[#f7fcfe]">
+        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-white">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -139,8 +139,8 @@ export default function BottomCards({
                   Maintenance &amp; Health
                 </span>
               </div>
-              <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                {overallHealth}% Stable
+              <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
+                ● {overallHealth}% Stable
               </span>
             </div>
             <p className="text-[10px] text-slate-400 mb-2.5">
@@ -156,7 +156,7 @@ export default function BottomCards({
                   <i className="fa-solid fa-circle-exclamation text-amber-600"></i>
                   Generator G2 Health: {g2Health}%
                 </span>
-                <span className="text-[9px] bg-amber-200/80 text-amber-800 px-1.5 py-0.5 rounded-full font-bold">
+                <span className="text-[9px] bg-amber-200/80 text-amber-800 px-1.5 py-0.5 rounded font-bold">
                   Recommended
                 </span>
               </div>
@@ -177,7 +177,7 @@ export default function BottomCards({
             <button
               type="button"
               onClick={() => onOpenModal('maintenance')}
-              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#bcecfc] transition shadow-xs flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] font-bold text-xs border border-[#bcecfc] transition shadow-xs flex items-center gap-1.5 cursor-pointer"
             >
               <i className="fa-solid fa-wrench text-xs text-[#0699C6]"></i>
               <span>VIEW MAINTENANCE</span>
@@ -186,18 +186,18 @@ export default function BottomCards({
         </div>
 
         {/* 3. EXTREME POLAR SCENARIO ENGINE */}
-        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-gradient-to-br from-white via-white to-[#fffafb] border-2 border-slate-200 hover:border-[#bcecfc] transition">
+        <div className="novara-card p-4 sm:p-5 flex flex-col justify-between bg-white border border-[#bcecfc] transition">
           <div>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                <div className="w-7 h-7 rounded-lg bg-[#c2f0fe] text-[#0699C6] flex items-center justify-center font-bold text-xs">
                   <i className="fa-solid fa-flask-vial"></i>
                 </div>
                 <span className="font-extrabold text-xs text-[#127694] uppercase tracking-tight">
                   Extreme Polar Scenario Engine
                 </span>
               </div>
-              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full border ${activeScenario.badgeClass}`}>
+              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded border ${activeScenario.badgeClass}`}>
                 {activeScenario.severity} ● {activeScenario.name}
               </span>
             </div>

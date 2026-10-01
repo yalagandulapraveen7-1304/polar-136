@@ -1051,7 +1051,7 @@ export default function ManualEntryModal({
                   ) : appliedSuccess ? (
                     <>
                       <i className="fa-solid fa-circle-check text-xs"></i>
-                      <span>Applied &amp; Re-Optimized ✓</span>
+                      <span>Applied &amp; Re-Optimized</span>
                     </>
                   ) : (
                     <>
@@ -1281,7 +1281,7 @@ export default function ManualEntryModal({
                     <ul className="space-y-1 text-[11px] text-slate-200">
                       {scenarioControl.summary_card.recommended_mitigations?.map((m, i) => (
                         <li key={i} className="flex items-start gap-1.5">
-                          <span className="text-emerald-400">✓</span> {m}
+                          <span className="text-emerald-400">●</span> {m}
                         </li>
                       ))}
                     </ul>
@@ -1375,8 +1375,8 @@ export default function ManualEntryModal({
                 {/* Benchmark Verification Banner */}
                 <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 p-3 rounded-2xl flex items-center justify-between text-xs shadow-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold">
-                      ✓
+                    <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+                      <i className="fa-solid fa-check text-xs"></i>
                     </div>
                     <div>
                       <div className="font-extrabold">{winterReport.benchmark_name}</div>

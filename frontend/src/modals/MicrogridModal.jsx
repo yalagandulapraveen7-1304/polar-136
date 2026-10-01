@@ -289,7 +289,7 @@ export default function MicrogridModal({
         <div className="flex items-center gap-1 px-6 pt-3 border-b border-[#bcecfc]/40 bg-[#f8fcfe] overflow-x-auto">
           {[
             { id: 'balance', label: '1. Live Microgrid Flow', icon: 'fa-diagram-project' },
-            { id: 'advisor', label: '2. Forecast-Aware Dispatch', icon: 'fa-brain' },
+            { id: 'advisor', label: '2. Forecast-Aware Dispatch', icon: 'fa-microchip' },
             { id: 'generators', label: '3. Dual Gensets & CHP', icon: 'fa-gears' },
             { id: 'blackout', label: '4. Blackout Defense & Shedding', icon: 'fa-shield-halved' },
             { id: 'historical', label: '5. Analytics & Comparison', icon: 'fa-chart-column' }
@@ -474,7 +474,7 @@ export default function MicrogridModal({
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-[#127694] flex items-center justify-center font-bold">
-                      <i className="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                      <i className="fa-solid fa-microchip text-sm"></i>
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-[#0699C6] uppercase tracking-wider font-mono">

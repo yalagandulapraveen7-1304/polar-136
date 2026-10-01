@@ -181,7 +181,7 @@ export default function DigitalTwinModal({
               className="px-3 py-1.5 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] text-xs font-bold border border-[#bcecfc] transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               title="Ask Copilot about asset health"
             >
-              <i className="fa-solid fa-robot text-indigo-500"></i>
+              <i className="fa-solid fa-microchip text-[#0699C6]"></i>
               <span>Consult Copilot</span>
             </button>
             <button
@@ -220,7 +220,7 @@ export default function DigitalTwinModal({
                   : 'text-slate-600 hover:text-[#127694] hover:bg-[#edf9fd]'
               }`}
             >
-              <i className="fa-solid fa-wand-magic-sparkles text-amber-400 text-xs"></i>
+              <i className="fa-solid fa-sliders text-xs"></i>
               <span>"What-If" Cause &amp; Effect</span>
             </button>
 
@@ -550,7 +550,7 @@ export default function DigitalTwinModal({
                     onClick={() => setActiveTab('whatif')}
                     className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#127694] text-xs font-bold border border-[#bcecfc] shadow-xs flex items-center gap-1.5"
                   >
-                    <i className="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                    <i className="fa-solid fa-sliders text-[#0699C6]"></i>
                     <span>Test Subsystem Resilience in What-If</span>
                   </button>
                   <button
@@ -578,7 +578,7 @@ export default function DigitalTwinModal({
                 <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-slate-100">
                   <div>
                     <h3 className="text-sm font-black text-[#127694] uppercase flex items-center gap-2">
-                      <i className="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                      <i className="fa-solid fa-sliders text-[#0699C6]"></i>
                       Interactive Contingency Cause &amp; Effect Simulator
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">

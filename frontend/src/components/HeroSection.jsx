@@ -146,12 +146,12 @@ export default function HeroSection({
   const curForecast = forecastConfigs[forecastHorizon] || forecastConfigs['6h'];
 
   return (
-    <div className="novara-card p-4 sm:p-5 flex flex-col gap-4 overflow-hidden bg-gradient-to-b from-white via-[#f7fcfe] to-[#edf8fc] relative">
+    <div className="novara-card p-4 sm:p-5 flex flex-col gap-4 overflow-hidden bg-white relative">
 
       {/* 1. POLAR ENERGY DISPATCH STATUS STRIP */}
-      <div className="w-full p-2.5 rounded-2xl bg-[#e5f6fd] border border-[#bcecfc] flex items-center justify-between text-xs text-[#127694] font-bold shadow-sm">
+      <div className="w-full p-2.5 rounded-2xl bg-[#e5f6fd] border border-[#bcecfc] flex items-center justify-between text-xs text-[#127694] font-bold shadow-xs">
         <span className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
           <span>POLAR ENERGY DISPATCH · 0.00 kW residual · AI LP Optimizer active · 68.2% Green Share</span>
         </span>
         <span className="text-[10px] font-mono bg-white text-[#0699C6] px-2.5 py-0.5 rounded-full border border-[#bcecfc]">
@@ -162,17 +162,17 @@ export default function HeroSection({
       {/* 2. SUB-HEADER: TABS (COPILOT & SCHEMATIC vs PREDICTIVE HORIZON) */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#bcecfc]/40 pb-2">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#bcecfc] shadow-sm">
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-xl border border-[#bcecfc] shadow-xs">
             <button
               type="button"
               onClick={() => setCenterTab('copilot')}
               className={`px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${
                 centerTab === 'copilot'
-                  ? 'bg-[#127694] text-white shadow-sm'
+                  ? 'bg-[#127694] text-white shadow-xs'
                   : 'text-slate-600 hover:text-[#0699C6]'
               }`}
             >
-              <i className="fa-solid fa-robot text-xs"></i>
+              <i className="fa-solid fa-microchip text-xs"></i>
               <span>POLAR AI COPILOT</span>
             </button>
             <button
@@ -235,8 +235,8 @@ export default function HeroSection({
             <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-[#bcecfc] shadow-sm relative overflow-hidden">
               <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-[#0699C6] text-white flex items-center justify-center text-xs font-bold shadow-sm">
-                    <i className="fa-solid fa-brain"></i>
+                  <div className="w-7 h-7 rounded-lg bg-[#0699C6] text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                    <i className="fa-solid fa-microchip"></i>
                   </div>
                   <span className="text-xs font-black text-[#127694] tracking-tight uppercase">
                     Autonomous Dispatch Advisory
@@ -289,18 +289,18 @@ export default function HeroSection({
                   <button
                     type="button"
                     onClick={() => onOpenModal('recommendations')}
-                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-50 via-yellow-50/90 to-amber-100/70 hover:from-amber-100 hover:to-yellow-100 text-amber-900/85 hover:text-amber-900 font-bold text-xs border border-amber-200/90 shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-xs transition flex items-center gap-1.5 cursor-pointer"
                     title="Open Full Engineering & Operational Recommendations Console"
                   >
-                    <i className="fa-solid fa-list-check text-amber-600"></i>
+                    <i className="fa-solid fa-list-check text-[#0699C6]"></i>
                     <span>VIEW RECOMMENDATIONS ({latestData?.recommendations?.items?.length || 4})</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => onOpenModal('copilot')}
-                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-extrabold text-xs border border-slate-200 transition shadow-xs flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
-                    <i className="fa-solid fa-lightbulb text-amber-500"></i>
+                    <i className="fa-solid fa-circle-info text-[#0699C6]"></i>
                     <span>AI EXPLANATION</span>
                   </button>
                 </div>
@@ -311,7 +311,7 @@ export default function HeroSection({
                   className={`px-4 py-1.5 rounded-xl font-extrabold text-xs transition shadow flex items-center gap-1.5 ${
                     isG2Dispatched
                       ? 'bg-emerald-600 text-white cursor-default'
-                      : 'bg-[#0699C6] hover:bg-[#05C5FF] text-white'
+                      : 'bg-[#0699C6] hover:bg-[#05C5FF] text-white cursor-pointer'
                   }`}
                 >
                   <i className={`fa-solid ${isG2Dispatched ? 'fa-check' : 'fa-play'} text-xs`}></i>
@@ -333,16 +333,16 @@ export default function HeroSection({
                 />
                 <button
                   type="submit"
-                  className="px-3.5 py-1.5 rounded-full bg-[#0699C6] hover:bg-[#05C5FF] text-white font-bold text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm"
+                  className="px-3.5 py-1.5 rounded-full bg-[#0699C6] hover:bg-[#05C5FF] text-white font-bold text-xs transition flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
                 >
-                  <i className="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                  <i className="fa-solid fa-paper-plane text-xs"></i>
                   <span className="hidden sm:inline">Ask Copilot</span>
                 </button>
                 <button
                   type="button"
                   title="Expand Full Chatbot Dialog"
                   onClick={() => onOpenModal('copilot')}
-                  className="p-1.5 rounded-full text-slate-400 hover:text-[#0699C6] hover:bg-slate-100 transition shrink-0"
+                  className="p-1.5 rounded-full text-slate-400 hover:text-[#0699C6] hover:bg-slate-100 transition shrink-0 cursor-pointer"
                 >
                   <i className="fa-solid fa-up-right-and-down-left-from-center text-xs"></i>
                 </button>
@@ -359,7 +359,7 @@ export default function HeroSection({
                     handleAskCopilot('Explain the latest system decision and dispatch action.');
                   }}
                 >
-                  <i className="fa-solid fa-brain text-[9px] mr-1 text-[#0699C6]"></i>
+                  <i className="fa-solid fa-circle-question text-[9px] mr-1 text-[#0699C6]"></i>
                   Explain Decision
                 </button>
                 <button
@@ -409,7 +409,7 @@ export default function HeroSection({
                 <div className="mt-2.5 p-3 rounded-2xl bg-white border border-[#05C5FF]/50 shadow-md">
                   <div className="flex items-center justify-between pb-1 mb-1 border-b border-[#bcecfc]/40 text-xs font-bold text-[#127694]">
                     <span className="flex items-center gap-1.5">
-                      <i className="fa-solid fa-robot text-xs text-[#05C5FF]"></i>
+                      <i className="fa-solid fa-microchip text-xs text-[#0699C6]"></i>
                       Polar AI Response
                     </span>
                     <button

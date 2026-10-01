@@ -39,15 +39,15 @@ export default function CriticalAlertBanner({
   return (
     <div className="w-full animate-fadeIn transition-all duration-300">
       {!isG2Dispatched ? (
-        <div className="w-full p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 border-2 border-rose-300 flex flex-wrap items-center justify-between gap-3 shadow-md animate-pulse">
+        <div className="w-full p-3 sm:p-3.5 rounded-xl bg-rose-50 border border-rose-300 flex flex-wrap items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
               <i className="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
-              <div className="text-xs sm:text-sm font-black text-rose-900 tracking-tight flex items-center gap-2 flex-wrap">
-                <span>⚠ CRITICAL RENEWABLE DEFICIT PREDICTED (-{deficitKw.toFixed(0)} kW at {projectedTimeStr})</span>
-                <span className="text-[9px] bg-rose-200 text-rose-800 px-2 py-0.5 rounded-full font-extrabold uppercase border border-rose-300">
+              <div className="text-xs sm:text-sm font-bold text-rose-900 tracking-tight flex items-center gap-2 flex-wrap">
+                <span>CRITICAL RENEWABLE DEFICIT PREDICTED (-{deficitKw.toFixed(0)} kW at {projectedTimeStr})</span>
+                <span className="text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded font-bold uppercase border border-rose-200">
                   Action Required
                 </span>
               </div>
@@ -60,22 +60,22 @@ export default function CriticalAlertBanner({
             <button
               type="button"
               onClick={onAcceptRecommendation}
-              className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer"
             >
-              <i className="fa-solid fa-bolt"></i>
+              <i className="fa-solid fa-bolt text-xs"></i>
               <span>Auto-Dispatch G2 (85 kW)</span>
             </button>
             <button
               type="button"
               onClick={() => onOpenModal && onOpenModal('copilot', `Why is a critical renewable deficit predicted for ${stationShortName} at ${projectedTimeStr}, and why must Generator G2 be dispatched at 85 kW?`)}
-              className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-rose-200 transition shadow-xs cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-rose-200 transition cursor-pointer"
             >
               Inspect Why
             </button>
             <button
               type="button"
               onClick={() => setIsDismissed(true)}
-              className="w-8 h-8 rounded-xl bg-rose-100/60 hover:bg-rose-200 text-rose-700 font-bold text-xs flex items-center justify-center transition cursor-pointer"
+              className="w-7 h-7 rounded-lg bg-rose-100/60 hover:bg-rose-200 text-rose-700 font-bold text-xs flex items-center justify-center transition cursor-pointer"
               title="Dismiss Notification"
             >
               <i className="fa-solid fa-xmark text-sm"></i>
@@ -83,13 +83,13 @@ export default function CriticalAlertBanner({
           </div>
         </div>
       ) : (
-        <div className="w-full p-2.5 sm:p-3 rounded-2xl bg-emerald-50 border border-emerald-300 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-900 font-bold shadow-xs">
+        <div className="w-full p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-900 font-semibold shadow-xs">
           <span className="flex items-center gap-2">
-            <i className="fa-solid fa-circle-check text-emerald-600 text-base"></i>
+            <i className="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
             <span>RECOMMENDATION APPLIED: Generator G2 dispatched at 85 kW. {stationShortName} deficit neutralized · 0.00 kW residual.</span>
           </span>
-          <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300">
-            20% Reserve Protected ✓
+          <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
+            20% Reserve Protected
           </span>
         </div>
       )}

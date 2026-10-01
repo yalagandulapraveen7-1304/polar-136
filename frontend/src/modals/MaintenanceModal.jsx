@@ -14,7 +14,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
 
   const handleAck = () => {
     setIsAcked(true);
-    setAckText('Telemetry Verified ✓');
+    setAckText('Telemetry Verified');
     setTimeout(() => {
       setIsAcked(false);
       setAckText('Acknowledge Telemetry');
@@ -289,7 +289,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                     <td className="p-2.5 font-bold text-[#127694]">$463,894</td>
                     <td className="p-2.5">414.4 T</td>
                     <td className="p-2.5 text-slate-800">$108,000</td>
-                    <td className="p-2.5 font-bold text-emerald-700">1.01 Years ★</td>
+                    <td className="p-2.5 font-bold text-emerald-700">1.01 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-[#f0faff]/60">
                     <td className="p-2.5 font-bold text-[#127694]">Double Wind (200 kW)</td>

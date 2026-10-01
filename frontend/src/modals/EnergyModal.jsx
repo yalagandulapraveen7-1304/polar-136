@@ -407,9 +407,9 @@ export default function EnergyModal({
 
               {/* Curtailment & Advisor Advisory */}
               {recommendation && (
-                <div className="bg-gradient-to-r from-[#edf9fd] to-white p-4 rounded-2xl border border-[#bcecfc] shadow-xs">
+                <div className="bg-[#edf9fd]/50 p-4 rounded-xl border border-[#bcecfc] shadow-xs">
                   <div className="flex items-center gap-2 mb-2">
-                    <i className="fa-solid fa-lightbulb text-amber-500"></i>
+                    <i className="fa-solid fa-circle-info text-[#0699C6]"></i>
                     <h4 className="text-xs font-black text-[#127694] uppercase tracking-wider">
                       Microgrid Operational Advisory
                     </h4>
@@ -488,13 +488,13 @@ export default function EnergyModal({
                         <td className="py-2 px-4 font-bold text-slate-900 font-sans">Bifacial Solar PV</td>
                         <td className="py-2 px-4 text-amber-700 font-bold">{solarKw.toFixed(1)} kW</td>
                         <td className="py-2 px-4 text-slate-500">0 – 120 kW</td>
-                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">✓ Max Renewable Capture</td>
+                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">Max Renewable Capture</td>
                       </tr>
                       <tr>
                         <td className="py-2 px-4 font-bold text-slate-900 font-sans">Polar Wind Turbines</td>
                         <td className="py-2 px-4 text-sky-700 font-bold">{windKw.toFixed(1)} kW</td>
                         <td className="py-2 px-4 text-slate-500">0 – 250 kW</td>
-                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">✓ Pitch Angle Active</td>
+                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">Pitch Angle Active</td>
                       </tr>
                       <tr>
                         <td className="py-2 px-4 font-bold text-slate-900 font-sans">LiFePO4 BESS Net</td>
@@ -502,19 +502,19 @@ export default function EnergyModal({
                           {battRateKw > 0 ? `+${battRateKw.toFixed(1)} kW (Discharge)` : battRateKw < 0 ? `${battRateKw.toFixed(1)} kW (Charge)` : '0.0 kW'}
                         </td>
                         <td className="py-2 px-4 text-slate-500">-100 kW to +100 kW</td>
-                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">✓ Heated Envelope Normal</td>
+                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">Heated Envelope Normal</td>
                       </tr>
                       <tr>
                         <td className="py-2 px-4 font-bold text-slate-900 font-sans">Genset D16 (Primary)</td>
                         <td className="py-2 px-4 text-orange-700 font-bold">{pGenset1.toFixed(1)} kW</td>
                         <td className="py-2 px-4 text-slate-500">40 – 120 kW</td>
-                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">✓ Min 40% loading satisfied</td>
+                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">Min 40% loading satisfied</td>
                       </tr>
                       <tr>
                         <td className="py-2 px-4 font-bold text-slate-900 font-sans">Renewable Curtailment</td>
                         <td className="py-2 px-4 text-slate-700 font-bold">{(curt.power_curtailed_kw || 0).toFixed(1)} kW</td>
                         <td className="py-2 px-4 text-slate-500">0 kW (No curtailment)</td>
-                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">✓ 100% Green Absorption</td>
+                        <td className="py-2 px-4 text-emerald-700 font-bold font-sans">100% Green Absorption</td>
                       </tr>
                     </tbody>
                   </table>

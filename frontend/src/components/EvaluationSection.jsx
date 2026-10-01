@@ -288,7 +288,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-600 flex justify-between">
             <span>Life-Support Guarantee:</span>
-            <strong className="text-emerald-700 font-mono">0.00 unserved energy ✓</strong>
+            <strong className="text-emerald-700 font-mono">0.00 unserved energy</strong>
           </div>
         </div>
 
@@ -300,7 +300,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
                 <i className="fa-solid fa-battery-half text-[#0699C6]"></i>
                 Reserve Floor Violations
               </span>
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <span className="text-[10px] font-black px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
                 ≥20% HELD
               </span>
             </div>
@@ -319,7 +319,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-600 flex justify-between">
             <span>Reserve Floor Status:</span>
-            <strong className="text-emerald-700 font-mono">Strictly ≥ 20.0% protected ✓</strong>
+            <strong className="text-emerald-700 font-mono">Strictly ≥ 20.0% protected</strong>
           </div>
         </div>
       </div>

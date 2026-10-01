@@ -136,7 +136,7 @@ export async function executeCopilotAction({
     markActionExecuted(lockKey);
     if (recommendationId) markActionExecuted(recommendationId);
 
-    const successMsg = data.message || `Action '${actionType}' executed successfully ✓`;
+    const successMsg = data.message || `Action '${actionType}' executed successfully`;
     notifyState('SUCCESS', successMsg);
 
     if (typeof onSuccess === 'function') {

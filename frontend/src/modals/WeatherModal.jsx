@@ -237,10 +237,10 @@ export default function WeatherModal({
                 </div>
 
                 <div className="flex items-center gap-2 text-[10px] font-mono">
-                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Temp: ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Wind: ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Solar: ✓</span>
-                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-400">Pressure: ✓</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-700">Temp: OK</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-700">Wind: OK</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-700">Solar: OK</span>
+                  <span className="px-2 py-0.5 rounded bg-slate-100 border border-emerald-500/30 text-emerald-700">Pressure: OK</span>
                 </div>
               </div>
 

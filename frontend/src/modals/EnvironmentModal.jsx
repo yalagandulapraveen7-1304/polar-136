@@ -193,7 +193,7 @@ export default function EnvironmentModal({
                 : 'text-slate-600 hover:bg-[#edf9fd] hover:text-[#0699C6]'
             }`}
           >
-            <i className="fa-solid fa-brain text-xs"></i>
+            <i className="fa-solid fa-chart-line text-xs"></i>
             <span>Forecast Intelligence &amp; Accuracy</span>
           </button>
 

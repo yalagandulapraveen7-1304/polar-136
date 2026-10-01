@@ -165,10 +165,10 @@ export default function RecommendationsModal({ isOpen, onClose, latestData, stat
       <div className="relative w-full max-w-6xl h-[92vh] bg-white rounded-3xl shadow-2xl border border-[#bcecfc] flex flex-col overflow-hidden font-sans text-slate-800">
         
         {/* HEADER BAR */}
-        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#edf9fd] via-white to-[#edf9fd] border-b border-[#bcecfc] shrink-0">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#f0faff]/60 border-b border-[#bcecfc] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
-              <i className="fa-solid fa-lightbulb text-lg text-white"></i>
+            <div className="w-9 h-9 rounded-xl bg-[#0699C6] text-white flex items-center justify-center shadow-xs shrink-0">
+              <i className="fa-solid fa-circle-info text-base text-white"></i>
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -725,7 +725,7 @@ export default function RecommendationsModal({ isOpen, onClose, latestData, stat
                       ]).map((row) => (
                         <tr key={row.capacity_kwh} className={`hover:bg-[#f0faff] ${row.capacity_kwh === 400 ? 'bg-cyan-50/60 font-bold' : ''}`}>
                           <td className="py-2.5 px-3 font-bold text-slate-900">
-                            {row.capacity_kwh} kWh {row.capacity_kwh === 400 ? '★ Current' : ''}
+                            {row.capacity_kwh} kWh {row.capacity_kwh === 400 ? '(Current)' : ''}
                           </td>
                           <td className={`py-2.5 px-3 ${row.unserved_kwh > 0 ? 'text-rose-700 font-bold' : 'text-emerald-700'}`}>
                             {row.unserved_kwh.toFixed(1)}

@@ -500,7 +500,7 @@ export default function DispatchModal({
                     <td className="p-2">100 kW / 120 kW / 400 kWh</td>
                     <td className="p-2 font-bold text-emerald-600">154,631 L ($464K)</td>
                     <td className="p-2 font-mono text-slate-800">$108,000</td>
-                    <td className="p-2 font-bold text-emerald-700">1.01 Years ★</td>
+                    <td className="p-2 font-bold text-emerald-700">1.01 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-[#f0faff]">
                     <td className="p-2 font-bold text-[#127694]">Double Wind (200 kW)</td>

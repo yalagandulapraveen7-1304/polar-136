@@ -310,10 +310,10 @@ export default function CopilotModal({
         if (state === 'VALIDATING' || state === 'EXECUTING') {
           setActionNotice(message);
         } else if (state === 'SUCCESS') {
-          setActionNotice(`✓ ${message}`);
+          setActionNotice(message);
           setTimeout(() => setActionNotice(null), 5000);
         } else if (state === 'FAILED') {
-          setActionNotice(`⚠ Action Blocked: ${message}`);
+          setActionNotice(`Action Blocked: ${message}`);
           setTimeout(() => setActionNotice(null), 6000);
         }
       },
@@ -390,10 +390,10 @@ export default function CopilotModal({
       <div className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-3xl bg-white border border-[#bcecfc] text-slate-800 shadow-2xl(2,132,199,0.25)] overflow-hidden">
         
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between px-6 py-3.5 border-b border-[#bcecfc]/60 bg-gradient-to-r from-[#f0faff] via-white to-[#f0faff] gap-3">
+        <div className="flex flex-wrap items-center justify-between px-6 py-3.5 border-b border-[#bcecfc]/60 bg-[#f0faff]/60 gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#0699C6] to-[#05C5FF] flex items-center justify-center text-white shadow-lg">
-              <i className="fa-solid fa-robot text-lg"></i>
+            <div className="w-9 h-9 rounded-xl bg-[#0699C6] flex items-center justify-center text-white shadow-xs">
+              <i className="fa-solid fa-microchip text-base"></i>
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -405,7 +405,7 @@ export default function CopilotModal({
                 <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-slate-100 border border-slate-200">
                   <span className="text-slate-400">Mode:</span>
                   <span className={`flex items-center gap-1 ${activeModeDisplay === 'CLOUD' ? 'text-[#127694]' : 'text-amber-800'}`}>
-                    <span className={`w-2 h-2 rounded-full ${activeModeDisplay === 'CLOUD' ? 'bg-cyan-400 animate-pulse' : 'bg-amber-400'}`}></span>
+                    <span className={`w-2 h-2 rounded-full ${activeModeDisplay === 'CLOUD' ? 'bg-[#0699C6]' : 'bg-amber-500'}`}></span>
                     {activeModeDisplay === 'CLOUD' ? 'CLOUD' : 'LOCAL FALLBACK'}
                   </span>
                 </div>
@@ -523,7 +523,7 @@ export default function CopilotModal({
                 : 'text-slate-600 hover:text-[#0699C6] hover:bg-slate-100/70'
             }`}
           >
-            <i className="fa-solid fa-brain"></i>
+            <i className="fa-solid fa-cube"></i>
             <span>Digital Twin &amp; Residuals</span>
           </button>
 
@@ -625,8 +625,8 @@ export default function CopilotModal({
                     className={`flex items-start gap-2.5 ${m.sender === 'commander' ? 'justify-end' : 'justify-start'}`}
                   >
                     {m.sender === 'ai' && (
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0699C6] to-[#05C5FF] text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-md">
-                        <i className="fa-solid fa-robot"></i>
+                      <div className="w-8 h-8 rounded-xl bg-[#0699C6] text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-xs">
+                        <i className="fa-solid fa-microchip"></i>
                       </div>
                     )}
 
@@ -754,7 +754,7 @@ export default function CopilotModal({
                                           ? 'bg-emerald-600 text-white cursor-default'
                                           : isBlocked
                                             ? 'bg-rose-600 hover:bg-rose-500 text-white cursor-pointer'
-                                            : 'bg-gradient-to-r from-sky-500 to-[#0699C6] hover:from-sky-400 hover:to-[#05C5FF] text-white cursor-pointer'
+                                            : 'bg-[#0699C6] hover:bg-[#05C5FF] text-white cursor-pointer'
                                     }`}
                                   >
                                     {isExecuting && <i className="fa-solid fa-spinner fa-spin text-[10px]"></i>}
@@ -764,7 +764,7 @@ export default function CopilotModal({
                                       {isExecuting
                                         ? 'Executing...'
                                         : isExecuted
-                                          ? 'Executed ✓'
+                                          ? 'Executed'
                                           : isBlocked
                                             ? 'Retry Action'
                                             : (m.action_card.button_label || 'EXECUTE ACTION')}
