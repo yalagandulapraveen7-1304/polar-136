@@ -38,16 +38,71 @@ function validatePlausibility(t) {
   };
 }
 
+// Generate deterministic 50-step high-resolution fallback points for offline cold-starts
+function generateFallbackBuffer(stationId = 'MAITRI', count = 50) {
+  const isMaitri = (stationId || 'MAITRI').toUpperCase() === 'MAITRI';
+  const baseLoad = isMaitri ? 180.0 : 120.0;
+  const now = Date.now();
+  const buffer = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const t = new Date(now - i * 1000);
+    const timeLabel = t.toTimeString().substring(0, 8);
+    const loadKw = Number((baseLoad + Math.sin((now - i * 1000) / 10000) * 8.5).toFixed(1));
+    const windKw = Number((isMaitri ? 65.0 + Math.cos(i * 0.1) * 6.0 : 80.0 + Math.cos(i * 0.1) * 8.0).toFixed(1));
+    const solarKw = Number((isMaitri ? 42.0 + Math.sin(i * 0.05) * 5.0 : 35.0 + Math.sin(i * 0.05) * 4.0).toFixed(1));
+    const dieselKw = Number(Math.max(56.0, loadKw - windKw - solarKw).toFixed(1));
+    const genKw = Number((windKw + solarKw + dieselKw).toFixed(1));
+    buffer.push({
+      timestamp: t.toISOString(),
+      timeLabel,
+      load_kw: loadKw,
+      solar_kw: solarKw,
+      wind_kw: windKw,
+      diesel_kw: dieselKw,
+      battery_kw: 12.0,
+      generation_kw: genKw,
+      net_balance_kw: Number((genKw - loadKw).toFixed(2)),
+      soc_pct: 76.5,
+      grid_freq_hz: 50.01,
+      temp_c: isMaitri ? -28.4 : -18.2,
+      wind_speed_ms: 12.4
+    });
+  }
+  return buffer;
+}
+
+function loadCachedBuffer(stationId = 'MAITRI') {
+  try {
+    const key = `polar_telemetry_buffer_${(stationId || 'MAITRI').toUpperCase()}`;
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length >= 10) {
+        return parsed.slice(-50);
+      }
+    }
+  } catch (e) {}
+  return generateFallbackBuffer(stationId, 50);
+}
+
 export function TelemetryProvider({ children, activeStationId = 'MAITRI', mode = 'DEMO_MODE', initialData = null }) {
   const [connectionState, setConnectionState] = useState('CONNECTING'); // CONNECTING | CONNECTED | RECONNECTING | DISCONNECTED | STALE | ERROR
-  const [telemetryData, setTelemetryData] = useState(initialData);
+  const [telemetryData, setTelemetryData] = useState(() => {
+    if (initialData) return initialData;
+    try {
+      const st = (activeStationId || 'MAITRI').toUpperCase();
+      const raw = localStorage.getItem(`polar_last_snapshot_${st}`);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return null;
+  });
   const [lastPacketTime, setLastPacketTime] = useState(initialData ? Date.now() : null);
   const [staleSeconds, setStaleSeconds] = useState(0);
   const [isStale, setIsStale] = useState(false);
   const [latencyMs, setLatencyMs] = useState(12);
   const [packetCount, setPacketCount] = useState(0);
   const [retryCount, setRetryCount] = useState(0);
-  const [telemetryBuffer, setTelemetryBuffer] = useState([]);
+  const [telemetryBuffer, setTelemetryBuffer] = useState(() => loadCachedBuffer(activeStationId));
   const [sessionStartTime] = useState(() => Date.now());
   const [uptimeSeconds, setUptimeSeconds] = useState(0);
 
@@ -60,6 +115,7 @@ export function TelemetryProvider({ children, activeStationId = 'MAITRI', mode =
 
   useEffect(() => {
     activeStationIdRef.current = activeStationId;
+    setTelemetryBuffer(loadCachedBuffer(activeStationId));
   }, [activeStationId]);
 
   // Keep track of session uptime and stale status every 500ms
@@ -167,7 +223,12 @@ export function TelemetryProvider({ children, activeStationId = 'MAITRI', mode =
 
           setTelemetryBuffer((prev) => {
             const next = [...prev, point];
-            return next.length > MAX_BUFFER_POINTS ? next.slice(-MAX_BUFFER_POINTS) : next;
+            const sliced = next.length > MAX_BUFFER_POINTS ? next.slice(-MAX_BUFFER_POINTS) : next;
+            try {
+              const st = (activeStationIdRef.current || 'MAITRI').toUpperCase();
+              localStorage.setItem(`polar_telemetry_buffer_${st}`, JSON.stringify(sliced.slice(-50)));
+            } catch (e) {}
+            return sliced;
           });
         } catch (err) {
           console.warn('[TelemetryContext] Packet parse warning:', err);
@@ -294,6 +355,37 @@ export function TelemetryProvider({ children, activeStationId = 'MAITRI', mode =
       setTelemetryData(freshSnapshot);
       setLastPacketTime(Date.now());
       setIsStale(false);
+      try {
+        const st = (activeStationIdRef.current || 'MAITRI').toUpperCase();
+        localStorage.setItem(`polar_last_snapshot_${st}`, JSON.stringify(freshSnapshot));
+        const t = freshSnapshot?.telemetry || {};
+        const d = freshSnapshot?.dispatch || {};
+        const genKw = (d.p_solar_kw || 0) + (d.p_wind_kw || 0) + (d.p_diesel_1_kw || 0) + (d.p_diesel_2_kw || 0) + ((d.p_battery_discharge_kw || 0) > 0 ? (d.p_battery_discharge_kw || 0) : 0);
+        const loadKw = t.station_load_kwe !== undefined ? t.station_load_kwe : (t.load_elec_kw !== undefined ? t.load_elec_kw : 0);
+        const point = {
+          timestamp: freshSnapshot.timestamp || new Date().toISOString(),
+          timeLabel: new Date().toTimeString().substring(0, 8),
+          load_kw: loadKw,
+          solar_kw: d.p_solar_kw || t.solar_kw || 0,
+          wind_kw: d.p_wind_kw || t.wind_kw || 0,
+          diesel_kw: (d.p_diesel_1_kw || 0) + (d.p_diesel_2_kw || 0),
+          battery_kw: (d.p_battery_discharge_kw || 0) - (d.p_battery_charge_kw || 0),
+          generation_kw: genKw,
+          net_balance_kw: Number((genKw - loadKw).toFixed(2)),
+          soc_pct: t.battery_soc_pct !== undefined ? t.battery_soc_pct : 77.0,
+          grid_freq_hz: t.grid_frequency_hz || 50.02,
+          temp_c: t.ambient_temp_c !== undefined ? t.ambient_temp_c : -42.0,
+          wind_speed_ms: t.wind_speed_ms !== undefined ? t.wind_speed_ms : 25.9
+        };
+        setTelemetryBuffer((prev) => {
+          const next = [...prev, point];
+          const sliced = next.length > MAX_BUFFER_POINTS ? next.slice(-MAX_BUFFER_POINTS) : next;
+          try {
+            localStorage.setItem(`polar_telemetry_buffer_${st}`, JSON.stringify(sliced.slice(-50)));
+          } catch (e) {}
+          return sliced;
+        });
+      } catch (e) {}
     }
   }), [
     connectionState,

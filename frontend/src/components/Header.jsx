@@ -514,8 +514,22 @@ export default function Header({
 
         </nav>
 
-        {/* Right: 1-Click Polar Crisis Simulator & NCPOR Fiscal Ledger (Crisis Stress-Test Bench) */}
-        <div className="shrink-0">
+        {/* Right: 415V Single-Line Diagram & 1-Click Polar Crisis Simulator */}
+        <div className="shrink-0 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onOpenModal('sld')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black transition shadow-xs cursor-pointer border ${
+              activeModal === 'sld'
+                ? 'bg-[#0699C6] text-white border-[#05C5FF] shadow-md ring-2 ring-[#05C5FF]/40'
+                : 'bg-[#e5f6fd] hover:bg-[#c2f0fe] text-[#127694] border-[#bcecfc]'
+            }`}
+            title="Open Substation Single-Line Diagram (SLD) - Physical 415V Busbar & Protection Topology"
+          >
+            <i className="fa-solid fa-diagram-project text-xs text-[#0699C6]"></i>
+            <span className="uppercase tracking-tight">415V SLD</span>
+          </button>
+
           <button
             type="button"
             onClick={() => onOpenModal('crisis')}
@@ -669,6 +683,26 @@ export default function Header({
                   <span>5. EXPORT REPORTS</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-normal">Savings &amp; Evidence</span>
+              </button>
+
+              {/* 5.5 SUBSTATION SINGLE-LINE DIAGRAM (SLD) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('sld');
+                }}
+                className={`w-full p-2 rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
+                  activeModal === 'sld'
+                    ? 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc]'
+                    : 'bg-slate-50 hover:bg-[#edf9fd] text-slate-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-diagram-project text-[#0699C6]"></i>
+                  <span>415V SUBSTATION SLD</span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-normal">Physical Busbar &amp; CBs</span>
               </button>
 
               {/* 6. CRISIS SIMULATOR (LIVE BENCH) */}

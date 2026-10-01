@@ -9,13 +9,21 @@ export default function CrisisSimulatorModal({
   onApplyOverrides,
   onResetOverrides,
   onScenarioChange,
-  onResetScenario
+  onResetScenario,
+  initialTab = 'scenarios'
 }) {
-  const [activeTab, setActiveTab] = useState('scenarios'); // 'scenarios' | 'logistics' | 'sld' | 'iec_log'
+  const [activeTab, setActiveTab] = useState(initialTab || 'scenarios'); // 'scenarios' | 'logistics' | 'sld' | 'iec_log'
+  const [selectedAsset, setSelectedAsset] = useState(null);
   const [activeScenarioKey, setActiveScenarioKey] = useState(null);
   const [isSimulating, setIsSimulating] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [actionNotice, setActionNotice] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   // Dynamic Logistics Calculator state
   const [fuelCostPerLiter, setFuelCostPerLiter] = useState(195); // INR
@@ -753,132 +761,422 @@ export default function CrisisSimulatorModal({
               TAB 3: SUBSTATION SINGLE-LINE DIAGRAM (SLD)
               ========================================================================= */}
           {activeTab === 'sld' && (
-            <div className="space-y-6">
-              <div className="p-4 rounded-xl bg-slate-900 text-white font-mono text-xs flex items-center justify-between border border-slate-700">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>SUBSTATION BUS-A/B/C REAL-TIME POWER VECTOR TOPOLOGY</span>
+            <div className="space-y-4">
+              {/* SLD Header Bar */}
+              <div className="p-4 rounded-2xl bg-slate-950 text-white font-mono text-xs flex flex-wrap items-center justify-between gap-3 border border-slate-800 shadow-md">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                  <span className="font-extrabold text-cyan-300 uppercase tracking-wider text-xs sm:text-sm">
+                    {currentStation.name} · Substation Single-Line Diagram (415V SLD)
+                  </span>
+                  <span className="hidden md:inline px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 text-[10px]">
+                    IEC-61850-7-4 MMS
+                  </span>
                 </div>
-                <span className="text-[10px] text-cyan-300">IEC-61850 GOOSE FAST SYNCHROCHECK</span>
+                <div className="flex items-center gap-4 text-[11px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400">Bus:</span>
+                    <strong className="text-cyan-300 font-bold">{t.bus_voltage_v ? Number(t.bus_voltage_v).toFixed(1) : '415.2'} V</strong>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400">Freq:</span>
+                    <strong className="text-emerald-400 font-bold">{t.grid_frequency_hz ? Number(t.grid_frequency_hz).toFixed(2) : '50.02'} Hz</strong>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-slate-400">Synchrocheck:</span>
+                    <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold text-[10px]">
+                      LOCKED (Δθ 0.4°)
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              {/* Graphical SLD Canvas / Visual Layout */}
-              <div className="p-6 rounded-2xl bg-[#09111e] border border-cyan-900/60 relative overflow-hidden">
-                {/* Circuit Breakers & Bus Visual */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+              {/* Graphical SVG Single-Line Canvas */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#06111f] to-[#040913] border border-cyan-900/60 shadow-xl overflow-x-auto relative">
+                
+                {/* Vector SVG Diagram */}
+                <svg
+                  viewBox="0 0 960 440"
+                  className="w-full min-w-[760px] h-auto select-none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <defs>
+                    {/* Linear Gradients */}
+                    <linearGradient id="busGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#05C5FF" stopOpacity="0.9" />
+                      <stop offset="50%" stopColor="#00e5ff" stopOpacity="1" />
+                      <stop offset="100%" stopColor="#0699C6" stopOpacity="0.9" />
+                    </linearGradient>
+                    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor="#0f1f38" stopOpacity="0.95" />
+                      <stop offset="100%" stopColor="#0a1424" stopOpacity="0.95" />
+                    </linearGradient>
+                    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
+                      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                  </defs>
+
+                  {/* -------------------------------------------------------------
+                      ROW 1: GENERATION & STORAGE SOURCES (Y = 20 to 105)
+                      ------------------------------------------------------------- */}
                   
-                  {/* Column 1: Renewable Generation */}
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700 space-y-3">
-                    <div className="text-xs font-bold text-sky-400 uppercase flex items-center justify-between">
-                      <span>Renewable Feeder</span>
-                      <span className="text-[9px] font-mono text-slate-400">FEEDER-01</span>
+                  {/* SOURCE 1: Generator 1 (DG-1) */}
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Diesel Generator 1 (DG-1)',
+                      type: 'Synchronous Marine Diesel',
+                      model: 'Volvo Penta D13 / Cat C9 Heavy Duty',
+                      rating: `${currentStation.genset_1_max_kw || 160} kW @ 1500 RPM`,
+                      output: `${(d.p_diesel_1_kw || t.diesel_gen_kw || 75).toFixed(1)} kW`,
+                      breaker: activeScenarioKey === 'GENSET_TRIP' ? 'CB-01 TRIPPED (Overcurrent)' : 'CB-01 CLOSED',
+                      breakerStatus: activeScenarioKey === 'GENSET_TRIP' ? 'TRIPPED' : 'CLOSED',
+                      protection: 'ANSI 50/51 Overcurrent · 81 Underfrequency · Reverse Power 32',
+                      fuelRate: `${((d.p_diesel_1_kw || t.diesel_gen_kw || 75) * 0.26).toFixed(1)} L/h`
+                    })}
+                  >
+                    <rect x="30" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('DG-1') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="55" cy="50" r="16" fill="#162942" stroke="#f59e0b" strokeWidth="2" />
+                    <text x="55" y="55" textAnchor="middle" fill="#f59e0b" fontFamily="monospace" fontSize="13" fontWeight="bold">G1</text>
+                    <text x="82" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">DG-1 Primary</text>
+                    <text x="82" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.genset_1_max_kw || 160} kW Rated</text>
+                    <text x="82" y="74" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">{(d.p_diesel_1_kw || t.diesel_gen_kw || 75).toFixed(0)} kW</text>
+                  </g>
+
+                  {/* SOURCE 2: Generator 2 (DG-2 Standby) */}
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Diesel Generator 2 (DG-2)',
+                      type: 'Standby Emergency Unit',
+                      model: 'Secondary Synchronous Unit',
+                      rating: `${currentStation.genset_2_max_kw || 120} kW Standby`,
+                      output: `${(d.p_diesel_2_kw || 0).toFixed(1)} kW`,
+                      breaker: (d.p_diesel_2_kw || 0) > 0 ? 'CB-02 CLOSED' : 'CB-02 OPEN (Standby)',
+                      breakerStatus: (d.p_diesel_2_kw || 0) > 0 ? 'CLOSED' : 'OPEN',
+                      protection: 'ANSI 50/51 Instantaneous Overcurrent · 27 Undervoltage',
+                      fuelRate: `${((d.p_diesel_2_kw || 0) * 0.26).toFixed(1)} L/h`
+                    })}
+                  >
+                    <rect x="220" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('DG-2') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="245" cy="50" r="16" fill="#162942" stroke="#94a3b8" strokeWidth="2" />
+                    <text x="245" y="55" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="13" fontWeight="bold">G2</text>
+                    <text x="272" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">DG-2 Standby</text>
+                    <text x="272" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.genset_2_max_kw || 120} kW Unit</text>
+                    <text x="272" y="74" fill={(d.p_diesel_2_kw || 0) > 0 ? '#38bdf8' : '#64748b'} fontFamily="monospace" fontSize="11" fontWeight="bold">
+                      {(d.p_diesel_2_kw || 0) > 0 ? `${Number(d.p_diesel_2_kw).toFixed(0)} kW` : 'STANDBY'}
+                    </text>
+                  </g>
+
+                  {/* SOURCE 3: Wind Turbines (WTG-1/2) */}
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Polar Wind Turbines (WTG)',
+                      type: 'De-iced Aerodynamic Rotors',
+                      model: 'Direct-Drive High-Altitude Arctic Turbines',
+                      rating: `${currentStation.wind_capacity_kw || 100} kW Capacity`,
+                      output: `${(d.p_wind_kw || t.wind_kw || 68).toFixed(1)} kW`,
+                      breaker: activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'CB-03 TRIPPED (>25 m/s Cut-Out)' : 'CB-03 CLOSED',
+                      breakerStatus: activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'TRIPPED' : 'CLOSED',
+                      protection: 'Aerodynamic Storm Feathering · Thermal De-icing Heaters',
+                      speed: `${t.wind_speed_ms ? Number(t.wind_speed_ms).toFixed(1) : '12.4'} m/s wind velocity`
+                    })}
+                  >
+                    <rect x="410" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Wind') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="435" cy="50" r="16" fill="#162942" stroke="#38bdf8" strokeWidth="2" />
+                    <text x="435" y="55" textAnchor="middle" fill="#38bdf8" fontFamily="sans-serif" fontSize="13" fontWeight="bold">WT</text>
+                    <text x="462" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Wind Turbine</text>
+                    <text x="462" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.wind_capacity_kw || 100} kW Dual</text>
+                    <text x="462" y="74" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#38bdf8'} fontFamily="monospace" fontSize="11" fontWeight="bold">
+                      {activeScenarioKey === 'KATABATIC_BLIZZARD' ? '0.0 kW (CUTOUT)' : `${(d.p_wind_kw || t.wind_kw || 68).toFixed(0)} kW`}
+                    </text>
+                  </g>
+
+                  {/* SOURCE 4: Bifacial Solar PV */}
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Bifacial Solar PV Array',
+                      type: 'Albedo-Boosted Bifacial Modules',
+                      model: 'Snow-Reflective Tilt Frames + MPPT Inverter',
+                      rating: `${currentStation.solar_capacity_kw || 60} kW Peak`,
+                      output: `${(d.p_solar_kw || t.solar_kw || 35).toFixed(1)} kW`,
+                      breaker: activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? 'CB-04 OPEN (Polar Night)' : 'CB-04 CLOSED',
+                      breakerStatus: activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? 'OPEN' : 'CLOSED',
+                      protection: 'Rapid Shutdown Contactor · Anti-Islanding IEEE 1547',
+                      albedo: '+20% Albedo reflection gain from Antarctic snowpack'
+                    })}
+                  >
+                    <rect x="600" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Solar') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="625" cy="50" r="16" fill="#162942" stroke="#facc15" strokeWidth="2" />
+                    <text x="625" y="55" textAnchor="middle" fill="#facc15" fontFamily="sans-serif" fontSize="13" fontWeight="bold">PV</text>
+                    <text x="652" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Bifacial Solar</text>
+                    <text x="652" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.solar_capacity_kw || 60} kW Array</text>
+                    <text x="652" y="74" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#94a3b8' : '#facc15'} fontFamily="monospace" fontSize="11" fontWeight="bold">
+                      {activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '0.0 kW (NIGHT)' : `${(d.p_solar_kw || t.solar_kw || 35).toFixed(0)} kW`}
+                    </text>
+                  </g>
+
+                  {/* SOURCE 5: BESS Energy Storage Hub */}
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'BESS Lithium Iron Phosphate Hub',
+                      type: 'LiFePO4 Storage & Grid-Forming PCS',
+                      model: `${currentStation.battery_capacity_kwh || 400} kWh Core with Thermal Hydronic Heating`,
+                      rating: `${currentStation.inverter_rating_kw || 80} kW Inverter PCS`,
+                      output: `${((d.p_battery_discharge_kw || 0) - (d.p_battery_charge_kw || 0)).toFixed(1)} kW (Net Flow)`,
+                      breaker: 'CB-05 CLOSED (Grid-Forming Master)',
+                      breakerStatus: 'CLOSED',
+                      protection: 'Cell BMS Over/Under Voltage · Protected 20% Reserve Floor',
+                      soc: `${t.battery_soc_pct ? Number(t.battery_soc_pct).toFixed(1) : '76.5'}% SoC`
+                    })}
+                  >
+                    <rect x="790" y="20" width="140" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('BESS') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="815" cy="50" r="16" fill="#162942" stroke="#10b981" strokeWidth="2" />
+                    <text x="815" y="55" textAnchor="middle" fill="#10b981" fontFamily="sans-serif" fontSize="11" fontWeight="bold">BAT</text>
+                    <text x="842" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">BESS Hub</text>
+                    <text x="842" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.battery_capacity_kwh || 400} kWh Core</text>
+                    <text x="842" y="74" fill="#10b981" fontFamily="monospace" fontSize="11" fontWeight="bold">
+                      {t.battery_soc_pct ? `${Number(t.battery_soc_pct).toFixed(0)}% SoC` : '77% SoC'}
+                    </text>
+                  </g>
+
+                  {/* -------------------------------------------------------------
+                      FEEDER LINES & CIRCUIT BREAKERS (TOP -> BUSBAR)
+                      ------------------------------------------------------------- */}
+
+                  {/* Feeder 1 (DG-1 to CB-01 to Busbar) */}
+                  <line x1="95" y1="95" x2="95" y2="135" stroke="#38bdf8" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-01', type: 'Molded Case Circuit Breaker (MCCB)', rating: '400A / 10kA Icu', status: activeScenarioKey === 'GENSET_TRIP' ? 'TRIPPED (ANSI 51)' : 'CLOSED', function: 'Generator 1 Main Bus Intertie' })}>
+                    <rect x="83" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'GENSET_TRIP' ? '#450a0a' : '#022c22'} stroke={activeScenarioKey === 'GENSET_TRIP' ? '#f43f5e' : '#10b981'} strokeWidth="2" />
+                    <text x="95" y="151" textAnchor="middle" fill={activeScenarioKey === 'GENSET_TRIP' ? '#f43f5e' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                      {activeScenarioKey === 'GENSET_TRIP' ? 'X' : '||'}
+                    </text>
+                    <text x="95" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-01</text>
+                  </g>
+                  <line x1="95" y1="159" x2="95" y2="215" stroke={activeScenarioKey === 'GENSET_TRIP' ? '#475569' : '#38bdf8'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'GENSET_TRIP' ? '4,4' : 'none'} />
+
+                  {/* Feeder 2 (DG-2 to CB-02 to Busbar) */}
+                  <line x1="285" y1="95" x2="285" y2="135" stroke="#64748b" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-02', type: 'MCCB Intertie', rating: '300A / 10kA Icu', status: (d.p_diesel_2_kw || 0) > 0 ? 'CLOSED' : 'OPEN (Standby)', function: 'Generator 2 Backup Bus Intertie' })}>
+                    <rect x="273" y="135" width="24" height="24" rx="4" fill={(d.p_diesel_2_kw || 0) > 0 ? '#022c22' : '#1e293b'} stroke={(d.p_diesel_2_kw || 0) > 0 ? '#10b981' : '#64748b'} strokeWidth="2" />
+                    <text x="285" y="151" textAnchor="middle" fill={(d.p_diesel_2_kw || 0) > 0 ? '#10b981' : '#94a3b8'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                      {(d.p_diesel_2_kw || 0) > 0 ? '||' : 'O'}
+                    </text>
+                    <text x="285" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-02</text>
+                  </g>
+                  <line x1="285" y1="159" x2="285" y2="215" stroke={(d.p_diesel_2_kw || 0) > 0 ? '#38bdf8' : '#475569'} strokeWidth="2.5" strokeDasharray={(d.p_diesel_2_kw || 0) > 0 ? 'none' : '4,4'} />
+
+                  {/* Feeder 3 (Wind to CB-03 to Busbar) */}
+                  <line x1="475" y1="95" x2="475" y2="135" stroke="#38bdf8" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-03', type: 'Wind Intertie Contactor', rating: '250A / 10kA', status: activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'TRIPPED (>25 m/s Gale)' : 'CLOSED', function: 'Wind Generation Sync Contactor' })}>
+                    <rect x="463" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#450a0a' : '#022c22'} stroke={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#10b981'} strokeWidth="2" />
+                    <text x="475" y="151" textAnchor="middle" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                      {activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'X' : '||'}
+                    </text>
+                    <text x="475" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-03</text>
+                  </g>
+                  <line x1="475" y1="159" x2="475" y2="215" stroke={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#475569' : '#38bdf8'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '4,4' : 'none'} />
+
+                  {/* Feeder 4 (Solar to CB-04 to Busbar) */}
+                  <line x1="665" y1="95" x2="665" y2="135" stroke="#facc15" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-04', type: 'Solar PV DC/AC Inverter Breaker', rating: '160A / 10kA', status: activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? 'OPEN (0.0 kW Night)' : 'CLOSED', function: 'Solar Inverter Bus Feeder' })}>
+                    <rect x="653" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#1e293b' : '#022c22'} stroke={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#64748b' : '#10b981'} strokeWidth="2" />
+                    <text x="665" y="151" textAnchor="middle" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#94a3b8' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                      {activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? 'O' : '||'}
+                    </text>
+                    <text x="665" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-04</text>
+                  </g>
+                  <line x1="665" y1="159" x2="665" y2="215" stroke={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#475569' : '#facc15'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '4,4' : 'none'} />
+
+                  {/* Feeder 5 (BESS to CB-05 to Busbar) */}
+                  <line x1="860" y1="95" x2="860" y2="135" stroke="#10b981" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-05', type: 'BESS Bi-Directional High-Speed Static Switch', rating: '250A / 15kA Fast Transfer', status: 'CLOSED (GRID FORMING)', function: 'Primary Frequency Master & Synthetic Inertia Injection' })}>
+                    <rect x="848" y="135" width="24" height="24" rx="4" fill="#022c22" stroke="#10b981" strokeWidth="2" />
+                    <text x="860" y="151" textAnchor="middle" fill="#10b981" fontFamily="monospace" fontSize="9" fontWeight="bold">||</text>
+                    <text x="860" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-05</text>
+                  </g>
+                  <line x1="860" y1="159" x2="860" y2="215" stroke="#10b981" strokeWidth="2.5" />
+
+                  {/* -------------------------------------------------------------
+                      CENTRAL MAIN 415V SYNCHRONIZATION BUSBAR (HORIZONTAL)
+                      ------------------------------------------------------------- */}
+                  <line x1="40" y1="215" x2="920" y2="215" stroke="url(#busGrad)" strokeWidth="6" strokeLinecap="round" filter="url(#cyanGlow)" />
+                  <rect x="360" y="202" width="240" height="26" rx="13" fill="#021a2e" stroke="#05C5FF" strokeWidth="1.5" />
+                  <text x="480" y="219" textAnchor="middle" fill="#38bdf8" fontFamily="monospace" fontSize="10" fontWeight="bold">
+                    MAIN 415V AC 3-PHASE BUSBAR &middot; 50.02 Hz
+                  </text>
+
+                  {/* Busbar Tap Points */}
+                  <circle cx="95" cy="215" r="4.5" fill="#38bdf8" />
+                  <circle cx="285" cy="215" r="4.5" fill="#38bdf8" />
+                  <circle cx="475" cy="215" r="4.5" fill="#38bdf8" />
+                  <circle cx="665" cy="215" r="4.5" fill="#facc15" />
+                  <circle cx="860" cy="215" r="4.5" fill="#10b981" />
+
+                  {/* Tap points down to loads */}
+                  <circle cx="190" cy="215" r="4.5" fill="#10b981" />
+                  <circle cx="480" cy="215" r="4.5" fill="#38bdf8" />
+                  <circle cx="770" cy="215" r="4.5" fill="#f59e0b" />
+
+                  {/* -------------------------------------------------------------
+                      ROW 2: DOWNSTREAM LOAD FEEDERS (BUSBAR -> LOADS)
+                      ------------------------------------------------------------- */}
+
+                  {/* FEEDER L1: Tier 1 Life Support Habitat */}
+                  <line x1="190" y1="215" x2="190" y2="255" stroke="#10b981" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-L1', type: 'Life-Support Critical Feeder Breaker', rating: '300A / Zero-Trip Shunt Interlock', status: 'CLOSED (INVIOLABLE)', function: 'Primary Life-Support Habitat Heating & Clean Air Loop' })}>
+                    <rect x="178" y="255" width="24" height="24" rx="4" fill="#022c22" stroke="#10b981" strokeWidth="2" />
+                    <text x="190" y="271" textAnchor="middle" fill="#10b981" fontFamily="monospace" fontSize="9" fontWeight="bold">||</text>
+                    <text x="190" y="292" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-L1</text>
+                  </g>
+                  <line x1="190" y1="279" x2="190" y2="330" stroke="#10b981" strokeWidth="2.5" />
+                  
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Tier 1: Life-Support Habitat & Medical',
+                      type: 'Critical Survival Bus (Priority 1)',
+                      demand: '142 kW Hydronic Base',
+                      sheddable: 'NON-SHEDDABLE (Protected Life-Support Guarantee)',
+                      components: 'Hydronic Boiler Circulation Pumps, Habitat HVAC, Medical Bay, Cryo-O2 Plant',
+                      reserve: 'Zero-outage tolerance; priority diesel commit if deficit occurs'
+                    })}
+                  >
+                    <rect x="100" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 1') ? '#10b981' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="125" cy="360" r="14" fill="#022c22" stroke="#10b981" strokeWidth="1.5" />
+                    <text x="125" y="364" textAnchor="middle" fill="#10b981" fontFamily="sans-serif" fontSize="11" fontWeight="bold">L1</text>
+                    <text x="148" y="354" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Life-Support Habitat</text>
+                    <text x="148" y="368" fill="#10b981" fontFamily="sans-serif" fontSize="9" fontWeight="bold">INVIOLABLE PRIORITY</text>
+                    <text x="148" y="384" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">142 kW Base Load</text>
+                  </g>
+
+                  {/* FEEDER L2: Tier 2 Water Production & Deep-Space SatCom */}
+                  <line x1="480" y1="215" x2="480" y2="255" stroke="#38bdf8" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-L2', type: 'Essential Mission Feeder Breaker', rating: '160A / Priority 2', status: 'CLOSED', function: 'Snow Melters, Reverse Osmosis & Deep-Space Uplink' })}>
+                    <rect x="468" y="255" width="24" height="24" rx="4" fill="#022c22" stroke="#10b981" strokeWidth="2" />
+                    <text x="480" y="271" textAnchor="middle" fill="#10b981" fontFamily="monospace" fontSize="9" fontWeight="bold">||</text>
+                    <text x="480" y="292" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-L2</text>
+                  </g>
+                  <line x1="480" y1="279" x2="480" y2="330" stroke="#38bdf8" strokeWidth="2.5" />
+
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Tier 2: Water Production & SatCom',
+                      type: 'Essential Mission Operations (Priority 2)',
+                      demand: '45 kW Operating Demand',
+                      sheddable: 'Delayed Shedding Permitted (Up to 4h Buffer)',
+                      components: 'Electric Snow Melters, Reverse Osmosis Plant, ISRO Deep-Space Satellite Dish',
+                      buffer: 'Water storage tanks provide 48h emergency reserve buffer'
+                    })}
+                  >
+                    <rect x="390" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 2') ? '#38bdf8' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="415" cy="360" r="14" fill="#162942" stroke="#38bdf8" strokeWidth="1.5" />
+                    <text x="415" y="364" textAnchor="middle" fill="#38bdf8" fontFamily="sans-serif" fontSize="11" fontWeight="bold">L2</text>
+                    <text x="438" y="354" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Water &amp; SatCom</text>
+                    <text x="438" y="368" fill="#38bdf8" fontFamily="sans-serif" fontSize="9">ESSENTIAL MISSION</text>
+                    <text x="438" y="384" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">45 kW Load</text>
+                  </g>
+
+                  {/* FEEDER L3: Tier 3 Scientific Labs & Auxiliary Contactor */}
+                  <line x1="770" y1="215" x2="770" y2="255" stroke="#f59e0b" strokeWidth="2.5" />
+                  <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-L3', type: 'Automated Demand Shedding Contactor', rating: '125A / Underfrequency Trip', status: (activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? 'TRIPPED (SHED)' : 'CLOSED', function: 'Fast automated disconnection during extreme generation deficit' })}>
+                    <rect x="758" y="255" width="24" height="24" rx="4" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#450a0a' : '#022c22'} stroke={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#10b981'} strokeWidth="2" />
+                    <text x="770" y="271" textAnchor="middle" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                      {(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? 'X' : '||'}
+                    </text>
+                    <text x="770" y="292" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-L3</text>
+                  </g>
+                  <line x1="770" y1="279" x2="770" y2="330" stroke={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#475569' : '#f59e0b'} strokeWidth="2.5" strokeDasharray={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '4,4' : 'none'} />
+
+                  <g
+                    className="cursor-pointer transition hover:opacity-90"
+                    onClick={() => setSelectedAsset({
+                      name: 'Tier 3: Science & Auxiliary Equipment',
+                      type: 'Controllable Shedding Bus (Priority 3)',
+                      demand: '35 kW Non-Critical Demand',
+                      sheddable: 'SHEDDABLE UNDER DEFICIT (<50ms contactor trip)',
+                      components: 'Atmospheric LIDAR, Seismic Arrays, Auroral Cameras, Auxiliary Heaters',
+                      tripCondition: 'Automatic trip if system frequency drops below 49.5 Hz or spinning reserve falls under 10 kW'
+                    })}
+                  >
+                    <rect x="680" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 3') ? '#f59e0b' : '#1e385c'} strokeWidth="1.5" />
+                    <circle cx="705" cy="360" r="14" fill="#291e10" stroke="#f59e0b" strokeWidth="1.5" />
+                    <text x="705" y="364" textAnchor="middle" fill="#f59e0b" fontFamily="sans-serif" fontSize="11" fontWeight="bold">L3</text>
+                    <text x="728" y="354" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Science &amp; Auxiliary</text>
+                    <text x="728" y="368" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#f59e0b'} fontFamily="sans-serif" fontSize="9" fontWeight="bold">
+                      {(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? 'SHEDDED CONTINGENCY' : 'SHEDDABLE CONTACTOR'}
+                    </text>
+                    <text x="728" y="384" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">35 kW Load</text>
+                  </g>
+
+                </svg>
+
+                {/* Substation Legend & Interaction Guide */}
+                <div className="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+                  <div className="flex items-center gap-4 text-[11px]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded bg-emerald-500 inline-block"></span>
+                      <span>CB Closed (Energized)</span>
                     </div>
-
-                    <div className="space-y-2">
-                      <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-wind text-sky-400"></i>
-                          <span className="text-xs font-bold text-white">Wind Turbines (WTG-1/2)</span>
-                        </div>
-                        <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                          activeScenarioKey === 'KATABATIC_BLIZZARD'
-                            ? 'bg-rose-950 text-rose-300 border border-rose-600'
-                            : 'bg-emerald-950 text-emerald-300 border border-emerald-600'
-                        }`}>
-                          {activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'CB-03 TRIPPED' : 'CB-03 CLOSED'}
-                        </span>
-                      </div>
-
-                      <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-sun text-amber-400"></i>
-                          <span className="text-xs font-bold text-white">Bifacial Solar PV Array</span>
-                        </div>
-                        <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                          activeScenarioKey === 'POLAR_NIGHT_FREEZE'
-                            ? 'bg-amber-950 text-amber-300 border border-amber-600'
-                            : 'bg-emerald-950 text-emerald-300 border border-emerald-600'
-                        }`}>
-                          {activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '0.0 kW (NIGHT)' : 'CB-04 CLOSED'}
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded bg-rose-500 inline-block"></span>
+                      <span>CB Tripped / Locked</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded bg-slate-500 inline-block"></span>
+                      <span>CB Open (Standby)</span>
                     </div>
                   </div>
-
-                  {/* Column 2: Storage & Inverter */}
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700 space-y-3">
-                    <div className="text-xs font-bold text-cyan-400 uppercase flex items-center justify-between">
-                      <span>BESS &amp; Inverter Hub</span>
-                      <span className="text-[9px] font-mono text-slate-400">FEEDER-02</span>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-car-battery text-cyan-400"></i>
-                          <span className="text-xs font-bold text-white">250 kWh LiFePO4 BESS</span>
-                        </div>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-600">
-                          CB-02 CLOSED
-                        </span>
-                      </div>
-
-                      <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-wave-square text-emerald-400"></i>
-                          <span className="text-xs font-bold text-white">Grid-Forming Inverter</span>
-                        </div>
-                        <span className="text-[10px] font-mono font-bold text-cyan-300">
-                          {activeScenarioKey === 'ISLAND_BLACKSTART' ? 'GFM ACTIVE' : 'GFL NOMINAL'}
-                        </span>
-                      </div>
-                    </div>
+                  <div className="text-[10px] font-mono text-cyan-400">
+                    &bull; CLICK ANY GENERATOR, BREAKER OR LOAD TO INSPECT RELAY SETTINGS
                   </div>
-
-                  {/* Column 3: Thermal & Base Generation */}
-                  <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-700 space-y-3">
-                    <div className="text-xs font-bold text-amber-400 uppercase flex items-center justify-between">
-                      <span>Thermal Co-Gen Station</span>
-                      <span className="text-[9px] font-mono text-slate-400">FEEDER-03</span>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-gears text-amber-400"></i>
-                          <span className="text-xs font-bold text-white">DG-1 Primary Genset</span>
-                        </div>
-                        <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                          activeScenarioKey === 'GENSET_TRIP'
-                            ? 'bg-rose-950 text-rose-300 border border-rose-600 animate-pulse'
-                            : 'bg-emerald-950 text-emerald-300 border border-emerald-600'
-                        }`}>
-                          {activeScenarioKey === 'GENSET_TRIP' ? 'CB-01 TRIPPED' : 'CB-01 CLOSED'}
-                        </span>
-                      </div>
-
-                      <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <i className="fa-solid fa-fire-burner text-rose-400"></i>
-                          <span className="text-xs font-bold text-white">CHP Thermal Co-Gen</span>
-                        </div>
-                        <span className="text-[10px] font-mono font-bold text-emerald-400">
-                          {activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '98.4% EFFICIENCY' : 'NOMINAL RECOVERY'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
 
-                {/* Central Microgrid 400V Synchronized Bus Bar */}
-                <div className="mt-6 pt-4 border-t-2 border-dashed border-cyan-500/40 text-center relative z-10">
-                  <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-cyan-950 border border-cyan-500/60 text-cyan-300 font-mono text-xs font-bold">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                    <span>MAIN 400V 3-PHASE ANTARCTIC BUS &middot; 50.00 Hz &middot; SYNCHRONIZED</span>
-                  </div>
-                </div>
               </div>
+
+              {/* Interactive Selected Asset Inspector Card */}
+              {selectedAsset && (
+                <div className="p-4 rounded-2xl bg-slate-900 border border-cyan-800/80 text-white space-y-2 animate-fadeIn shadow-lg">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-microchip text-cyan-400"></i>
+                      <strong className="text-xs sm:text-sm text-cyan-300 font-mono uppercase">{selectedAsset.name}</strong>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedAsset(null)}
+                      className="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-1">
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Subsystem Type</span>
+                      <strong className="text-slate-200">{selectedAsset.type || 'Electrical Component'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Hardware Rating</span>
+                      <strong className="text-cyan-300 font-mono">{selectedAsset.rating || '400V Nominal'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Breaker Status</span>
+                      <strong className={selectedAsset.breakerStatus === 'TRIPPED' ? 'text-rose-400 font-mono' : 'text-emerald-400 font-mono'}>
+                        {selectedAsset.breaker || selectedAsset.status || 'CLOSED'}
+                      </strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Protective Relaying</span>
+                      <strong className="text-slate-200 text-[11px]">{selectedAsset.protection || selectedAsset.function || 'IEC 60255'}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

@@ -13,21 +13,30 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
     setIsLoading(true);
 
     const fetchEval = async () => {
+      const cacheKey = `polar_eval_${stationId}_${horizon}`;
       try {
         const res = await fetch(`/api/evaluation/baseline-comparison?horizon=${horizon}&station_id=${stationId}`);
         if (res.ok) {
           const json = await res.json();
           if (isMounted) {
             setEvalData(json);
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify(json));
+            } catch (e) {}
             setIsLoading(false);
             return;
           }
         }
       } catch (e) {
-        // Fallback to local deterministic calculation
+        // Fallback to cached or local deterministic calculation
       }
       if (isMounted) {
-        setEvalData(calculateBaselineComparison(stationId, horizon));
+        let cached = null;
+        try {
+          const raw = localStorage.getItem(cacheKey);
+          if (raw) cached = JSON.parse(raw);
+        } catch (e) {}
+        setEvalData(cached || calculateBaselineComparison(stationId, horizon));
         setIsLoading(false);
       }
     };

@@ -47,7 +47,14 @@ export default function App() {
   const [mode, setMode] = useState('DEMO_MODE');
   const [currentScenario, setCurrentScenario] = useState('normal');
   const [clockTime, setClockTime] = useState('');
-  const [latestData, setLatestData] = useState(null);
+  const [latestData, setLatestData] = useState(() => {
+    try {
+      const st = (sessionStorage.getItem('polarops_station') || 'MAITRI').toUpperCase();
+      const saved = localStorage.getItem(`polar_last_snapshot_${st}`);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+  });
   const [activeModal, setActiveModal] = useState(null);
   const [activeOverrides, setActiveOverrides] = useState(() => {
     try {
@@ -220,6 +227,9 @@ export default function App() {
           try {
             const payload = JSON.parse(event.data);
             setLatestData(payload);
+            try {
+              localStorage.setItem(`polar_last_snapshot_${stationId}`, JSON.stringify(payload));
+            } catch (e) {}
 
             // Synchronize active_overrides if emitted from backend
             if (payload.active_overrides !== undefined) {
@@ -814,9 +824,9 @@ function AppDashboard({
         auditLogs={auditLogs}
       />
 
-      {/* 1-Click Live Polar Crisis Simulation & NCPOR Fiscal Ledger */}
+      {/* 1-Click Live Polar Crisis Simulation, Single-Line Diagram & NCPOR Fiscal Ledger */}
       <CrisisSimulatorModal
-        isOpen={activeModal === 'crisis'}
+        isOpen={activeModal === 'crisis' || activeModal === 'sld'}
         onClose={() => setActiveModal(null)}
         stationId={stationId}
         latestData={latestData}
@@ -824,6 +834,7 @@ function AppDashboard({
         onResetOverrides={onResetOverrides}
         onScenarioChange={onScenarioChange}
         onResetScenario={onResetScenario}
+        initialTab={activeModal === 'sld' ? 'sld' : (modalInitialTab || 'scenarios')}
       />
     </div>
   );
