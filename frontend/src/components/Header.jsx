@@ -92,10 +92,6 @@ export default function Header({
                   Polar EMS
                 </span>
               </div>
-              <span className="hidden lg:flex text-[10px] tracking-wider uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-[#e5f6fd] text-[#127694] border border-[#bcecfc] items-center gap-1.5 shadow-xs" title="Calibrated Polar Microgrid Energy Management Simulation">
-                <i className="fa-solid fa-microchip text-[10px] text-[#0699C6]"></i>
-                Calibrated Simulation Engine
-              </span>
               <span className="hidden 2xl:flex text-[10px] tracking-wider uppercase font-extrabold px-2.5 py-0.5 rounded-full bg-[#c2f0fe] text-[#0699C6] border border-[#bcecfc] items-center gap-1.5 shadow-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 {currentStation.name.split(' ')[0]} · OPERATIONAL
