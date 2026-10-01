@@ -510,7 +510,7 @@ export default function Header({
 
         </nav>
 
-        {/* Right: 1-Click Polar Crisis Simulator & NCPOR Fiscal Ledger (Live Jury Demo Bench) */}
+        {/* Right: 1-Click Polar Crisis Simulator & NCPOR Fiscal Ledger (Crisis Stress-Test Bench) */}
         <div className="shrink-0">
           <button
             type="button"
@@ -520,12 +520,12 @@ export default function Header({
                 ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white border-rose-500 shadow-md ring-2 ring-rose-400/40'
                 : 'bg-gradient-to-r from-rose-50 via-amber-50 to-rose-50 dark:from-rose-950/40 dark:via-amber-950/30 dark:to-rose-950/40 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800/80 hover:border-rose-400'
             }`}
-            title="Open 1-Click Polar Emergency Stress-Test & NCPOR Fiscal ROI Ledger (Live Jury Demo Bench)"
+            title="Open 1-Click Polar Emergency Stress-Test & NCPOR Fiscal ROI Ledger"
           >
             <i className="fa-solid fa-bolt-lightning text-amber-500 text-xs animate-pulse"></i>
             <span className="font-black uppercase tracking-tight">CRISIS SIM</span>
             <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-rose-600 text-white shadow-xs">
-              JURY
+              LIVE BENCH
             </span>
           </button>
         </div>
@@ -667,7 +667,7 @@ export default function Header({
                 <span className="text-[10px] text-slate-400 font-normal">Savings &amp; Evidence</span>
               </button>
 
-              {/* 6. CRISIS SIMULATOR (JURY BENCH) */}
+              {/* 6. CRISIS SIMULATOR (LIVE BENCH) */}
               <button
                 type="button"
                 onClick={() => {
@@ -685,7 +685,7 @@ export default function Header({
                   <span>CRISIS SIMULATOR</span>
                 </div>
                 <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded-full bg-rose-600 text-white">
-                  JURY BENCH
+                  LIVE BENCH
                 </span>
               </button>
             </div>

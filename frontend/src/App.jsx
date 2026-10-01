@@ -814,7 +814,7 @@ function AppDashboard({
         auditLogs={auditLogs}
       />
 
-      {/* 1-Click Live Jury Polar Crisis Simulation & NCPOR Fiscal Ledger */}
+      {/* 1-Click Live Polar Crisis Simulation & NCPOR Fiscal Ledger */}
       <CrisisSimulatorModal
         isOpen={activeModal === 'crisis'}
         onClose={() => setActiveModal(null)}

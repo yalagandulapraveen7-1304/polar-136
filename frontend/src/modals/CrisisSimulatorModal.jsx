@@ -303,7 +303,7 @@ export default function CrisisSimulatorModal({
                   Polar Emergency Response & Stress-Test Bench
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500 text-white shadow-xs">
-                  JURY LIVE BENCH
+                  LIVE BENCH
                 </span>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-cyan-500/10 text-[#0699C6] dark:text-cyan-400 border border-cyan-500/30">
                   {currentStation.name}
@@ -427,7 +427,7 @@ export default function CrisisSimulatorModal({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
           {/* =========================================================================
-              TAB 1: 1-CLICK JURY CRISIS SCENARIOS
+              TAB 1: 1-CLICK POLAR CRISIS SCENARIOS
               ========================================================================= */}
           {activeTab === 'scenarios' && (
             <div className="space-y-6">
