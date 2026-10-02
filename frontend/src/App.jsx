@@ -839,6 +839,7 @@ function AppDashboard({
         onScenarioChange={onScenarioChange}
         onResetScenario={onResetScenario}
         initialTab={activeModal === 'sld' ? 'sld' : (modalInitialTab || 'scenarios')}
+        isDarkMode={isDarkMode}
       />
     </div>
   );

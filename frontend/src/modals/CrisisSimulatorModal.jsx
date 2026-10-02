@@ -10,8 +10,10 @@ export default function CrisisSimulatorModal({
   onResetOverrides,
   onScenarioChange,
   onResetScenario,
-  initialTab = 'scenarios'
+  initialTab = 'scenarios',
+  isDarkMode = false
 }) {
+  const isDark = Boolean(isDarkMode || (typeof document !== 'undefined' && document.documentElement.classList.contains('dark')));
   const [activeTab, setActiveTab] = useState(initialTab || 'scenarios'); // 'scenarios' | 'logistics' | 'sld' | 'iec_log'
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [activeScenarioKey, setActiveScenarioKey] = useState(null);
@@ -291,7 +293,19 @@ export default function CrisisSimulatorModal({
   const totalFiscalSavingsLakhs = ((directFuelSavingsInr + helicopterSavingsInr) / 100000).toFixed(1);
 
   // Environmental Madrid Protocol CO2 abatement
-  const co2AbatementTonnes = ((fuelSavedLiters * 2.68) / 1000).toFixed(1); // 2.68 kg CO2 per liter of polar diesel
+  // Dynamic color palette based on theme (Light by default, dark in Aurora Night)
+  const cardStrokeDefault = isDark ? '#1e385c' : '#bcecfc';
+  const cardTextTitle = isDark ? '#ffffff' : '#0f172a';
+  const cardTextSub = isDark ? '#94a3b8' : '#64748b';
+  const cardValueDefault = isDark ? '#38bdf8' : '#0284c7';
+  const circleBg = isDark ? '#162942' : '#e5f6fd';
+  const cbLabelColor = isDark ? '#94a3b8' : '#475569';
+  const feederActiveColor = isDark ? '#38bdf8' : '#0284c7';
+  const feederGreenColor = isDark ? '#10b981' : '#059669';
+  const feederInactiveColor = isDark ? '#475569' : '#94a3b8';
+  const busBadgeBg = isDark ? '#021a2e' : '#e0f4fc';
+  const busBadgeStroke = isDark ? '#05C5FF' : '#0284c7';
+  const busBadgeText = isDark ? '#38bdf8' : '#0284c7';
 
   if (!isOpen) return null;
 
@@ -441,14 +455,14 @@ export default function CrisisSimulatorModal({
             <div className="space-y-6">
               
               {/* Active State Banner */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white border border-slate-700 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#edf9fd] via-white to-[#edf9fd] dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-slate-800 dark:text-white border border-[#bcecfc] dark:border-slate-700 shadow-sm dark:shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className={`w-3.5 h-3.5 rounded-full ${activeScenarioKey ? 'bg-rose-500 animate-ping' : 'bg-emerald-400'}`}></div>
+                  <div className={`w-3.5 h-3.5 rounded-full ${activeScenarioKey ? 'bg-rose-500 animate-ping' : 'bg-emerald-500'}`}></div>
                   <div>
-                    <div className="text-[10px] font-mono text-cyan-300 font-bold uppercase tracking-wider">
+                    <div className="text-[10px] font-mono text-[#0699C6] dark:text-cyan-300 font-bold uppercase tracking-wider">
                       Current Grid Operating Condition
                     </div>
-                    <div className="text-base font-black">
+                    <div className="text-base font-black text-slate-900 dark:text-white">
                       {activeScenarioKey
                         ? SCENARIOS.find((s) => s.id === activeScenarioKey)?.title
                         : 'NOMINAL GREEN DISPATCH · All Microgrid Circuits Balanced'}
@@ -458,13 +472,13 @@ export default function CrisisSimulatorModal({
 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-[10px] text-slate-400 uppercase font-mono">Synthesized Bus Inertia</div>
-                    <div className="text-sm font-mono font-bold text-emerald-400">50.01 Hz &middot; Δf &lt; 0.05 Hz</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono">Synthesized Bus Inertia</div>
+                    <div className="text-sm font-mono font-bold text-emerald-600 dark:text-emerald-400">50.01 Hz &middot; Δf &lt; 0.05 Hz</div>
                   </div>
-                  <div className="h-8 w-px bg-slate-700"></div>
+                  <div className="h-8 w-px bg-slate-200 dark:bg-slate-700"></div>
                   <div className="text-right">
-                    <div className="text-[10px] text-slate-400 uppercase font-mono">Life Support Health</div>
-                    <div className="text-sm font-mono font-bold text-cyan-300">100% UNCOMPROMISED</div>
+                    <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-mono">Life Support Health</div>
+                    <div className="text-sm font-mono font-bold text-[#0699C6] dark:text-cyan-300">100% UNCOMPROMISED</div>
                   </div>
                 </div>
               </div>
@@ -576,62 +590,62 @@ export default function CrisisSimulatorModal({
             <div className="space-y-6">
               
               {/* Top Highlights Banner */}
-              <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-950 via-slate-900 to-teal-950 text-white border border-emerald-500/30 shadow-xl relative overflow-hidden">
+              <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950 dark:via-slate-900 dark:to-teal-950 text-slate-800 dark:text-white border border-emerald-300 dark:border-emerald-500/30 shadow-lg relative overflow-hidden">
                 <div className="absolute right-0 top-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
                   <div>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-bold mb-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-400/40 text-emerald-800 dark:text-emerald-300 text-xs font-bold mb-2">
                       <i className="fa-solid fa-ship"></i>
                       <span>ISEA Expedition Partner: MV Vasiliy Golovnin &middot; MoES / NCPOR</span>
                     </div>
-                    <h3 className="text-2xl font-black text-white tracking-tight">
-                      Total Annual Expedition Fiscal Savings: <span className="text-emerald-400">₹{totalFiscalSavingsCrores} Crores</span>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                      Total Annual Expedition Fiscal Savings: <span className="text-emerald-600 dark:text-emerald-400">₹{totalFiscalSavingsCrores} Crores</span>
                     </h3>
-                    <p className="text-xs text-slate-300 max-w-2xl mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl mt-1 leading-relaxed">
                       Verified fuel and logistics savings calculated for Indian Antarctic Expeditions (Bharati &amp; Maitri), based on delivered polar diesel benchmarks, avoided Kamov-32 heavy airlift sorties, and Madrid Protocol emissions compliance.
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 text-center shrink-0">
-                    <div className="text-[10px] font-mono uppercase text-emerald-300 font-bold">Direct Rupee Economy</div>
-                    <div className="text-3xl font-black text-white font-mono">₹{totalFiscalSavingsLakhs} <span className="text-sm font-normal">Lakhs</span></div>
-                    <div className="text-[9px] text-slate-300 mt-1 font-mono">Per Annual Wintering Season</div>
+                  <div className="p-4 rounded-xl bg-white/80 dark:bg-white/10 backdrop-blur-md border border-emerald-200 dark:border-white/20 text-center shrink-0 shadow-xs">
+                    <div className="text-[10px] font-mono uppercase text-emerald-700 dark:text-emerald-300 font-bold">Direct Rupee Economy</div>
+                    <div className="text-3xl font-black text-slate-900 dark:text-white font-mono">₹{totalFiscalSavingsLakhs} <span className="text-sm font-normal">Lakhs</span></div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-300 mt-1 font-mono">Per Annual Wintering Season</div>
                   </div>
                 </div>
 
                 {/* 4 Pillar Breakdown */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-5 border-t border-emerald-800/60 relative z-10">
-                  <div className="bg-slate-900/60 p-3 rounded-xl border border-emerald-700/40">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Polar Diesel Saved</div>
-                    <div className="text-lg font-mono font-black text-emerald-300 mt-0.5">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 pt-5 border-t border-emerald-200 dark:border-emerald-800/60 relative z-10">
+                  <div className="bg-white/90 dark:bg-slate-900/60 p-3 rounded-xl border border-emerald-200 dark:border-emerald-700/40 shadow-xs">
+                    <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Polar Diesel Saved</div>
+                    <div className="text-lg font-mono font-black text-emerald-600 dark:text-emerald-300 mt-0.5">
                       {fuelSavedLiters.toLocaleString()} L
                     </div>
-                    <div className="text-[9px] text-slate-400">~213 Fuel Barrels</div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400">~213 Fuel Barrels</div>
                   </div>
 
-                  <div className="bg-slate-900/60 p-3 rounded-xl border border-emerald-700/40">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Direct Fuel Cost Saved</div>
-                    <div className="text-lg font-mono font-black text-cyan-300 mt-0.5">
+                  <div className="bg-white/90 dark:bg-slate-900/60 p-3 rounded-xl border border-emerald-200 dark:border-emerald-700/40 shadow-xs">
+                    <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Direct Fuel Cost Saved</div>
+                    <div className="text-lg font-mono font-black text-[#0699C6] dark:text-cyan-300 mt-0.5">
                       ₹{directFuelSavingsLakhs} Lakhs
                     </div>
-                    <div className="text-[9px] text-slate-400">At ₹{fuelCostPerLiter}/L Delivered</div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400">At ₹{fuelCostPerLiter}/L Delivered</div>
                   </div>
 
-                  <div className="bg-slate-900/60 p-3 rounded-xl border border-emerald-700/40">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Helicopter Sorties Avoided</div>
-                    <div className="text-lg font-mono font-black text-amber-300 mt-0.5">
+                  <div className="bg-white/90 dark:bg-slate-900/60 p-3 rounded-xl border border-emerald-200 dark:border-emerald-700/40 shadow-xs">
+                    <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Helicopter Sorties Avoided</div>
+                    <div className="text-lg font-mono font-black text-amber-600 dark:text-amber-300 mt-0.5">
                       {helicopterSortiesAvoided} Sorties
                     </div>
-                    <div className="text-[9px] text-slate-400">Kamov Ka-32 / Bell 412 (₹{helicopterSavingsLakhs}L)</div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400">Kamov Ka-32 / Bell 412 (₹{helicopterSavingsLakhs}L)</div>
                   </div>
 
-                  <div className="bg-slate-900/60 p-3 rounded-xl border border-emerald-700/40">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Madrid Protocol CO₂ Cut</div>
-                    <div className="text-lg font-mono font-black text-emerald-400 mt-0.5">
+                  <div className="bg-white/90 dark:bg-slate-900/60 p-3 rounded-xl border border-emerald-200 dark:border-emerald-700/40 shadow-xs">
+                    <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase">Madrid Protocol CO₂ Cut</div>
+                    <div className="text-lg font-mono font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
                       {co2AbatementTonnes} Tonnes
                     </div>
-                    <div className="text-[9px] text-slate-400">Zero Antarctic Habitat Soot</div>
+                    <div className="text-[9px] text-slate-500 dark:text-slate-400">Zero Antarctic Habitat Soot</div>
                   </div>
                 </div>
               </div>
@@ -763,28 +777,28 @@ export default function CrisisSimulatorModal({
           {activeTab === 'sld' && (
             <div className="space-y-4">
               {/* SLD Header Bar */}
-              <div className="p-4 rounded-2xl bg-slate-950 text-white font-mono text-xs flex flex-wrap items-center justify-between gap-3 border border-slate-800 shadow-md">
+              <div className="p-4 rounded-2xl bg-[#edf9fd] dark:bg-slate-950 text-[#127694] dark:text-white font-mono text-xs flex flex-wrap items-center justify-between gap-3 border border-[#bcecfc] dark:border-slate-800 shadow-md">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-                  <span className="font-extrabold text-cyan-300 uppercase tracking-wider text-xs sm:text-sm">
+                  <span className="font-extrabold text-[#127694] dark:text-cyan-300 uppercase tracking-wider text-xs sm:text-sm">
                     {currentStation.name} · Substation Single-Line Diagram (415V SLD)
                   </span>
-                  <span className="hidden md:inline px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-800 text-[10px]">
+                  <span className="hidden md:inline px-2 py-0.5 rounded-full bg-[#c2f0fe] dark:bg-cyan-950 text-[#0699C6] dark:text-cyan-300 border border-[#bcecfc] dark:border-cyan-800 text-[10px]">
                     IEC-61850-7-4 MMS
                   </span>
                 </div>
                 <div className="flex items-center gap-4 text-[11px]">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-slate-400">Bus:</span>
-                    <strong className="text-cyan-300 font-bold">{t.bus_voltage_v ? Number(t.bus_voltage_v).toFixed(1) : '415.2'} V</strong>
+                    <span className="text-slate-500 dark:text-slate-400">Bus:</span>
+                    <strong className="text-[#0699C6] dark:text-cyan-300 font-bold">{t.bus_voltage_v ? Number(t.bus_voltage_v).toFixed(1) : '415.2'} V</strong>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-slate-400">Freq:</span>
-                    <strong className="text-emerald-400 font-bold">{t.grid_frequency_hz ? Number(t.grid_frequency_hz).toFixed(2) : '50.02'} Hz</strong>
+                    <span className="text-slate-500 dark:text-slate-400">Freq:</span>
+                    <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{t.grid_frequency_hz ? Number(t.grid_frequency_hz).toFixed(2) : '50.02'} Hz</strong>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-slate-400">Synchrocheck:</span>
-                    <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold text-[10px]">
+                    <span className="text-slate-500 dark:text-slate-400">Synchrocheck:</span>
+                    <span className="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 font-bold text-[10px]">
                       LOCKED (Δθ 0.4°)
                     </span>
                   </div>
@@ -792,7 +806,7 @@ export default function CrisisSimulatorModal({
               </div>
 
               {/* Graphical SVG Single-Line Canvas */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#06111f] to-[#040913] border border-cyan-900/60 shadow-xl overflow-x-auto relative">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#f0f9fd] to-[#e4f5fc] dark:from-[#06111f] dark:to-[#040913] border border-[#bcecfc] dark:border-cyan-900/60 shadow-xl overflow-x-auto relative">
                 
                 {/* Vector SVG Diagram */}
                 <svg
@@ -808,8 +822,17 @@ export default function CrisisSimulatorModal({
                       <stop offset="100%" stopColor="#0699C6" stopOpacity="0.9" />
                     </linearGradient>
                     <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#0f1f38" stopOpacity="0.95" />
-                      <stop offset="100%" stopColor="#0a1424" stopOpacity="0.95" />
+                      {isDark ? (
+                        <>
+                          <stop offset="0%" stopColor="#0f1f38" stopOpacity="0.95" />
+                          <stop offset="100%" stopColor="#0a1424" stopOpacity="0.95" />
+                        </>
+                      ) : (
+                        <>
+                          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.98" />
+                          <stop offset="100%" stopColor="#f8fafc" stopOpacity="0.98" />
+                        </>
+                      )}
                     </linearGradient>
                     <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
                       <feGaussianBlur stdDeviation="3" result="blur" />
@@ -836,12 +859,12 @@ export default function CrisisSimulatorModal({
                       fuelRate: `${((d.p_diesel_1_kw || t.diesel_gen_kw || 75) * 0.26).toFixed(1)} L/h`
                     })}
                   >
-                    <rect x="30" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('DG-1') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="55" cy="50" r="16" fill="#162942" stroke="#f59e0b" strokeWidth="2" />
+                    <rect x="30" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('DG-1') ? '#05C5FF' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="55" cy="50" r="16" fill={circleBg} stroke="#f59e0b" strokeWidth="2" />
                     <text x="55" y="55" textAnchor="middle" fill="#f59e0b" fontFamily="monospace" fontSize="13" fontWeight="bold">G1</text>
-                    <text x="82" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">DG-1 Primary</text>
-                    <text x="82" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.genset_1_max_kw || 160} kW Rated</text>
-                    <text x="82" y="74" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">{(d.p_diesel_1_kw || t.diesel_gen_kw || 75).toFixed(0)} kW</text>
+                    <text x="82" y="44" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">DG-1 Primary</text>
+                    <text x="82" y="58" fill={cardTextSub} fontFamily="sans-serif" fontSize="9">{currentStation.genset_1_max_kw || 160} kW Rated</text>
+                    <text x="82" y="74" fill={cardValueDefault} fontFamily="monospace" fontSize="11" fontWeight="bold">{(d.p_diesel_1_kw || t.diesel_gen_kw || 75).toFixed(0)} kW</text>
                   </g>
 
                   {/* SOURCE 2: Generator 2 (DG-2 Standby) */}
@@ -859,12 +882,12 @@ export default function CrisisSimulatorModal({
                       fuelRate: `${((d.p_diesel_2_kw || 0) * 0.26).toFixed(1)} L/h`
                     })}
                   >
-                    <rect x="220" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('DG-2') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="245" cy="50" r="16" fill="#162942" stroke="#94a3b8" strokeWidth="2" />
-                    <text x="245" y="55" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="13" fontWeight="bold">G2</text>
-                    <text x="272" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">DG-2 Standby</text>
-                    <text x="272" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.genset_2_max_kw || 120} kW Unit</text>
-                    <text x="272" y="74" fill={(d.p_diesel_2_kw || 0) > 0 ? '#38bdf8' : '#64748b'} fontFamily="monospace" fontSize="11" fontWeight="bold">
+                    <rect x="220" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('DG-2') ? '#05C5FF' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="245" cy="50" r="16" fill={circleBg} stroke={isDark ? '#94a3b8' : '#64748b'} strokeWidth="2" />
+                    <text x="245" y="55" textAnchor="middle" fill={isDark ? '#94a3b8' : '#64748b'} fontFamily="monospace" fontSize="13" fontWeight="bold">G2</text>
+                    <text x="272" y="44" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">DG-2 Standby</text>
+                    <text x="272" y="58" fill={cardTextSub} fontFamily="sans-serif" fontSize="9">{currentStation.genset_2_max_kw || 120} kW Unit</text>
+                    <text x="272" y="74" fill={(d.p_diesel_2_kw || 0) > 0 ? cardValueDefault : (isDark ? '#64748b' : '#94a3b8')} fontFamily="monospace" fontSize="11" fontWeight="bold">
                       {(d.p_diesel_2_kw || 0) > 0 ? `${Number(d.p_diesel_2_kw).toFixed(0)} kW` : 'STANDBY'}
                     </text>
                   </g>
@@ -884,12 +907,12 @@ export default function CrisisSimulatorModal({
                       speed: `${t.wind_speed_ms ? Number(t.wind_speed_ms).toFixed(1) : '12.4'} m/s wind velocity`
                     })}
                   >
-                    <rect x="410" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Wind') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="435" cy="50" r="16" fill="#162942" stroke="#38bdf8" strokeWidth="2" />
-                    <text x="435" y="55" textAnchor="middle" fill="#38bdf8" fontFamily="sans-serif" fontSize="13" fontWeight="bold">WT</text>
-                    <text x="462" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Wind Turbine</text>
-                    <text x="462" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.wind_capacity_kw || 100} kW Dual</text>
-                    <text x="462" y="74" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#38bdf8'} fontFamily="monospace" fontSize="11" fontWeight="bold">
+                    <rect x="410" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Wind') ? '#05C5FF' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="435" cy="50" r="16" fill={circleBg} stroke={isDark ? '#38bdf8' : '#0284c7'} strokeWidth="2" />
+                    <text x="435" y="55" textAnchor="middle" fill={isDark ? '#38bdf8' : '#0284c7'} fontFamily="sans-serif" fontSize="13" fontWeight="bold">WT</text>
+                    <text x="462" y="44" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">Wind Turbine</text>
+                    <text x="462" y="58" fill={cardTextSub} fontFamily="sans-serif" fontSize="9">{currentStation.wind_capacity_kw || 100} kW Dual</text>
+                    <text x="462" y="74" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : cardValueDefault} fontFamily="monospace" fontSize="11" fontWeight="bold">
                       {activeScenarioKey === 'KATABATIC_BLIZZARD' ? '0.0 kW (CUTOUT)' : `${(d.p_wind_kw || t.wind_kw || 68).toFixed(0)} kW`}
                     </text>
                   </g>
@@ -909,12 +932,12 @@ export default function CrisisSimulatorModal({
                       albedo: '+20% Albedo reflection gain from Antarctic snowpack'
                     })}
                   >
-                    <rect x="600" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Solar') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="625" cy="50" r="16" fill="#162942" stroke="#facc15" strokeWidth="2" />
+                    <rect x="600" y="20" width="130" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Solar') ? '#05C5FF' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="625" cy="50" r="16" fill={circleBg} stroke="#facc15" strokeWidth="2" />
                     <text x="625" y="55" textAnchor="middle" fill="#facc15" fontFamily="sans-serif" fontSize="13" fontWeight="bold">PV</text>
-                    <text x="652" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Bifacial Solar</text>
-                    <text x="652" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.solar_capacity_kw || 60} kW Array</text>
-                    <text x="652" y="74" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#94a3b8' : '#facc15'} fontFamily="monospace" fontSize="11" fontWeight="bold">
+                    <text x="652" y="44" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">Bifacial Solar</text>
+                    <text x="652" y="58" fill={cardTextSub} fontFamily="sans-serif" fontSize="9">{currentStation.solar_capacity_kw || 60} kW Array</text>
+                    <text x="652" y="74" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? (isDark ? '#94a3b8' : '#64748b') : '#f59e0b'} fontFamily="monospace" fontSize="11" fontWeight="bold">
                       {activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '0.0 kW (NIGHT)' : `${(d.p_solar_kw || t.solar_kw || 35).toFixed(0)} kW`}
                     </text>
                   </g>
@@ -934,12 +957,12 @@ export default function CrisisSimulatorModal({
                       soc: `${t.battery_soc_pct ? Number(t.battery_soc_pct).toFixed(1) : '76.5'}% SoC`
                     })}
                   >
-                    <rect x="790" y="20" width="140" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('BESS') ? '#05C5FF' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="815" cy="50" r="16" fill="#162942" stroke="#10b981" strokeWidth="2" />
+                    <rect x="790" y="20" width="140" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('BESS') ? '#05C5FF' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="815" cy="50" r="16" fill={circleBg} stroke="#10b981" strokeWidth="2" />
                     <text x="815" y="55" textAnchor="middle" fill="#10b981" fontFamily="sans-serif" fontSize="11" fontWeight="bold">BAT</text>
-                    <text x="842" y="44" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">BESS Hub</text>
-                    <text x="842" y="58" fill="#94a3b8" fontFamily="sans-serif" fontSize="9">{currentStation.battery_capacity_kwh || 400} kWh Core</text>
-                    <text x="842" y="74" fill="#10b981" fontFamily="monospace" fontSize="11" fontWeight="bold">
+                    <text x="842" y="44" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">BESS Hub</text>
+                    <text x="842" y="58" fill={cardTextSub} fontFamily="sans-serif" fontSize="9">{currentStation.battery_capacity_kwh || 400} kWh Core</text>
+                    <text x="842" y="74" fill={isDark ? '#10b981' : '#059669'} fontFamily="monospace" fontSize="11" fontWeight="bold">
                       {t.battery_soc_pct ? `${Number(t.battery_soc_pct).toFixed(0)}% SoC` : '77% SoC'}
                     </text>
                   </g>
@@ -949,77 +972,77 @@ export default function CrisisSimulatorModal({
                       ------------------------------------------------------------- */}
 
                   {/* Feeder 1 (DG-1 to CB-01 to Busbar) */}
-                  <line x1="95" y1="95" x2="95" y2="135" stroke="#38bdf8" strokeWidth="2.5" />
+                  <line x1="95" y1="95" x2="95" y2="135" stroke={feederActiveColor} strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-01', type: 'Molded Case Circuit Breaker (MCCB)', rating: '400A / 10kA Icu', status: activeScenarioKey === 'GENSET_TRIP' ? 'TRIPPED (ANSI 51)' : 'CLOSED', function: 'Generator 1 Main Bus Intertie' })}>
-                    <rect x="83" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'GENSET_TRIP' ? '#450a0a' : '#022c22'} stroke={activeScenarioKey === 'GENSET_TRIP' ? '#f43f5e' : '#10b981'} strokeWidth="2" />
+                    <rect x="83" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'GENSET_TRIP' ? (isDark ? '#450a0a' : '#fff1f2') : (isDark ? '#022c22' : '#ecfdf5')} stroke={activeScenarioKey === 'GENSET_TRIP' ? '#f43f5e' : '#10b981'} strokeWidth="2" />
                     <text x="95" y="151" textAnchor="middle" fill={activeScenarioKey === 'GENSET_TRIP' ? '#f43f5e' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
                       {activeScenarioKey === 'GENSET_TRIP' ? 'X' : '||'}
                     </text>
-                    <text x="95" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-01</text>
+                    <text x="95" y="172" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-01</text>
                   </g>
-                  <line x1="95" y1="159" x2="95" y2="215" stroke={activeScenarioKey === 'GENSET_TRIP' ? '#475569' : '#38bdf8'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'GENSET_TRIP' ? '4,4' : 'none'} />
+                  <line x1="95" y1="159" x2="95" y2="215" stroke={activeScenarioKey === 'GENSET_TRIP' ? feederInactiveColor : feederActiveColor} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'GENSET_TRIP' ? '4,4' : 'none'} />
 
                   {/* Feeder 2 (DG-2 to CB-02 to Busbar) */}
-                  <line x1="285" y1="95" x2="285" y2="135" stroke="#64748b" strokeWidth="2.5" />
+                  <line x1="285" y1="95" x2="285" y2="135" stroke={feederInactiveColor} strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-02', type: 'MCCB Intertie', rating: '300A / 10kA Icu', status: (d.p_diesel_2_kw || 0) > 0 ? 'CLOSED' : 'OPEN (Standby)', function: 'Generator 2 Backup Bus Intertie' })}>
-                    <rect x="273" y="135" width="24" height="24" rx="4" fill={(d.p_diesel_2_kw || 0) > 0 ? '#022c22' : '#1e293b'} stroke={(d.p_diesel_2_kw || 0) > 0 ? '#10b981' : '#64748b'} strokeWidth="2" />
-                    <text x="285" y="151" textAnchor="middle" fill={(d.p_diesel_2_kw || 0) > 0 ? '#10b981' : '#94a3b8'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                    <rect x="273" y="135" width="24" height="24" rx="4" fill={(d.p_diesel_2_kw || 0) > 0 ? (isDark ? '#022c22' : '#ecfdf5') : (isDark ? '#1e293b' : '#f1f5f9')} stroke={(d.p_diesel_2_kw || 0) > 0 ? '#10b981' : (isDark ? '#64748b' : '#94a3b8')} strokeWidth="2" />
+                    <text x="285" y="151" textAnchor="middle" fill={(d.p_diesel_2_kw || 0) > 0 ? '#10b981' : cbLabelColor} fontFamily="monospace" fontSize="9" fontWeight="bold">
                       {(d.p_diesel_2_kw || 0) > 0 ? '||' : 'O'}
                     </text>
-                    <text x="285" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-02</text>
+                    <text x="285" y="172" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-02</text>
                   </g>
-                  <line x1="285" y1="159" x2="285" y2="215" stroke={(d.p_diesel_2_kw || 0) > 0 ? '#38bdf8' : '#475569'} strokeWidth="2.5" strokeDasharray={(d.p_diesel_2_kw || 0) > 0 ? 'none' : '4,4'} />
+                  <line x1="285" y1="159" x2="285" y2="215" stroke={(d.p_diesel_2_kw || 0) > 0 ? feederActiveColor : feederInactiveColor} strokeWidth="2.5" strokeDasharray={(d.p_diesel_2_kw || 0) > 0 ? 'none' : '4,4'} />
 
                   {/* Feeder 3 (Wind to CB-03 to Busbar) */}
-                  <line x1="475" y1="95" x2="475" y2="135" stroke="#38bdf8" strokeWidth="2.5" />
+                  <line x1="475" y1="95" x2="475" y2="135" stroke={feederActiveColor} strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-03', type: 'Wind Intertie Contactor', rating: '250A / 10kA', status: activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'TRIPPED (>25 m/s Gale)' : 'CLOSED', function: 'Wind Generation Sync Contactor' })}>
-                    <rect x="463" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#450a0a' : '#022c22'} stroke={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#10b981'} strokeWidth="2" />
+                    <rect x="463" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? (isDark ? '#450a0a' : '#fff1f2') : (isDark ? '#022c22' : '#ecfdf5')} stroke={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#10b981'} strokeWidth="2" />
                     <text x="475" y="151" textAnchor="middle" fill={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#f43f5e' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
                       {activeScenarioKey === 'KATABATIC_BLIZZARD' ? 'X' : '||'}
                     </text>
-                    <text x="475" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-03</text>
+                    <text x="475" y="172" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-03</text>
                   </g>
-                  <line x1="475" y1="159" x2="475" y2="215" stroke={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '#475569' : '#38bdf8'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '4,4' : 'none'} />
+                  <line x1="475" y1="159" x2="475" y2="215" stroke={activeScenarioKey === 'KATABATIC_BLIZZARD' ? feederInactiveColor : feederActiveColor} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'KATABATIC_BLIZZARD' ? '4,4' : 'none'} />
 
                   {/* Feeder 4 (Solar to CB-04 to Busbar) */}
                   <line x1="665" y1="95" x2="665" y2="135" stroke="#facc15" strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-04', type: 'Solar PV DC/AC Inverter Breaker', rating: '160A / 10kA', status: activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? 'OPEN (0.0 kW Night)' : 'CLOSED', function: 'Solar Inverter Bus Feeder' })}>
-                    <rect x="653" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#1e293b' : '#022c22'} stroke={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#64748b' : '#10b981'} strokeWidth="2" />
-                    <text x="665" y="151" textAnchor="middle" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#94a3b8' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
+                    <rect x="653" y="135" width="24" height="24" rx="4" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? (isDark ? '#1e293b' : '#f1f5f9') : (isDark ? '#022c22' : '#ecfdf5')} stroke={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? (isDark ? '#64748b' : '#94a3b8') : '#10b981'} strokeWidth="2" />
+                    <text x="665" y="151" textAnchor="middle" fill={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? cbLabelColor : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
                       {activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? 'O' : '||'}
                     </text>
-                    <text x="665" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-04</text>
+                    <text x="665" y="172" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-04</text>
                   </g>
-                  <line x1="665" y1="159" x2="665" y2="215" stroke={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '#475569' : '#facc15'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '4,4' : 'none'} />
+                  <line x1="665" y1="159" x2="665" y2="215" stroke={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? feederInactiveColor : '#facc15'} strokeWidth="2.5" strokeDasharray={activeScenarioKey === 'POLAR_NIGHT_FREEZE' ? '4,4' : 'none'} />
 
                   {/* Feeder 5 (BESS to CB-05 to Busbar) */}
-                  <line x1="860" y1="95" x2="860" y2="135" stroke="#10b981" strokeWidth="2.5" />
+                  <line x1="860" y1="95" x2="860" y2="135" stroke={feederGreenColor} strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-05', type: 'BESS Bi-Directional High-Speed Static Switch', rating: '250A / 15kA Fast Transfer', status: 'CLOSED (GRID FORMING)', function: 'Primary Frequency Master & Synthetic Inertia Injection' })}>
-                    <rect x="848" y="135" width="24" height="24" rx="4" fill="#022c22" stroke="#10b981" strokeWidth="2" />
+                    <rect x="848" y="135" width="24" height="24" rx="4" fill={isDark ? '#022c22' : '#ecfdf5'} stroke="#10b981" strokeWidth="2" />
                     <text x="860" y="151" textAnchor="middle" fill="#10b981" fontFamily="monospace" fontSize="9" fontWeight="bold">||</text>
-                    <text x="860" y="172" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-05</text>
+                    <text x="860" y="172" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-05</text>
                   </g>
-                  <line x1="860" y1="159" x2="860" y2="215" stroke="#10b981" strokeWidth="2.5" />
+                  <line x1="860" y1="159" x2="860" y2="215" stroke={feederGreenColor} strokeWidth="2.5" />
 
                   {/* -------------------------------------------------------------
                       CENTRAL MAIN 415V SYNCHRONIZATION BUSBAR (HORIZONTAL)
                       ------------------------------------------------------------- */}
                   <line x1="40" y1="215" x2="920" y2="215" stroke="url(#busGrad)" strokeWidth="6" strokeLinecap="round" filter="url(#cyanGlow)" />
-                  <rect x="360" y="202" width="240" height="26" rx="13" fill="#021a2e" stroke="#05C5FF" strokeWidth="1.5" />
-                  <text x="480" y="219" textAnchor="middle" fill="#38bdf8" fontFamily="monospace" fontSize="10" fontWeight="bold">
+                  <rect x="360" y="202" width="240" height="26" rx="13" fill={busBadgeBg} stroke={busBadgeStroke} strokeWidth="1.5" />
+                  <text x="480" y="219" textAnchor="middle" fill={busBadgeText} fontFamily="monospace" fontSize="10" fontWeight="bold">
                     MAIN 415V AC 3-PHASE BUSBAR &middot; 50.02 Hz
                   </text>
 
                   {/* Busbar Tap Points */}
-                  <circle cx="95" cy="215" r="4.5" fill="#38bdf8" />
-                  <circle cx="285" cy="215" r="4.5" fill="#38bdf8" />
-                  <circle cx="475" cy="215" r="4.5" fill="#38bdf8" />
+                  <circle cx="95" cy="215" r="4.5" fill={feederActiveColor} />
+                  <circle cx="285" cy="215" r="4.5" fill={feederActiveColor} />
+                  <circle cx="475" cy="215" r="4.5" fill={feederActiveColor} />
                   <circle cx="665" cy="215" r="4.5" fill="#facc15" />
                   <circle cx="860" cy="215" r="4.5" fill="#10b981" />
 
                   {/* Tap points down to loads */}
                   <circle cx="190" cy="215" r="4.5" fill="#10b981" />
-                  <circle cx="480" cy="215" r="4.5" fill="#38bdf8" />
+                  <circle cx="480" cy="215" r="4.5" fill={feederActiveColor} />
                   <circle cx="770" cy="215" r="4.5" fill="#f59e0b" />
 
                   {/* -------------------------------------------------------------
@@ -1027,13 +1050,13 @@ export default function CrisisSimulatorModal({
                       ------------------------------------------------------------- */}
 
                   {/* FEEDER L1: Tier 1 Life Support Habitat */}
-                  <line x1="190" y1="215" x2="190" y2="255" stroke="#10b981" strokeWidth="2.5" />
+                  <line x1="190" y1="215" x2="190" y2="255" stroke={feederGreenColor} strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-L1', type: 'Life-Support Critical Feeder Breaker', rating: '300A / Zero-Trip Shunt Interlock', status: 'CLOSED (INVIOLABLE)', function: 'Primary Life-Support Habitat Heating & Clean Air Loop' })}>
-                    <rect x="178" y="255" width="24" height="24" rx="4" fill="#022c22" stroke="#10b981" strokeWidth="2" />
+                    <rect x="178" y="255" width="24" height="24" rx="4" fill={isDark ? '#022c22' : '#ecfdf5'} stroke="#10b981" strokeWidth="2" />
                     <text x="190" y="271" textAnchor="middle" fill="#10b981" fontFamily="monospace" fontSize="9" fontWeight="bold">||</text>
-                    <text x="190" y="292" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-L1</text>
+                    <text x="190" y="292" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-L1</text>
                   </g>
-                  <line x1="190" y1="279" x2="190" y2="330" stroke="#10b981" strokeWidth="2.5" />
+                  <line x1="190" y1="279" x2="190" y2="330" stroke={feederGreenColor} strokeWidth="2.5" />
                   
                   <g
                     className="cursor-pointer transition hover:opacity-90"
@@ -1046,22 +1069,22 @@ export default function CrisisSimulatorModal({
                       reserve: 'Zero-outage tolerance; priority diesel commit if deficit occurs'
                     })}
                   >
-                    <rect x="100" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 1') ? '#10b981' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="125" cy="360" r="14" fill="#022c22" stroke="#10b981" strokeWidth="1.5" />
+                    <rect x="100" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 1') ? '#10b981' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="125" cy="360" r="14" fill={isDark ? '#022c22' : '#ecfdf5'} stroke="#10b981" strokeWidth="1.5" />
                     <text x="125" y="364" textAnchor="middle" fill="#10b981" fontFamily="sans-serif" fontSize="11" fontWeight="bold">L1</text>
-                    <text x="148" y="354" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Life-Support Habitat</text>
-                    <text x="148" y="368" fill="#10b981" fontFamily="sans-serif" fontSize="9" fontWeight="bold">INVIOLABLE PRIORITY</text>
-                    <text x="148" y="384" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">142 kW Base Load</text>
+                    <text x="148" y="354" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">Life-Support Habitat</text>
+                    <text x="148" y="368" fill={isDark ? '#10b981' : '#059669'} fontFamily="sans-serif" fontSize="9" fontWeight="bold">INVIOLABLE PRIORITY</text>
+                    <text x="148" y="384" fill={cardValueDefault} fontFamily="monospace" fontSize="11" fontWeight="bold">142 kW Base Load</text>
                   </g>
 
                   {/* FEEDER L2: Tier 2 Water Production & Deep-Space SatCom */}
-                  <line x1="480" y1="215" x2="480" y2="255" stroke="#38bdf8" strokeWidth="2.5" />
+                  <line x1="480" y1="215" x2="480" y2="255" stroke={feederActiveColor} strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-L2', type: 'Essential Mission Feeder Breaker', rating: '160A / Priority 2', status: 'CLOSED', function: 'Snow Melters, Reverse Osmosis & Deep-Space Uplink' })}>
-                    <rect x="468" y="255" width="24" height="24" rx="4" fill="#022c22" stroke="#10b981" strokeWidth="2" />
+                    <rect x="468" y="255" width="24" height="24" rx="4" fill={isDark ? '#022c22' : '#ecfdf5'} stroke="#10b981" strokeWidth="2" />
                     <text x="480" y="271" textAnchor="middle" fill="#10b981" fontFamily="monospace" fontSize="9" fontWeight="bold">||</text>
-                    <text x="480" y="292" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-L2</text>
+                    <text x="480" y="292" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-L2</text>
                   </g>
-                  <line x1="480" y1="279" x2="480" y2="330" stroke="#38bdf8" strokeWidth="2.5" />
+                  <line x1="480" y1="279" x2="480" y2="330" stroke={feederActiveColor} strokeWidth="2.5" />
 
                   <g
                     className="cursor-pointer transition hover:opacity-90"
@@ -1074,24 +1097,24 @@ export default function CrisisSimulatorModal({
                       buffer: 'Water storage tanks provide 48h emergency reserve buffer'
                     })}
                   >
-                    <rect x="390" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 2') ? '#38bdf8' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="415" cy="360" r="14" fill="#162942" stroke="#38bdf8" strokeWidth="1.5" />
-                    <text x="415" y="364" textAnchor="middle" fill="#38bdf8" fontFamily="sans-serif" fontSize="11" fontWeight="bold">L2</text>
-                    <text x="438" y="354" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Water &amp; SatCom</text>
-                    <text x="438" y="368" fill="#38bdf8" fontFamily="sans-serif" fontSize="9">ESSENTIAL MISSION</text>
-                    <text x="438" y="384" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">45 kW Load</text>
+                    <rect x="390" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 2') ? '#38bdf8' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="415" cy="360" r="14" fill={circleBg} stroke={isDark ? '#38bdf8' : '#0284c7'} strokeWidth="1.5" />
+                    <text x="415" y="364" textAnchor="middle" fill={isDark ? '#38bdf8' : '#0284c7'} fontFamily="sans-serif" fontSize="11" fontWeight="bold">L2</text>
+                    <text x="438" y="354" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">Water &amp; SatCom</text>
+                    <text x="438" y="368" fill={isDark ? '#38bdf8' : '#0284c7'} fontFamily="sans-serif" fontSize="9">ESSENTIAL MISSION</text>
+                    <text x="438" y="384" fill={cardValueDefault} fontFamily="monospace" fontSize="11" fontWeight="bold">45 kW Load</text>
                   </g>
 
                   {/* FEEDER L3: Tier 3 Scientific Labs & Auxiliary Contactor */}
                   <line x1="770" y1="215" x2="770" y2="255" stroke="#f59e0b" strokeWidth="2.5" />
                   <g className="cursor-pointer" onClick={() => setSelectedAsset({ name: 'Breaker CB-L3', type: 'Automated Demand Shedding Contactor', rating: '125A / Underfrequency Trip', status: (activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? 'TRIPPED (SHED)' : 'CLOSED', function: 'Fast automated disconnection during extreme generation deficit' })}>
-                    <rect x="758" y="255" width="24" height="24" rx="4" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#450a0a' : '#022c22'} stroke={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#10b981'} strokeWidth="2" />
+                    <rect x="758" y="255" width="24" height="24" rx="4" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? (isDark ? '#450a0a' : '#fff1f2') : (isDark ? '#022c22' : '#ecfdf5')} stroke={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#10b981'} strokeWidth="2" />
                     <text x="770" y="271" textAnchor="middle" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#10b981'} fontFamily="monospace" fontSize="9" fontWeight="bold">
                       {(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? 'X' : '||'}
                     </text>
-                    <text x="770" y="292" textAnchor="middle" fill="#94a3b8" fontFamily="monospace" fontSize="9">CB-L3</text>
+                    <text x="770" y="292" textAnchor="middle" fill={cbLabelColor} fontFamily="monospace" fontSize="9">CB-L3</text>
                   </g>
-                  <line x1="770" y1="279" x2="770" y2="330" stroke={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#475569' : '#f59e0b'} strokeWidth="2.5" strokeDasharray={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '4,4' : 'none'} />
+                  <line x1="770" y1="279" x2="770" y2="330" stroke={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? feederInactiveColor : '#f59e0b'} strokeWidth="2.5" strokeDasharray={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '4,4' : 'none'} />
 
                   <g
                     className="cursor-pointer transition hover:opacity-90"
@@ -1104,20 +1127,20 @@ export default function CrisisSimulatorModal({
                       tripCondition: 'Automatic trip if system frequency drops below 49.5 Hz or spinning reserve falls under 10 kW'
                     })}
                   >
-                    <rect x="680" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 3') ? '#f59e0b' : '#1e385c'} strokeWidth="1.5" />
-                    <circle cx="705" cy="360" r="14" fill="#291e10" stroke="#f59e0b" strokeWidth="1.5" />
+                    <rect x="680" y="330" width="180" height="75" rx="8" fill="url(#cardGrad)" stroke={selectedAsset?.name?.includes('Tier 3') ? '#f59e0b' : cardStrokeDefault} strokeWidth="1.5" />
+                    <circle cx="705" cy="360" r="14" fill={isDark ? '#291e10' : '#fef3c7'} stroke="#f59e0b" strokeWidth="1.5" />
                     <text x="705" y="364" textAnchor="middle" fill="#f59e0b" fontFamily="sans-serif" fontSize="11" fontWeight="bold">L3</text>
-                    <text x="728" y="354" fill="#ffffff" fontFamily="sans-serif" fontSize="11" fontWeight="bold">Science &amp; Auxiliary</text>
+                    <text x="728" y="354" fill={cardTextTitle} fontFamily="sans-serif" fontSize="11" fontWeight="bold">Science &amp; Auxiliary</text>
                     <text x="728" y="368" fill={(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? '#f43f5e' : '#f59e0b'} fontFamily="sans-serif" fontSize="9" fontWeight="bold">
                       {(activeScenarioKey === 'ISLAND_BLACKSTART' || (t.unmet_load_kw > 0)) ? 'SHEDDED CONTINGENCY' : 'SHEDDABLE CONTACTOR'}
                     </text>
-                    <text x="728" y="384" fill="#38bdf8" fontFamily="monospace" fontSize="11" fontWeight="bold">35 kW Load</text>
+                    <text x="728" y="384" fill={cardValueDefault} fontFamily="monospace" fontSize="11" fontWeight="bold">35 kW Load</text>
                   </g>
 
                 </svg>
 
                 {/* Substation Legend & Interaction Guide */}
-                <div className="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400">
                   <div className="flex items-center gap-4 text-[11px]">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded bg-emerald-500 inline-block"></span>
@@ -1128,11 +1151,11 @@ export default function CrisisSimulatorModal({
                       <span>CB Tripped / Locked</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded bg-slate-500 inline-block"></span>
+                      <span className="w-2.5 h-2.5 rounded bg-slate-400 dark:bg-slate-500 inline-block"></span>
                       <span>CB Open (Standby)</span>
                     </div>
                   </div>
-                  <div className="text-[10px] font-mono text-cyan-400">
+                  <div className="text-[10px] font-mono text-[#0699C6] dark:text-cyan-400">
                     &bull; CLICK ANY GENERATOR, BREAKER OR LOAD TO INSPECT RELAY SETTINGS
                   </div>
                 </div>
@@ -1141,38 +1164,38 @@ export default function CrisisSimulatorModal({
 
               {/* Interactive Selected Asset Inspector Card */}
               {selectedAsset && (
-                <div className="p-4 rounded-2xl bg-slate-900 border border-cyan-800/80 text-white space-y-2 animate-fadeIn shadow-lg">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-[#bcecfc] dark:border-cyan-800/80 text-slate-800 dark:text-white space-y-2 animate-fadeIn shadow-xl">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
                     <div className="flex items-center gap-2">
-                      <i className="fa-solid fa-microchip text-cyan-400"></i>
-                      <strong className="text-xs sm:text-sm text-cyan-300 font-mono uppercase">{selectedAsset.name}</strong>
+                      <i className="fa-solid fa-microchip text-[#0699C6] dark:text-cyan-400"></i>
+                      <strong className="text-xs sm:text-sm text-[#127694] dark:text-cyan-300 font-mono uppercase">{selectedAsset.name}</strong>
                     </div>
                     <button
                       type="button"
                       onClick={() => setSelectedAsset(null)}
-                      className="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700"
+                      className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white text-xs px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                     >
                       Close
                     </button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-1">
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Subsystem Type</span>
-                      <strong className="text-slate-200">{selectedAsset.type || 'Electrical Component'}</strong>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase block font-bold">Subsystem Type</span>
+                      <strong className="text-slate-800 dark:text-slate-200 font-bold">{selectedAsset.type || 'Electrical Component'}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Hardware Rating</span>
-                      <strong className="text-cyan-300 font-mono">{selectedAsset.rating || '400V Nominal'}</strong>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase block font-bold">Hardware Rating</span>
+                      <strong className="text-[#0699C6] dark:text-cyan-300 font-mono font-bold">{selectedAsset.rating || '400V Nominal'}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Breaker Status</span>
-                      <strong className={selectedAsset.breakerStatus === 'TRIPPED' ? 'text-rose-400 font-mono' : 'text-emerald-400 font-mono'}>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase block font-bold">Breaker Status</span>
+                      <strong className={selectedAsset.breakerStatus === 'TRIPPED' ? 'text-rose-600 dark:text-rose-400 font-mono font-bold' : 'text-emerald-600 dark:text-emerald-400 font-mono font-bold'}>
                         {selectedAsset.breaker || selectedAsset.status || 'CLOSED'}
                       </strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 uppercase block font-bold">Protective Relaying</span>
-                      <strong className="text-slate-200 text-[11px]">{selectedAsset.protection || selectedAsset.function || 'IEC 60255'}</strong>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase block font-bold">Protective Relaying</span>
+                      <strong className="text-slate-800 dark:text-slate-200 text-[11px]">{selectedAsset.protection || selectedAsset.function || 'IEC 60255'}</strong>
                     </div>
                   </div>
                 </div>
@@ -1190,25 +1213,26 @@ export default function CrisisSimulatorModal({
                 <span className="font-mono text-[10px]">PROTOCOL: IEC-61850-8-1 MMS</span>
               </div>
 
-              <div className="rounded-2xl bg-slate-950 border border-slate-800 p-4 font-mono text-xs text-slate-300 space-y-2 max-h-[450px] overflow-y-auto shadow-inner">
+              <div className="rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-4 font-mono text-xs text-slate-700 dark:text-slate-300 space-y-2 max-h-[450px] overflow-y-auto shadow-inner">
                 {scadaEvents.map((evt) => (
-                  <div key={evt.id} className="flex items-start gap-2.5 py-1 border-b border-slate-900">
-                    <span className="text-slate-500 shrink-0 text-[10px]">{evt.time}</span>
+                  <div key={evt.id} className="flex items-start gap-2.5 py-1 border-b border-slate-100 dark:border-slate-900">
+                    <span className="text-slate-400 shrink-0 text-[10px]">{evt.time}</span>
                     <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold shrink-0 ${
                       evt.type === 'ALARM'
-                        ? 'bg-rose-950 text-rose-300 border border-rose-800'
+                        ? 'bg-rose-50 text-rose-700 border border-rose-300 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800'
                         : evt.type === 'RESTORE'
-                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
-                        : 'bg-cyan-950 text-cyan-300 border border-cyan-800'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800'
+                        : 'bg-[#edf9fd] text-[#127694] border border-[#bcecfc] dark:bg-cyan-950 dark:text-cyan-300 dark:border-cyan-800'
                     }`}>
                       {evt.code}
                     </span>
-                    <span className="text-slate-300 leading-snug">{evt.message}</span>
+                    <span className="text-slate-700 dark:text-slate-300 leading-snug">{evt.message}</span>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
 
         </div>
 
