@@ -566,6 +566,8 @@ function AppDashboard({
     isStale,
     staleSeconds,
     quality,
+    isAutonomousTwin,
+    isBackendWaking,
     reconnectNow,
     updateTelemetrySnapshot
   } = useTelemetry();
@@ -613,6 +615,8 @@ function AppDashboard({
           isStale,
           staleSeconds,
           quality,
+          isAutonomousTwin,
+          isBackendWaking,
           reconnectNow,
           alertCount: latestData?.alerts?.active_count || (latestData?.alerts?.items?.length || 0),
           recommendationsCount: latestData?.recommendations?.active_count ?? (latestData?.recommendations?.items?.length || 4)

@@ -61,34 +61,34 @@ export default function Header({
   }, []);
 
   return (
-    <header id="mainNavHeader" className="w-full floating-nav px-4 py-2.5 z-40 relative transition-all duration-300 flex flex-col gap-2">
+    <header id="mainNavHeader" className="w-full floating-nav px-2.5 sm:px-4 py-2 sm:py-2.5 z-40 relative transition-all duration-300 flex flex-col gap-2">
       
       {/* =========================================================================
           ROW 1: TOP COMMAND UTILITY BAR
           Station + Status + Operating Mode [DEMO | SCADA] + [OVERRIDE] + Global Status
           ========================================================================= */}
-      <div className="flex items-center justify-between w-full gap-2 xl:gap-3 flex-nowrap overflow-x-auto lg:overflow-visible">
+      <div className="flex items-center justify-between w-full gap-1.5 sm:gap-2 xl:gap-3 flex-nowrap overflow-x-auto lg:overflow-visible no-scrollbar pb-0.5 sm:pb-0">
         
         {/* Left Section: Brand, Station Selector, Operating Mode & OVERRIDE */}
-        <div className="flex items-center gap-2 lg:gap-2.5 shrink-0 flex-nowrap">
+        <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 shrink-0 flex-nowrap">
           {/* Brand Identity & Polar System Tag */}
           <div
-            className="flex items-center gap-2.5 cursor-pointer"
+            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer"
             onClick={() => {
               onOpenModal(null);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             title="Click to view Operational Overview HUD"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
-              <i className="fa-solid fa-snowflake text-sm text-white"></i>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
+              <i className="fa-solid fa-snowflake text-xs sm:text-sm text-white"></i>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="flex flex-col justify-center">
-                <span className="font-black tracking-tight text-base sm:text-lg text-[#127694] leading-none">
+                <span className="font-black tracking-tight text-sm sm:text-base md:text-lg text-[#127694] leading-none">
                   Novara
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase text-[#0699C6] leading-none mt-0.5">
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wider uppercase text-[#0699C6] leading-none mt-0.5">
                   Polar EMS
                 </span>
               </div>
@@ -106,10 +106,10 @@ export default function Header({
               onClick={() => setIsStationMenuOpen(!isStationMenuOpen)}
               aria-label="Select Antarctic Station"
               aria-expanded={isStationMenuOpen}
-              className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#bcecfc] transition text-[#127694] font-bold text-xs shadow-xs cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#bcecfc] transition text-[#127694] font-bold text-[11px] sm:text-xs shadow-xs cursor-pointer shrink-0"
             >
               <i className="fa-solid fa-location-dot text-[#0699C6]"></i>
-              <span>Station:</span>
+              <span className="hidden xs:inline">Station:</span>
               <span className="text-slate-900 font-extrabold uppercase">{currentStation.name.split(' ')[0]}</span>
               <i className={`fa-solid fa-chevron-down text-[10px] transition-transform duration-200 ${isStationMenuOpen ? 'rotate-180' : ''}`}></i>
             </button>
@@ -239,19 +239,31 @@ export default function Header({
                 type="button"
                 onClick={() => setIsDiagOpen(!isDiagOpen)}
                 className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border transition flex items-center gap-1.5 justify-end shadow-xs cursor-pointer ${
-                  telemetryMeta.connectionState === 'RECONNECTING'
+                  telemetryMeta.isBackendWaking
                     ? 'bg-sky-50 text-sky-800 border-sky-300'
+                    : telemetryMeta.connectionState === 'RECONNECTING'
+                    ? 'bg-sky-50 text-sky-800 border-sky-300'
+                    : telemetryMeta.isAutonomousTwin
+                    ? 'bg-[#e5f6fd] text-[#127694] border-[#9ae5fe]'
                     : telemetryMeta.isStale
                     ? 'bg-rose-50 text-rose-800 border-rose-300'
                     : mode === 'SCADA_MODE'
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
                     : 'bg-[#edf9fd] text-[#127694] border-[#bcecfc]'
                 }`}
-                title="Click to view live telemetry diagnostics"
+                title={
+                  telemetryMeta.isAutonomousTwin
+                    ? 'Autonomous Client Digital Twin Active (Calibrated Physics)'
+                    : 'Click to view live telemetry diagnostics'
+                }
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${
-                  telemetryMeta.connectionState === 'RECONNECTING'
-                    ? 'bg-sky-500'
+                  telemetryMeta.isBackendWaking
+                    ? 'bg-sky-500 animate-pulse'
+                    : telemetryMeta.connectionState === 'RECONNECTING'
+                    ? 'bg-sky-500 animate-pulse'
+                    : telemetryMeta.isAutonomousTwin
+                    ? 'bg-[#05C5FF] animate-pulse'
                     : telemetryMeta.isStale
                     ? 'bg-rose-500'
                     : mode === 'SCADA_MODE'
@@ -259,15 +271,21 @@ export default function Header({
                     : 'bg-[#05C5FF]'
                 }`}></span>
                 <span>
-                  {telemetryMeta.connectionState === 'RECONNECTING'
+                  {telemetryMeta.isBackendWaking
+                    ? 'WAKING SERVER...'
+                    : telemetryMeta.connectionState === 'RECONNECTING'
                     ? `RECONNECTING (${telemetryMeta.retryCount || 1}/5)`
+                    : telemetryMeta.isAutonomousTwin
+                    ? '● AUTONOMOUS TWIN (1 Hz)'
                     : telemetryMeta.isStale
                     ? `● DATA STALE (${telemetryMeta.staleSeconds}s ago)`
                     : mode === 'SCADA_MODE'
                     ? '● LIVE SCADA'
-                    : '● SIMULATION (1 Hz)'}
+                    : '● LIVE STREAM (1 Hz)'}
                 </span>
-                <span className="text-[8px] font-mono text-slate-400">({telemetryMeta.latencyMs || 12}ms)</span>
+                <span className="text-[8px] font-mono text-slate-400">
+                  ({telemetryMeta.isAutonomousTwin ? '0ms' : `${telemetryMeta.latencyMs || 12}ms`})
+                </span>
               </button>
 
               {/* Diagnostic Hover/Click Popover */}
@@ -279,20 +297,32 @@ export default function Header({
                       Telemetry Diagnostics
                     </span>
                     <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                      telemetryMeta.isStale ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+                      telemetryMeta.isAutonomousTwin
+                        ? 'bg-[#c2f0fe] text-[#127694]'
+                        : telemetryMeta.isStale
+                        ? 'bg-rose-100 text-rose-800'
+                        : 'bg-emerald-100 text-emerald-800'
                     }`}>
-                      {telemetryMeta.connectionState || 'CONNECTED'}
+                      {telemetryMeta.isAutonomousTwin ? 'AUTONOMOUS TWIN' : (telemetryMeta.connectionState || 'CONNECTED')}
                     </span>
                   </div>
 
                   <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500 text-[11px]">Stream Engine:</span>
+                      <strong className={`font-bold text-[11px] ${telemetryMeta.isAutonomousTwin ? 'text-[#0699C6]' : 'text-emerald-700'}`}>
+                        {telemetryMeta.isAutonomousTwin ? 'Autonomous Digital Twin' : 'FastAPI Live Telemetry'}
+                      </strong>
+                    </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 text-[11px]">Station Stream:</span>
                       <strong className="font-bold text-[#127694]">{stationId}</strong>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 text-[11px]">Round-Trip Latency:</span>
-                      <span className="font-mono font-bold text-slate-800">{telemetryMeta.latencyMs || 12} ms</span>
+                      <span className="font-mono font-bold text-slate-800">
+                        {telemetryMeta.isAutonomousTwin ? '0 ms (Client Math)' : `${telemetryMeta.latencyMs || 12} ms`}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 text-[11px]">Packets Ingested:</span>
@@ -313,7 +343,7 @@ export default function Header({
                     <div className="flex items-center justify-between">
                       <span className="text-slate-500 text-[11px]">Last Valid Packet:</span>
                       <span className="font-mono text-slate-600 text-[10px]">
-                        {telemetryMeta.staleSeconds < 2 ? 'Just now (<1s)' : `${telemetryMeta.staleSeconds}s ago`}
+                        {telemetryMeta.isAutonomousTwin ? 'Real-time (Active Twin)' : (telemetryMeta.staleSeconds < 2 ? 'Just now (<1s)' : `${telemetryMeta.staleSeconds}s ago`)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -353,15 +383,21 @@ export default function Header({
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400">Cadence: ~1.0 Hz WebSocket</span>
+                  <div className="mt-3 pt-2 border-t border-slate-100 flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400">Cadence: ~1.0 Hz High-Speed</span>
+                      <span className="text-[9px] font-mono text-slate-400">
+                        {telemetryMeta.isAutonomousTwin ? 'Client Digital Twin' : 'FastAPI Stream'}
+                      </span>
+                    </div>
                     {telemetryMeta.reconnectNow && (
                       <button
                         type="button"
                         onClick={telemetryMeta.reconnectNow}
-                        className="px-2 py-1 rounded-lg bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] font-bold text-[10px] border border-[#bcecfc] transition cursor-pointer"
+                        className="w-full mt-1 px-3 py-1.5 rounded-lg bg-[#127694] hover:bg-[#0699C6] text-white font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                       >
-                        Force Resync
+                        <i className={`fa-solid fa-rotate text-xs ${telemetryMeta.isBackendWaking ? 'animate-spin' : ''}`}></i>
+                        <span>{telemetryMeta.isBackendWaking ? 'Waking Cloud Backend...' : 'Wake / Reconnect Backend'}</span>
                       </button>
                     )}
                   </div>

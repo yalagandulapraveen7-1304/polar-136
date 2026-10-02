@@ -85,13 +85,13 @@ export default function MetricCards({
   const tempHistory = buffer.length > 3 ? buffer.map((pt) => pt.temp_c) : [tempC + 0.2, tempC - 0.1, tempC];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 w-full">
 
       {/* 1. BATTERY RESERVE GAUGE CARD */}
       {/* 1. BATTERY RESERVE GAUGE CARD (Section 4 Battery Management) */}
       <div
         onClick={() => onOpenModal('battery')}
-        className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0faff] cursor-pointer hover:border-[#0699C6] hover:shadow-md transition group"
+        className="novara-card p-3.5 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0faff] cursor-pointer hover:border-[#0699C6] hover:shadow-md transition group"
         title="Click to open Battery Management & Storage Sizing Center"
       >
         <div className="flex items-center justify-between">
@@ -191,7 +191,7 @@ export default function MetricCards({
       </div>
 
       {/* 2. CURRENT LOAD CARD */}
-      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f7fcfe]">
+      <div className="novara-card p-3.5 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f7fcfe]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
@@ -250,7 +250,7 @@ export default function MetricCards({
       </div>
 
       {/* 3. RENEWABLE GENERATION CARD */}
-      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0fdf4]">
+      <div className="novara-card p-3.5 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#f0fdf4]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">
@@ -308,7 +308,7 @@ export default function MetricCards({
       </div>
 
       {/* 4. ENVIRONMENTAL CONDITIONS CARD */}
-      <div className="novara-card p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#eff6ff]">
+      <div className="novara-card p-3.5 sm:p-5 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-white to-[#eff6ff]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-xs">
