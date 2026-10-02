@@ -67,10 +67,10 @@ export default function Header({
           ROW 1: TOP COMMAND UTILITY BAR
           Station + Status + Operating Mode [DEMO | SCADA] + [OVERRIDE] + Global Status
           ========================================================================= */}
-      <div className="flex items-center justify-between w-full gap-1.5 sm:gap-2 xl:gap-3 flex-nowrap overflow-x-auto lg:overflow-visible no-scrollbar pb-0.5 sm:pb-0">
+      <div className="flex items-center justify-between w-full gap-2 lg:gap-3">
         
         {/* Left Section: Brand, Station Selector, Operating Mode & OVERRIDE */}
-        <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2.5 shrink-0 flex-nowrap">
+        <div className="flex items-center gap-2 lg:gap-2.5 shrink-0">
           {/* Brand Identity & Polar System Tag */}
           <div
             className="flex items-center gap-2 sm:gap-2.5 cursor-pointer"
@@ -80,15 +80,15 @@ export default function Header({
             }}
             title="Click to view Operational Overview HUD"
           >
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
-              <i className="fa-solid fa-snowflake text-xs sm:text-sm text-white"></i>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0699C6] to-[#127694] text-white flex items-center justify-center shadow-md shrink-0">
+              <i className="fa-solid fa-snowflake text-sm text-white"></i>
             </div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <div className="flex flex-col justify-center">
-                <span className="font-black tracking-tight text-sm sm:text-base md:text-lg text-[#127694] leading-none">
+                <span className="font-black tracking-tight text-base sm:text-lg text-[#127694] leading-none">
                   Novara
                 </span>
-                <span className="text-[8px] sm:text-[9px] md:text-[10px] font-bold tracking-wider uppercase text-[#0699C6] leading-none mt-0.5">
+                <span className="text-[9px] sm:text-[10px] font-bold tracking-wider uppercase text-[#0699C6] leading-none mt-0.5">
                   Polar EMS
                 </span>
               </div>
@@ -99,14 +99,14 @@ export default function Header({
             </div>
           </div>
 
-          {/* Station Selector Dropdown */}
-          <div className="relative" id="stationDropdownContainer">
+          {/* Station Selector Dropdown (Desktop Only) */}
+          <div className="hidden lg:block relative" id="stationDropdownContainer">
             <button
               type="button"
               onClick={() => setIsStationMenuOpen(!isStationMenuOpen)}
               aria-label="Select Antarctic Station"
               aria-expanded={isStationMenuOpen}
-              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#bcecfc] transition text-[#127694] font-bold text-[11px] sm:text-xs shadow-xs cursor-pointer shrink-0"
+              className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#e5f6fd] hover:bg-[#c2f0fe] border border-[#bcecfc] transition text-[#127694] font-bold text-xs shadow-xs cursor-pointer shrink-0"
             >
               <i className="fa-solid fa-location-dot text-[#0699C6]"></i>
               <span className="hidden xs:inline">Station:</span>
@@ -159,8 +159,8 @@ export default function Header({
             )}
           </div>
 
-          {/* Operational Mode Toggle: DEMO vs SCADA */}
-          <div className="flex items-center gap-1 bg-[#e5f6fd] p-0.5 rounded-full border border-[#bcecfc]">
+          {/* Operational Mode Toggle: DEMO vs SCADA (Desktop Only - In Mobile Drawer on Mobile) */}
+          <div className="hidden lg:flex items-center gap-1 bg-[#e5f6fd] p-0.5 rounded-full border border-[#bcecfc]">
             <button
               type="button"
               className={`mode-pill ${mode === 'DEMO_MODE' ? 'active' : ''}`}
@@ -179,11 +179,11 @@ export default function Header({
             </button>
           </div>
 
-          {/* Operational Control: OVERRIDE positioned immediately after DEMO / SCADA */}
+          {/* Operational Control: OVERRIDE positioned immediately after DEMO / SCADA (Desktop Only - In Mobile Drawer on Mobile) */}
           <button
             type="button"
             onClick={() => onOpenModal('manual')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border transition shadow-xs cursor-pointer ${
+            className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border transition shadow-xs cursor-pointer ${
               mode === 'DEMO_MODE'
                 ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
                 : 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-300'
@@ -204,8 +204,8 @@ export default function Header({
           </button>
         </div>
 
-        {/* Right Section: System Operational Badge, UTC Clock, Telemetry Status, Operator Profile */}
-        <div className="flex items-center gap-2 lg:gap-2.5 shrink-0 justify-end flex-nowrap ml-auto">
+        {/* Desktop Right Section: System Operational Badge, UTC Clock, Telemetry Status, Operator Profile */}
+        <div className="hidden lg:flex items-center gap-2 lg:gap-2.5 shrink-0 justify-end flex-nowrap ml-auto">
           
           {/* System Status Pill: "● OPERATIONAL" */}
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-xs shrink-0">
@@ -421,21 +421,50 @@ export default function Header({
             <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'}`} aria-hidden="true"></i>
             <span className="hidden sm:inline font-mono text-[10px] uppercase font-extrabold">{isDarkMode ? 'DAY ICE' : 'AURORA NIGHT'}</span>
           </button>
+        </div>
 
-          {/* Mobile Navigation Drawer Trigger */}
-          <div className="lg:hidden relative shrink-0" id="mobileNavContainer">
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle Navigation Menu"
-              aria-expanded={isMobileMenuOpen}
-              className="w-8 h-8 rounded-xl bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] border border-[#bcecfc] flex items-center justify-center transition cursor-pointer"
-              title="Open Navigation Menu"
-            >
-              <i className={`fa-solid ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'} text-sm`}></i>
-            </button>
+        {/* Mobile Right Section: Compact Status Badge & Burger Menu Button */}
+        <div className="flex lg:hidden items-center gap-1.5 sm:gap-2 shrink-0 ml-auto" id="mobileNavContainer">
+          {/* Compact Telemetry & Mode Badge */}
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#e5f6fd] border border-[#bcecfc] text-[#127694] text-[10px] font-extrabold shadow-xs">
+            <span className={`w-1.5 h-1.5 rounded-full ${
+              telemetryMeta?.isAutonomousTwin ? 'bg-[#05C5FF]' : telemetryMeta?.isStale ? 'bg-rose-500' : 'bg-emerald-500'
+            } animate-pulse`}></span>
+            <span className="uppercase">{currentStation.name.split(' ')[0]}</span>
+            <span className="text-slate-400 font-normal">·</span>
+            <span className="text-[#0699C6]">{mode === 'SCADA_MODE' ? 'SCADA' : 'DEMO'}</span>
           </div>
 
+          {/* Theme Toggle */}
+          <button
+            type="button"
+            onClick={onToggleDarkMode}
+            aria-label={isDarkMode ? 'Switch to Arctic Day Ice Theme' : 'Switch to Aurora Polar Night Mode'}
+            className={`w-8 h-8 rounded-xl border flex items-center justify-center transition shadow-xs cursor-pointer ${
+              isDarkMode
+                ? 'bg-[#162a45] text-cyan-300 border-cyan-500/50 hover:bg-[#1e3a5f]'
+                : 'bg-[#e5f6fd] text-[#127694] border-[#bcecfc] hover:bg-[#c2f0fe]'
+            }`}
+            title={isDarkMode ? 'Switch to Arctic Day Theme' : 'Switch to Aurora Night Mode'}
+          >
+            <i className={`fa-solid ${isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-[#0699C6]'} text-xs`} aria-hidden="true"></i>
+          </button>
+
+          {/* Burger Menu Button */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle Mission Controls Menu"
+            aria-expanded={isMobileMenuOpen}
+            className={`w-8 h-8 rounded-xl border flex items-center justify-center transition shadow-xs cursor-pointer ${
+              isMobileMenuOpen
+                ? 'bg-[#127694] text-white border-[#127694]'
+                : 'bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] border-[#bcecfc]'
+            }`}
+            title="Open Mission Controls Menu"
+          >
+            <i className={`fa-solid ${isMobileMenuOpen ? 'fa-xmark' : 'fa-bars'} text-sm`}></i>
+          </button>
         </div>
       </div>
 
@@ -583,13 +612,110 @@ export default function Header({
 
         {/* Mobile / Tablet Responsive Drawer Navigation Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden mt-2 p-3 bg-white rounded-2xl border border-[#bcecfc] shadow-xl animate-fadeIn space-y-3 font-sans">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-1.5">
+          <div className="lg:hidden mt-2 p-3 bg-white rounded-2xl border border-[#bcecfc] shadow-xl animate-fadeIn space-y-3 font-sans max-h-[85vh] overflow-y-auto">
+            {/* Mobile Mission Controls: Station Selector */}
+            <div className="space-y-1.5 pb-2 border-b border-slate-100">
+              <div className="flex items-center justify-between text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                <span>Antarctic Station</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenModal('comparison');
+                  }}
+                  className="text-[#0699C6] font-extrabold hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <i className="fa-solid fa-code-compare text-[9px]"></i> Compare Bases
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-1.5">
+                {Object.values(STATIONS).map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => {
+                      onStationChange(st.id);
+                    }}
+                    className={`py-1.5 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer border ${
+                      stationId === st.id
+                        ? 'bg-[#127694] text-white border-[#127694] shadow-xs'
+                        : 'bg-[#edf9fd] hover:bg-[#c2f0fe] text-[#127694] border-[#bcecfc]'
+                    }`}
+                  >
+                    <i className="fa-solid fa-location-dot text-[10px]"></i>
+                    <span>{st.name.split(' ')[0]} Base</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile Operational Mode [DEMO | SCADA] & [OVERRIDE] */}
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-1 bg-[#e5f6fd] p-0.5 rounded-full border border-[#bcecfc] flex-1">
+                <button
+                  type="button"
+                  className={`mode-pill flex-1 text-center py-1 text-[11px] ${mode === 'DEMO_MODE' ? 'active' : ''}`}
+                  onClick={() => onModeChange('DEMO_MODE')}
+                >
+                  DEMO
+                </button>
+                <button
+                  type="button"
+                  className={`mode-pill flex-1 text-center py-1 text-[11px] ${mode === 'SCADA_MODE' ? 'active' : ''}`}
+                  onClick={() => onModeChange('SCADA_MODE')}
+                >
+                  SCADA
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenModal('manual');
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black border transition shadow-xs cursor-pointer shrink-0 ${
+                  mode === 'DEMO_MODE'
+                    ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
+                    : 'bg-rose-50 hover:bg-rose-100 text-rose-900 border-rose-300'
+                }`}
+              >
+                <i className={`fa-solid fa-sliders text-xs ${mode === 'DEMO_MODE' ? 'text-amber-600' : 'text-rose-600'}`}></i>
+                <span>OVERRIDE</span>
+              </button>
+            </div>
+
+            {/* Live Clock & Stream Status Bar */}
+            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-600 text-xs font-mono">
+              <span className="font-bold flex items-center gap-1.5 text-[11px]">
+                <i className="fa-regular fa-clock text-slate-400"></i>
+                {clockTime || 'ANTARCTIC UTC'}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${
+                  telemetryMeta?.isAutonomousTwin ? 'bg-[#05C5FF]' : telemetryMeta?.isStale ? 'bg-rose-500' : 'bg-emerald-500'
+                } animate-pulse`}></span>
+                <span className="text-[10px] font-bold">
+                  {telemetryMeta?.isAutonomousTwin ? 'AUTONOMOUS TWIN' : telemetryMeta?.isStale ? 'STALE' : 'LIVE'}
+                </span>
+                {telemetryMeta?.reconnectNow && (
+                  <button
+                    type="button"
+                    onClick={telemetryMeta.reconnectNow}
+                    className="ml-1 text-[9px] font-sans font-bold text-[#127694] underline cursor-pointer"
+                  >
+                    Resync
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-slate-100 pb-1 pt-1">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
-                5 Primary Polar EMS Workspaces
+                Primary Polar EMS Workspaces
               </span>
               <span className="text-[9px] font-mono text-[#0699C6] font-bold">
-                {stationId} &middot; {mode === 'SCADA_MODE' ? 'SCADA' : 'DEMO'}
+                8 MODULES
               </span>
             </div>
 
