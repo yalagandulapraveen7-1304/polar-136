@@ -1,0 +1,9 @@
+{
+  "name": "polar-136",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "start": "node -e \"console.log('Build output located in frontend/dist')\""
+  }
+}

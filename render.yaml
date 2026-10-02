@@ -1,7 +1,7 @@
 # Render configuration for PolarOPS backend
 services:
   - type: web
-    name: polarops-backend          # you can rename it later in Render UI
+    name: polar-136
     env: docker
     dockerfilePath: ./Dockerfile    # uses existing Dockerfile to build FastAPI
     startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"

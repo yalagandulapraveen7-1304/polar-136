@@ -1,22 +1,24 @@
 # Dockerfile for PolarOPS backend (Render deployment)
-# Use official Python slim image for a small footprint
 FROM python:3.12-slim
 
-# Install system dependencies required by some Python packages (git, gcc, etc.)
-RUN apt-get update && apt-get install -y --no-install-recommends git gcc && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (gcc and libgomp1 required for LightGBM OpenMP)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Install Python dependencies first (leverages Docker layer caching)
+# Install Python dependencies with memory-efficient flags
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --prefer-binary -r requirements.txt
 
-# Copy the application source code
-COPY . ./
+# Copy only the backend source code
+COPY backend/ ./backend/
+COPY requirements.txt ./
 
-# Expose the port that Render will provide via $PORT
-EXPOSE $PORT
+# Default fallback port (Render injects $PORT at runtime)
+ENV PORT=10000
 
 CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
-
