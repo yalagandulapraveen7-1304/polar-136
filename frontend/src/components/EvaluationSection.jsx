@@ -51,6 +51,10 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
   const diesel = m.diesel_fuel || m.fuel_consumption_liters || {};
   const ren = m.renewable_utilization || m.renewable_penetration_pct || {};
   const cost = m.operating_cost || m.operating_cost_usd || {};
+  const isAlreadyInr = cost.unit?.includes('INR') || cost.unit?.includes('₹') || (cost.baseline && cost.baseline > 50000);
+  const baseCostInr = isAlreadyInr ? (cost.baseline || 0) : Math.round((cost.baseline || 0) * 83.5);
+  const polarCostInr = isAlreadyInr ? (cost.polarops || 0) : Math.round((cost.polarops || 0) * 83.5);
+  const savedCostInr = isAlreadyInr ? (cost.saved || 0) : Math.round((cost.saved || 0) * 83.5);
   const co2 = m.co2_emissions || m.co2_emissions_kg || {};
   const unserved = m.unserved_energy || m.unserved_energy_kwh || {};
   const battViol = m.battery_reserve_violations || {};
@@ -205,7 +209,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <i className="fa-solid fa-dollar-sign text-amber-500"></i>
+                <i className="fa-solid fa-indian-rupee-sign text-amber-500"></i>
                 Fuel &amp; Logistics Cost
               </span>
               <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -214,15 +218,15 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
             </div>
             <div className="flex items-baseline justify-between mt-1">
               <div>
-                <span className="text-[9px] text-slate-400 block font-medium">Baseline ($3.00/L delivered)</span>
+                <span className="text-[9px] text-slate-400 block font-medium">Baseline (₹250/L delivered)</span>
                 <span className="text-sm font-mono font-bold text-slate-600 line-through">
-                  ${(cost.baseline || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  ₹{baseCostInr >= 100000 ? `${(baseCostInr / 100000).toFixed(2)}L` : baseCostInr.toLocaleString()}
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-[9px] text-[#127694] block font-bold">PolarOPS Total Cost</span>
                 <span className="text-xl font-mono font-black text-[#127694]">
-                  ${(cost.polarops || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  ₹{polarCostInr >= 100000 ? `${(polarCostInr / 100000).toFixed(2)}L` : polarCostInr.toLocaleString()}
                 </span>
               </div>
             </div>
@@ -230,7 +234,7 @@ export default function EvaluationSection({ stationId = 'MAITRI', latestData, on
           <div className="mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-semibold text-slate-600 flex justify-between">
             <span>Cost Reduction:</span>
             <strong className="text-emerald-700 font-mono">
-              ${(cost.saved || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} saved
+              ₹{savedCostInr.toLocaleString()} ({savedCostInr >= 100000 ? `₹${(savedCostInr / 100000).toFixed(2)}L` : 'saved'})
             </strong>
           </div>
         </div>

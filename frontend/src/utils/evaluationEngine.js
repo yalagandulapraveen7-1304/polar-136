@@ -214,13 +214,16 @@ export function calculateBaselineComparison(stationId = 'MAITRI', horizon = '24h
       },
       operating_cost: {
         metric_name: 'Fuel / Operating Cost',
-        unit: 'USD ($)',
-        baseline: Math.round(baseCostUsd * 100) / 100,
-        polarops: Math.round(polarCostUsd * 100) / 100,
-        saved: Math.round(costSavedUsd * 100) / 100,
+        unit: 'INR (₹)',
+        baseline: Math.round(baseCostUsd * 83.5),
+        polarops: Math.round(polarCostUsd * 83.5),
+        saved: Math.round(costSavedUsd * 83.5),
         improvement_pct: costSavingsPct,
-        delivered_fuel_rate: '$3.00/L',
-        interpretation: `$${costSavedUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })} USD logistics and maintenance savings (-${costSavingsPct}%)`
+        delivered_fuel_rate: '₹250/L',
+        baseline_usd: Math.round(baseCostUsd * 100) / 100,
+        polarops_usd: Math.round(polarCostUsd * 100) / 100,
+        saved_usd: Math.round(costSavedUsd * 100) / 100,
+        interpretation: `₹${Math.round(costSavedUsd * 83.5).toLocaleString()} (₹${((costSavedUsd * 83.5) / 100000).toFixed(2)} Lakhs) logistics and maintenance savings (-${costSavingsPct}%)`
       },
       co2_emissions: {
         metric_name: 'CO₂ Emissions',

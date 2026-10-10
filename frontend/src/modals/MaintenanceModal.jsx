@@ -272,7 +272,7 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                 Microgrid Asset Sizing Sweep &amp; CapEx Payback Matrix
               </span>
               <p className="text-slate-600 leading-relaxed">
-                Evaluating station upgrade scenarios with delivered Antarctic fuel cost of <strong>$3.00 / Liter</strong>. Double Solar achieves payback in just <strong>1.01 years</strong> ($106K annual savings for $108K CapEx), while Double Wind yields <strong>1.58 years</strong> payback with 192,829 L saved annually.
+                Evaluating station upgrade scenarios with delivered Antarctic fuel cost of <strong>₹250 / Liter</strong>. Double Solar achieves payback in just <strong>1.01 years</strong> (₹88.5L annual savings for ₹90.2L CapEx), while Double Wind yields <strong>1.58 years</strong> payback with 192,829 L saved annually.
               </p>
             </div>
 
@@ -283,9 +283,9 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                     <th className="p-2.5">Architecture Scenario</th>
                     <th className="p-2.5">Wind / Solar / BESS</th>
                     <th className="p-2.5">Annual Fuel Saved</th>
-                    <th className="p-2.5">Annual Cost Saved</th>
+                    <th className="p-2.5">Annual Cost Saved (₹)</th>
                     <th className="p-2.5">CO₂ Avoided</th>
-                    <th className="p-2.5">Incremental CapEx</th>
+                    <th className="p-2.5">Incremental CapEx (₹)</th>
                     <th className="p-2.5">Payback Period</th>
                   </tr>
                 </thead>
@@ -294,45 +294,45 @@ export default function MaintenanceModal({ isOpen, onClose, latestData }) {
                     <td className="p-2.5 font-bold">Current Baseline</td>
                     <td className="p-2.5">100 kW / 60 kW / 400 kWh</td>
                     <td className="p-2.5 font-bold text-emerald-600">119,003 L</td>
-                    <td className="p-2.5 font-bold text-[#127694]">$357,009</td>
+                    <td className="p-2.5 font-bold text-[#127694]">₹2.98 Cr</td>
                     <td className="p-2.5">318.9 T</td>
-                    <td className="p-2.5">$0</td>
+                    <td className="p-2.5">₹0</td>
                     <td className="p-2.5 font-bold text-emerald-600">Immediate</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-amber-50/40">
                     <td className="p-2.5 font-bold text-amber-900">Double Solar (120 kW)</td>
                     <td className="p-2.5">100 kW / 120 kW / 400 kWh</td>
                     <td className="p-2.5 font-bold text-emerald-600">154,631 L</td>
-                    <td className="p-2.5 font-bold text-[#127694]">$463,894</td>
+                    <td className="p-2.5 font-bold text-[#127694]">₹3.87 Cr</td>
                     <td className="p-2.5">414.4 T</td>
-                    <td className="p-2.5 text-slate-800">$108,000</td>
+                    <td className="p-2.5 text-slate-800">₹90.2 Lakhs</td>
                     <td className="p-2.5 font-bold text-emerald-700">1.01 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-[#f0faff]/60">
                     <td className="p-2.5 font-bold text-[#127694]">Double Wind (200 kW)</td>
                     <td className="p-2.5">200 kW / 60 kW / 400 kWh</td>
                     <td className="p-2.5 font-bold text-emerald-600">192,829 L</td>
-                    <td className="p-2.5 font-bold text-[#127694]">$578,486</td>
+                    <td className="p-2.5 font-bold text-[#127694]">₹4.83 Cr</td>
                     <td className="p-2.5">516.8 T</td>
-                    <td className="p-2.5 text-slate-800">$350,000</td>
+                    <td className="p-2.5 text-slate-800">₹2.92 Crores</td>
                     <td className="p-2.5 font-bold text-[#0699C6]">1.58 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-emerald-50/50">
                     <td className="p-2.5 font-bold text-emerald-900">Double All Renewables</td>
                     <td className="p-2.5">200 kW / 120 kW / 800 kWh</td>
                     <td className="p-2.5 font-bold text-emerald-600">220,166 L</td>
-                    <td className="p-2.5 font-bold text-[#127694]">$660,499</td>
+                    <td className="p-2.5 font-bold text-[#127694]">₹5.51 Cr</td>
                     <td className="p-2.5">590.0 T</td>
-                    <td className="p-2.5 text-slate-800">$618,000</td>
+                    <td className="p-2.5 text-slate-800">₹5.16 Crores</td>
                     <td className="p-2.5 font-bold text-emerald-700">2.04 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans text-slate-400">
                     <td className="p-2.5">No Renewables (Diesel Only)</td>
                     <td className="p-2.5">0 kW / 0 kW / 0 kWh</td>
                     <td className="p-2.5 text-rose-600">-641 L</td>
-                    <td className="p-2.5 text-rose-600">-$1,922</td>
+                    <td className="p-2.5 text-rose-600">-₹1.6 Lakhs</td>
                     <td className="p-2.5">-1.7 T</td>
-                    <td className="p-2.5">-$618,000</td>
+                    <td className="p-2.5">-₹5.16 Cr</td>
                     <td className="p-2.5 text-slate-400">Infinite</td>
                   </tr>
                 </tbody>

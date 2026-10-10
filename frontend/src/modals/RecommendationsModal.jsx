@@ -700,7 +700,7 @@ export default function RecommendationsModal({ isOpen, onClose, latestData, stat
                     <i className="fa-solid fa-car-battery text-[#0699C6]"></i>
                     BESS Capacity Sweeps (300 to 600 kWh) &amp; Economics
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">Delivered Fuel Cost: $3.00/L</span>
+                  <span className="text-[10px] text-slate-400 font-mono">Delivered Fuel Cost: ₹250/L</span>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -711,7 +711,7 @@ export default function RecommendationsModal({ isOpen, onClose, latestData, stat
                         <th className="py-2.5 px-3">Unserved (kWh)</th>
                         <th className="py-2.5 px-3">Curtailed (kWh)</th>
                         <th className="py-2.5 px-3">Fuel Saved (L)</th>
-                        <th className="py-2.5 px-3">CapEx (USD)</th>
+                        <th className="py-2.5 px-3">CapEx (₹)</th>
                         <th className="py-2.5 px-3">Payback</th>
                         <th className="py-2.5 px-3">Bottleneck Assessment</th>
                       </tr>
@@ -732,7 +732,7 @@ export default function RecommendationsModal({ isOpen, onClose, latestData, stat
                           </td>
                           <td className="py-2.5 px-3 font-mono">{row.curtailed_kwh.toLocaleString()}</td>
                           <td className="py-2.5 px-3 font-mono text-emerald-800 font-bold">{row.fuel_saved_l.toLocaleString()} L</td>
-                          <td className="py-2.5 px-3 font-mono">${row.capex_usd.toLocaleString()}</td>
+                          <td className="py-2.5 px-3 font-mono font-bold text-slate-800">₹{((row.capex_usd * 83.5) / 100000).toFixed(0)} Lakhs</td>
                           <td className="py-2.5 px-3 font-bold text-slate-800">{row.payback_years} Years</td>
                           <td className="py-2.5 px-3">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${

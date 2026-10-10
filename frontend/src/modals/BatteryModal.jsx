@@ -591,7 +591,7 @@ export default function BatteryModal({
                     </span>
                     <p className="text-xs text-slate-700 leading-relaxed mt-0.5">
                       {sizingData?.key_engineering_takeaway || (
-                        "Increasing battery capacity alone produces negligible return (+0.04% fuel saved) because the 80 kW inverter restricts discharge power. Upgrading inverter power to 120 kW unlocks an additional $51,268/yr by eliminating renewable curtailment and enabling peak shaving."
+                        "Increasing battery capacity alone produces negligible return (+0.04% fuel saved) because the 80 kW inverter restricts discharge power. Upgrading inverter power to 120 kW unlocks an additional ₹42.8 Lakhs/yr by eliminating renewable curtailment and enabling peak shaving."
                       )}
                     </p>
                   </div>
@@ -606,7 +606,7 @@ export default function BatteryModal({
                       <th className="pb-2.5">Configuration</th>
                       <th className="pb-2.5">Battery</th>
                       <th className="pb-2.5">Inverter</th>
-                      <th className="pb-2.5">Annual Savings</th>
+                      <th className="pb-2.5">Annual Savings (₹)</th>
                       <th className="pb-2.5">Diesel Red.</th>
                       <th className="pb-2.5">Curtailment</th>
                       <th className="pb-2.5">Payback</th>
@@ -623,7 +623,7 @@ export default function BatteryModal({
                         <td className="py-3 font-mono text-[#127694] font-bold">{cfg.battery_kwh} kWh</td>
                         <td className="py-3 font-mono text-[#0699C6] font-bold">{cfg.inverter_kw} kW</td>
                         <td className="py-3 font-mono font-black text-emerald-600">
-                          ${cfg.annual_savings_usd.toLocaleString()}
+                          ₹{cfg.annual_savings_inr ? (cfg.annual_savings_inr / 100000).toFixed(1) : ((cfg.annual_savings_usd * 83.5) / 100000).toFixed(1)} Lakhs
                         </td>
                         <td className="py-3 font-bold text-slate-700">{cfg.diesel_reduction_pct}%</td>
                         <td className="py-3 font-mono text-slate-500">{cfg.curtailment_kwh.toLocaleString()} kWh</td>
@@ -651,8 +651,8 @@ export default function BatteryModal({
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-mono text-xs font-black text-emerald-800">
-                  <span>Marginal CapEx: $35,000</span>
-                  <span>Marginal Savings: +$51,268/yr</span>
+                  <span>Marginal CapEx: ₹29.2 Lakhs</span>
+                  <span>Marginal Savings: +₹42.8 Lakhs/yr</span>
                   <span className="bg-emerald-200 px-2 py-0.5 rounded-md">Payback: 0.68 Years</span>
                 </div>
               </div>

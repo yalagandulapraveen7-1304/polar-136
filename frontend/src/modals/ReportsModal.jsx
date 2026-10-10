@@ -91,12 +91,16 @@ export default function ReportsModal({
   };
 
   const costRaw = rawMetrics.operating_cost || rawMetrics.operating_cost_usd || {};
+  const isCostInr = costRaw.unit?.includes('INR') || costRaw.unit?.includes('₹') || (costRaw.baseline && costRaw.baseline > 50000);
   const costMetric = {
     baseline: costRaw.baseline !== undefined ? costRaw.baseline : (reportPeriod === '30d' ? 115500 : reportPeriod === '7d' ? 27600 : 4140),
     polarops: costRaw.polarops !== undefined ? costRaw.polarops : (reportPeriod === '30d' ? 85200 : reportPeriod === '7d' ? 20250 : 3036),
     saved_usd: costRaw.saved_usd !== undefined ? costRaw.saved_usd : (costRaw.saved !== undefined ? costRaw.saved : (reportPeriod === '30d' ? 30300 : reportPeriod === '7d' ? 7350 : 1104)),
     improvement_pct: costRaw.improvement_pct !== undefined ? costRaw.improvement_pct : 26.6,
-    unit: costRaw.unit || 'USD'
+    unit: 'INR (₹)',
+    baseline_inr: isCostInr ? costRaw.baseline : Math.round((costRaw.baseline !== undefined ? costRaw.baseline : (reportPeriod === '30d' ? 115500 : reportPeriod === '7d' ? 27600 : 4140)) * 83.5),
+    polarops_inr: isCostInr ? costRaw.polarops : Math.round((costRaw.polarops !== undefined ? costRaw.polarops : (reportPeriod === '30d' ? 85200 : reportPeriod === '7d' ? 20250 : 3036)) * 83.5),
+    saved_inr: isCostInr ? costRaw.saved : Math.round((costRaw.saved_usd !== undefined ? costRaw.saved_usd : (costRaw.saved !== undefined ? costRaw.saved : (reportPeriod === '30d' ? 30300 : reportPeriod === '7d' ? 7350 : 1104))) * 83.5)
   };
 
   const co2Raw = rawMetrics.co2_emissions || rawMetrics.co2_emissions_kg || {};
@@ -362,7 +366,7 @@ export default function ReportsModal({
 
     const items = [
       { label: 'Diesel Fuel (Liters)', base: met.fuel_consumption_liters?.baseline || 1380, opt: met.fuel_consumption_liters?.polarops || 1012, unit: 'L', saved: met.fuel_consumption_liters?.improvement_pct || 26.6 },
-      { label: 'Operating Cost ($ USD)', base: met.operating_cost_usd?.baseline || 4140, opt: met.operating_cost_usd?.polarops || 3036, unit: '$', saved: met.operating_cost_usd?.improvement_pct || 26.6 },
+      { label: 'Operating Cost (₹ INR)', base: Math.round((met.operating_cost_usd?.baseline_inr || (met.operating_cost_usd?.baseline || 4140) * 83.5)), opt: Math.round((met.operating_cost_usd?.polarops_inr || (met.operating_cost_usd?.polarops || 3036) * 83.5)), unit: '₹', saved: met.operating_cost_usd?.improvement_pct || 26.6 },
       { label: 'CO₂ Emissions (kg)', base: met.co2_emissions_kg?.baseline || 3698, opt: met.co2_emissions_kg?.polarops || 2712, unit: 'kg', saved: met.co2_emissions_kg?.improvement_pct || 26.6 },
       { label: 'Renewable Penetration', base: met.renewable_penetration_pct?.baseline || 0.0, opt: met.renewable_penetration_pct?.polarops || 44.8, unit: '%', isGain: true }
     ];
@@ -432,10 +436,12 @@ export default function ReportsModal({
     const fuelPolar = (metrics.fuel_consumption_liters?.polarops || 0).toLocaleString();
     const fuelBase = (metrics.fuel_consumption_liters?.baseline || 0).toLocaleString();
 
-    const costSaved = (metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 0).toLocaleString();
+    const costSavedRaw = metrics.operating_cost_usd?.saved_inr || Math.round((metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 0) * 83.5);
+    const costSaved = costSavedRaw.toLocaleString();
+    const costSavedLakhs = (costSavedRaw / 100000).toFixed(2);
     const costPct = metrics.operating_cost_usd?.improvement_pct || 0;
-    const costPolar = (metrics.operating_cost_usd?.polarops || 0).toLocaleString();
-    const costBase = (metrics.operating_cost_usd?.baseline || 0).toLocaleString();
+    const costPolar = Math.round(metrics.operating_cost_usd?.polarops_inr || (metrics.operating_cost_usd?.polarops || 0) * 83.5).toLocaleString();
+    const costBase = Math.round(metrics.operating_cost_usd?.baseline_inr || (metrics.operating_cost_usd?.baseline || 0) * 83.5).toLocaleString();
 
     const co2Saved = (metrics.co2_emissions_kg?.saved_kg || metrics.co2_emissions_kg?.saved || 0).toLocaleString();
     const co2Pct = metrics.co2_emissions_kg?.improvement_pct || 0;
@@ -766,12 +772,12 @@ export default function ReportsModal({
     <div class="kpi-card">
       <div class="kpi-label">
         <span>Operating Cost Saved</span>
-        <span class="val-primary">@ $3.00/L</span>
+        <span class="val-primary">@ ₹250/L</span>
       </div>
-      <div class="kpi-val val-primary">$${costSaved} <span style="font-size: 12px; color: #64748b;">USD</span></div>
+      <div class="kpi-val val-primary">₹${costSavedLakhs} <span style="font-size: 12px; color: #64748b;">Lakhs</span></div>
       <div class="kpi-sub">
         <span>Avoided: +${costPct}%</span>
-        <span class="val-positive">Audited</span>
+        <span class="val-positive">₹${costSaved}</span>
       </div>
     </div>
 
@@ -881,9 +887,9 @@ export default function ReportsModal({
       </tr>
       <tr>
         <td><strong>Fuel &amp; Operating Cost</strong></td>
-        <td class="mono">$${costBase} USD</td>
-        <td class="mono val-positive"><strong>$${costPolar} USD</strong></td>
-        <td class="mono val-positive">-$${costSaved} USD</td>
+        <td class="mono">₹${costBase}</td>
+        <td class="mono val-positive"><strong>₹${costPolar}</strong></td>
+        <td class="mono val-positive">-₹${costSaved}</td>
         <td><span class="badge badge-green">+${costPct}%</span></td>
       </tr>
       <tr>
@@ -1205,10 +1211,10 @@ export default function ReportsModal({
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-2xl font-black text-[#127694] font-mono">
-                      ₹{(((metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104) * 83.5) / 100000).toFixed(2)} Lakhs
+                      ₹{(((metrics.operating_cost_usd?.saved_inr || (metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104) * 83.5)) / 100000).toFixed(2)} Lakhs
                     </span>
                     <span className="text-xs font-bold text-slate-500 font-mono">
-                      (${(metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104).toLocaleString()})
+                      (₹{Math.round(metrics.operating_cost_usd?.saved_inr || (metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 1104) * 83.5).toLocaleString()})
                     </span>
                   </div>
                   <div className="pt-1 border-t border-slate-100 text-[11px] text-slate-500 flex justify-between">
@@ -1371,9 +1377,9 @@ export default function ReportsModal({
                       {/* Fuel & Operating Cost */}
                       <tr className="hover:bg-[#f8fcfe]">
                         <td className="py-3 px-3 font-sans font-bold text-slate-800">Delivered Fuel &amp; Operating Cost</td>
-                        <td className="py-3 px-3 text-slate-600">${(metrics.operating_cost_usd?.baseline || 0).toLocaleString()}</td>
-                        <td className="py-3 px-3 font-bold text-emerald-700">${(metrics.operating_cost_usd?.polarops || 0).toLocaleString()}</td>
-                        <td className="py-3 px-3 text-emerald-600">-${(metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 0).toLocaleString()}</td>
+                        <td className="py-3 px-3 text-slate-600">₹{Math.round(metrics.operating_cost_usd?.baseline_inr || (metrics.operating_cost_usd?.baseline || 0) * 83.5).toLocaleString()}</td>
+                        <td className="py-3 px-3 font-bold text-emerald-700">₹{Math.round(metrics.operating_cost_usd?.polarops_inr || (metrics.operating_cost_usd?.polarops || 0) * 83.5).toLocaleString()}</td>
+                        <td className="py-3 px-3 text-emerald-600">-₹{Math.round(metrics.operating_cost_usd?.saved_inr || (metrics.operating_cost_usd?.saved_usd || metrics.operating_cost_usd?.saved || 0) * 83.5).toLocaleString()}</td>
                         <td className="py-3 px-3 font-sans font-bold text-emerald-700">
                           <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                             +{metrics.operating_cost_usd?.improvement_pct || 0}%

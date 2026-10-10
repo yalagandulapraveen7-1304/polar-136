@@ -370,12 +370,12 @@ class PolarBatteryManager:
             "key_engineering_takeaway": (
                 "Increasing battery capacity alone (Config B) produces negligible return (+0.04% fuel saved) "
                 "because the 80 kW inverter restricts discharge power. Upgrading inverter power (Config C) "
-                "unlocks an additional $51,268/yr by eliminating renewable curtailment and enabling peak shaving."
+                "unlocks an additional ₹42.8 Lakhs/yr by eliminating renewable curtailment and enabling peak shaving."
             ),
             "recommendation_summary": {
                 "preferred_upgrade": "CONFIG_C (400 kWh + 120 kW Inverter)",
-                "marginal_capex": "$35,000 USD",
-                "marginal_annual_savings": "$51,268 USD/yr",
+                "marginal_capex": "₹29.2 Lakhs",
+                "marginal_annual_savings": "₹42.8 Lakhs/yr",
                 "payback_on_upgrade": "0.68 Years"
             }
         }

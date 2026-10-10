@@ -201,19 +201,19 @@ export function generateCopilotResponse(query, stationId = 'MAITRI', latestData 
     };
   }
 
-  // $356K Savings Benchmark
-  if (qLower.includes('saving') || qLower.includes('benchmark') || qLower.includes('356') || qLower.includes('baseline') || qLower.includes('cost saved') || qLower.includes('litres saved')) {
+  // Savings Benchmark (₹2.98 Crores / ₹298 Lakhs)
+  if (qLower.includes('saving') || qLower.includes('benchmark') || qLower.includes('356') || qLower.includes('298') || qLower.includes('baseline') || qLower.includes('cost saved') || qLower.includes('litres saved')) {
     return {
       answer: `VERIFIED FUEL & COST SAVINGS BENCHMARK — ${station.name.toUpperCase()}:\n\n` +
         `• Annual Diesel Burn (Baseline): 471,631 Litres\n` +
         `• Annual Diesel Burn (Optimized): 352,628 Litres\n` +
         `• Net Diesel Saved Annually: 118,994 Litres (-25.2% reduction)\n` +
-        `• Financial Logistics Savings: $356,982 USD / year (at $3.00/L delivered Antarctic fuel cost)\n` +
+        `• Financial Logistics Savings: ₹2.98 Crores / year (₹298.1 Lakhs at ₹250/L delivered Antarctic fuel cost)\n` +
         `• Carbon Emissions Avoided: 318.9 Tonnes CO2 avoided annually\n` +
         `• Recommended Tank Sizing: 405,522 L with +52,895 L reserve margin (eradicates historical -66,098 L deficit)\n` +
         `• Primary Savings Drivers: Predictive LightGBM renewable absorption, BESS peak shaving, and 70+ kWth CHP waste-heat recovery.`,
-      evidence: `Grounded in Project A validated 8,760-hour polar dispatch simulation and master scenario comparison data.`,
-      impact: `Eliminates fuel starvation risk while saving over $350K in air and sea tanker replenishment logistics per station year.`,
+      evidence: `Grounded in validated 8,760-hour polar dispatch simulation and master scenario comparison data.`,
+      impact: `Eliminates fuel starvation risk while saving over ₹2.9 Crores (₹298 Lakhs) in air and sea replenishment logistics per station year.`,
       recommendation: `Maintain autonomous MILP scheduling to maximize renewable penetration and preserve verified savings.`,
       sources: ['Project A Sizing Engine', 'Master Scenario Comparison', 'HiGHS Annual Simulation Archive'],
       action_card: null,
@@ -426,7 +426,7 @@ export function generateCopilotResponse(query, stationId = 'MAITRI', latestData 
         `• Peak Load Requirement: 412 kW with single 300 kW generator\n` +
         `• Bottleneck Deficit: 112 kW required discharge exceeds 80 kW inverter rating by 32 kW\n` +
         `• Recommended Engineering Upgrade: 120 kW Power Conversion System (PCS) + 500 kWh BESS\n` +
-        `• Projected CapEx: $250,000 | Payback Period: 3.7 Years | Annual Diesel Saved: 132,400 L ($397,200/yr)`,
+        `• Projected CapEx: ₹2.09 Crores (₹209 Lakhs) | Payback Period: 3.7 Years | Annual Diesel Saved: 132,400 L (₹3.31 Cr/yr)`,
       evidence: `Digital Twin peak dispatch simulations indicate that during 412 kW spikes, battery discharge is capped at 80 kW, forcing secondary diesel generator ignition.`,
       impact: `Upgrading to a 120 kW inverter allows full battery peak shaving and saves an additional 13,406 L of fuel annually.`,
       recommendation: `Plan 120 kW inverter upgrade during the next summer Antarctic expedition logistical rotation.`,

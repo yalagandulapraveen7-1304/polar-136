@@ -981,13 +981,16 @@ class PolarScenarioControlEngine:
                 },
                 "operating_cost": {
                     "metric_name": "Fuel / Operating Cost",
-                    "unit": "USD ($)",
-                    "baseline": round(base_cost_usd, 2),
-                    "polarops": round(polar_cost_usd, 2),
-                    "saved": round(cost_saved_usd, 2),
+                    "unit": "INR (₹)",
+                    "baseline": round(base_cost_usd * 83.5, 2),
+                    "polarops": round(polar_cost_usd * 83.5, 2),
+                    "saved": round(cost_saved_usd * 83.5, 2),
                     "improvement_pct": cost_savings_pct,
-                    "delivered_fuel_rate": "$3.00/L",
-                    "interpretation": f"${cost_saved_usd:,.2f} USD logistics and maintenance savings (-{cost_savings_pct}%)"
+                    "delivered_fuel_rate": "₹250/L",
+                    "baseline_usd": round(base_cost_usd, 2),
+                    "polarops_usd": round(polar_cost_usd, 2),
+                    "saved_usd": round(cost_saved_usd, 2),
+                    "interpretation": f"₹{cost_saved_usd * 83.5:,.0f} (₹{(cost_saved_usd * 83.5)/100000:.2f} Lakhs) logistics and maintenance savings (-{cost_savings_pct}%)"
                 },
                 "co2_emissions": {
                     "metric_name": "CO₂ Emissions",

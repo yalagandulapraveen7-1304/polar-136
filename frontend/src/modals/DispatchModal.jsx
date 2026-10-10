@@ -441,8 +441,8 @@ export default function DispatchModal({
                 </div>
                 <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
                   <span className="text-[9px] font-bold text-slate-400 uppercase block">Delivered Cost Saved</span>
-                  <div className="text-lg font-black text-[#127694]">$356,982 USD</div>
-                  <span className="text-[9px] text-slate-500">$3.00/L logistics cost</span>
+                  <div className="text-lg font-black text-[#127694]">₹2.98 Crores</div>
+                  <span className="text-[9px] text-slate-500">₹250/L logistics cost (₹298L)</span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white border border-[#bcecfc] shadow-xs">
                   <span className="text-[9px] font-bold text-slate-400 uppercase block">Tank Margin</span>
@@ -475,15 +475,15 @@ export default function DispatchModal({
             <div className="rounded-2xl border border-[#bcecfc] overflow-hidden">
               <div className="p-2.5 bg-[#f0faff] border-b border-[#bcecfc] flex items-center justify-between text-xs">
                 <span className="font-extrabold text-[#127694]">Infrastructure Sizing Sweeps &amp; CapEx Payback</span>
-                <span className="text-[10px] text-slate-500">Delivered Fuel Cost: $3.00/L</span>
+                <span className="text-[10px] text-slate-500">Delivered Fuel Cost: ₹250/L</span>
               </div>
               <table className="w-full text-xs text-left font-mono">
                 <thead className="bg-white text-slate-500 font-bold border-b border-slate-100 font-sans">
                   <tr>
                     <th className="p-2">Architecture</th>
                     <th className="p-2">Renewables / BESS</th>
-                    <th className="p-2">Annual Savings</th>
-                    <th className="p-2">CapEx</th>
+                    <th className="p-2">Annual Savings (₹)</th>
+                    <th className="p-2">CapEx (₹)</th>
                     <th className="p-2">Payback Period</th>
                   </tr>
                 </thead>
@@ -491,29 +491,29 @@ export default function DispatchModal({
                   <tr className="hover:bg-slate-50 font-sans">
                     <td className="p-2 font-bold">Current Baseline</td>
                     <td className="p-2">100 kW / 60 kW / 400 kWh</td>
-                    <td className="p-2 font-bold text-emerald-600">119,003 L ($357K)</td>
-                    <td className="p-2 font-mono">$0</td>
+                    <td className="p-2 font-bold text-emerald-600">119,003 L (₹2.98 Cr)</td>
+                    <td className="p-2 font-mono">₹0</td>
                     <td className="p-2 font-bold text-emerald-600">Immediate</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-amber-50/50">
                     <td className="p-2 font-bold text-amber-900">Double Solar (120 kW)</td>
                     <td className="p-2">100 kW / 120 kW / 400 kWh</td>
-                    <td className="p-2 font-bold text-emerald-600">154,631 L ($464K)</td>
-                    <td className="p-2 font-mono text-slate-800">$108,000</td>
+                    <td className="p-2 font-bold text-emerald-600">154,631 L (₹3.87 Cr)</td>
+                    <td className="p-2 font-mono text-slate-800">₹90.2 Lakhs</td>
                     <td className="p-2 font-bold text-emerald-700">1.01 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-[#f0faff]">
                     <td className="p-2 font-bold text-[#127694]">Double Wind (200 kW)</td>
                     <td className="p-2">200 kW / 60 kW / 400 kWh</td>
-                    <td className="p-2 font-bold text-emerald-600">192,829 L ($578K)</td>
-                    <td className="p-2 font-mono text-slate-800">$350,000</td>
+                    <td className="p-2 font-bold text-emerald-600">192,829 L (₹4.83 Cr)</td>
+                    <td className="p-2 font-mono text-slate-800">₹2.92 Crores</td>
                     <td className="p-2 font-bold text-[#0699C6]">1.58 Years</td>
                   </tr>
                   <tr className="hover:bg-slate-50 font-sans bg-emerald-50/50">
                     <td className="p-2 font-bold text-emerald-900">Double All Renewables</td>
                     <td className="p-2">200 kW / 120 kW / 800 kWh</td>
-                    <td className="p-2 font-bold text-emerald-600">220,166 L ($660K)</td>
-                    <td className="p-2 font-mono text-slate-800">$618,000</td>
+                    <td className="p-2 font-bold text-emerald-600">220,166 L (₹5.51 Cr)</td>
+                    <td className="p-2 font-mono text-slate-800">₹5.16 Crores</td>
                     <td className="p-2 font-bold text-emerald-700">2.04 Years</td>
                   </tr>
                 </tbody>
