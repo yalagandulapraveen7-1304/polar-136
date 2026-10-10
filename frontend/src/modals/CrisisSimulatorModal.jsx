@@ -293,6 +293,8 @@ export default function CrisisSimulatorModal({
   const totalFiscalSavingsLakhs = ((directFuelSavingsInr + helicopterSavingsInr) / 100000).toFixed(1);
 
   // Environmental Madrid Protocol CO2 abatement
+  const co2AbatementTonnes = ((fuelSavedLiters * 2.68) / 1000).toFixed(1); // 2.68 kg CO2 per liter of polar diesel
+
   // Dynamic color palette based on theme (Light by default, dark in Aurora Night)
   const cardStrokeDefault = isDark ? '#1e385c' : '#bcecfc';
   const cardTextTitle = isDark ? '#ffffff' : '#0f172a';
