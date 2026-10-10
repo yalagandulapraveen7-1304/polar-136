@@ -36,24 +36,6 @@ export const STATIONS = {
     genset2Capacity: 120.0,
     minLoadPct: 0.35,
     criticalLoadKw: 20.0
-  },
-  COASTAL75S: {
-    id: 'COASTAL75S',
-    name: 'Coastal-75S Station',
-    locationText: "Coastal-75S Digital Twin • 75°00'S, 00°00'E (Queen Maud Land)",
-    crew: 40,
-    batteryCapacity: 400.0,
-    inverterRating: 80.0,
-    fuelCapacity: 405532.0,
-    windCapacity: 100.0,
-    solarCapacity: 60.0,
-    baseLoad: 179.0,
-    peakLoad: 457.0,
-    baseThermal: 120.0,
-    peakThermal: 268.0,
-    genset1Capacity: 300.0,
-    genset2Capacity: 200.0,
-    minLoadPct: 0.35,
-    criticalLoadKw: 20.0
   }
 };
+
